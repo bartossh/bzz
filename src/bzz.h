@@ -3,6 +3,6 @@
 #ifndef BZZ_H
 #define BZZ_H
 
-void dummy(void);
+void classify(void);
 
 #endif

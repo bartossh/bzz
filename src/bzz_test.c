@@ -10,13 +10,15 @@ void tearDown(void) {
 }
 
 static void
-testDummy(void) {}
+testClassify(void) {
+    classify();
+}
 
 int main(void)
 {
     UnityBegin("bzz_test.c");
 
-    RUN_TEST(testDummy);
+    RUN_TEST(testClassify);
    
     return UnityEnd();
 }
