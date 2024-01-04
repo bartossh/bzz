@@ -22,6 +22,9 @@
 //}
 
 
+#include <math.h>
+#include <time.h>
+
 #define GYM_IMPLEMENTATION
 #include "gym.h"
 
@@ -38,12 +41,12 @@ void verify_nn_gate(Font font, NN nn, Gym_Rect r)
 {
     char buffer[256];
     float s = r.h*0.025;
-    //float pad = r.h*0.01;
+    float pad = r.h*0.01;
     float f[5] = {0};
 
     for (size_t i = 0; i < 5; ++i) {
         for (size_t j = 0; j < 5; ++j) {
-            float v = 1.0f/(float)(j+1);
+            float v = 1.0f/(float)((i*j)+1);
             f[j] = v;
             ROW_AT(NN_INPUT(nn), j) = v;
         }
@@ -53,12 +56,13 @@ void verify_nn_gate(Font font, NN nn, Gym_Rect r)
             "%.3f, %.3f, %.3f, %.3f, %.3f == %.3f", 
             f[0], f[1], f[2], f[3], f[4], ROW_AT(NN_OUTPUT(nn), 0)
         );
-        DrawTextEx(font, buffer, CLITERAL(Vector2){r.x, r.y + i*s}, s, 0, WHITE);
+        DrawTextEx(font, buffer, CLITERAL(Vector2){r.x, r.y + i*(s+pad)}, s, 0, WHITE);
     }
 }
 
 int main(void)
 {
+    srand(time(NULL));
     Region temp = region_alloc_alloc(256*1024*1024);
 
     Mat t = mat_alloc(NULL, 20, 6);
@@ -121,13 +125,14 @@ int main(void)
             verify_nn_gate(font, nn, gym_layout_slot());
             gym_layout_end();
 
+            DrawText("Yellow from BZZ!", 5, 5, h*0.025, ORANGE);
             char buffer[256];
             snprintf(
                 buffer, sizeof(buffer), 
-                "BZZ! | Epoch: %zu/%zu, Rate: %f, Cost: %f, Temporary Memory: %zu bytes", 
+                " | Epoch: %zu/%zu, Rate: %f, Cost: %f, Temporary Memory: %zu bytes | ", 
                 epoch, max_epoch, rate, nn_cost(nn, t), region_occupied_bytes(&temp)
             );
-            DrawTextEx(font, buffer,CLITERAL(Vector2){.x = 10, .y = 10}, h*0.02, 0, WHITE);
+            DrawTextEx(font, buffer,CLITERAL(Vector2){.x = 30, .y = 30}, h*0.02, 0, WHITE);
         }
         EndDrawing();
 
