@@ -1,13 +1,16 @@
 # BZZ
 
+Bzz is to bzzzzz. I don't know why, what or when.
+
 ![BZZ Logo](https://github.com/bartossh/bzz/blob/main/artefacts/logo.png)
+
 
 ## Build / install dependencies
 
 BZZ depends on:
  
 - [Raylib](https://www.raylib.com/index.html) - raylib is a simple and easy-to-use library to enjoy videogames programming.
-- [Tsoding nn.h](https://github.com/tsoding/nn.h) - head-only library only Neural-Network.
+- [Tsoding nn.h](https://github.com/tsoding/nn.h) - head-only Neural-Network library.
 
 
 ### Raylib - build from source
@@ -46,22 +49,22 @@ This software is still in the beginning of development stage. Keep your expectat
 
 ### Testing 
 
- - When providing a new files add this  `*.c` files in `TFILES` in `makefile`.
- - Add test in *_test.c file and add it to `TFILES` in `makefile`.
- - Run `make test` to run all the tests. 
- - Run `make memcheck` tu run memcheck tests.
+ - When creating new files, add this  `*.c` files into `TFILES` in `makefile`.
+ - Create tests in `*_test.c` file, and add this file into `TFILES` in `makefile`.
+ - Run command: `make test`, to run all the tests.
+ - Run command: `make memcheck`, tu run memcheck tests.
 
 ### Running in development mode.
  
- - Add new `*.c` files with new functionalities to `CFILES` in `makefile` 
- - Run for development with `make run`.
+ - Add new `*.c` files with new functionalities to `CFILES` in `makefile`.
+ - For development run command: `make run`.
 
 ## Build
 
- - To build for your current machine OS and architecture use `make build`.
- - For now only MAC OS is supported.
+- To build for your current machine OS and architecture run command: `make build`.
+ - Now only MAC OS is supported, this will change.
 
 
 ## Idea
 
-Roll your :game_die: for what this repo will become.
+Roll your :game_die: for this repo becoming something of a value.
