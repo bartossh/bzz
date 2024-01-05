@@ -10,8 +10,6 @@ Bzz is to bzzzzz. I don't know why, what or when.
 BZZ depends on:
  
 - [Raylib](https://www.raylib.com/index.html) - raylib is a simple and easy-to-use library to enjoy videogames programming.
-- [Tsoding nn.h](https://github.com/tsoding/nn.h) - head-only Neural-Network library.
-
 
 ### Raylib - build from source
 
@@ -66,10 +64,6 @@ Roll your :game_die: for this repo becoming something of a value.
 
 ## Thanks and inspiration
 
- - Thanks to [rexim](https://github.com/rexim) for Tsoding/nn.h -> `https://github.com/tsoding/nn.h/blob/master/nn.h` an amazing Neural Network library and great streaming on how to code and hack things in `C`. I was truly inspired. I will blend this library in to my code.
+ - Thanks to [rexim](https://github.com/rexim) for Tsoding/nn.h -> `https://github.com/tsoding/nn.h/blob/master/nn.h` an amazing Neural Network library and great streaming on how to code and hack things in `C`. I was truly inspired. I will blend this library in to my code simply because of the project requirements.
  - [Lingon Studios](https://twitter.com/lingonstudios) for high level description of graphical design.
-
-
-
-
 
