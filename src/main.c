@@ -26,10 +26,10 @@
 #include <time.h>
 
 #define GYM_IMPLEMENTATION
-#include "gym.h"
+#include "nn/gym.h"
 
-#define NN_IMPLEMENTATION
-#include "nn.h"
+#include "nn/nn.h"
+#include "flowers/flowers.h"
 
 size_t arch[] = {5, 8, 1};
 const size_t max_epoch = 100*1000;
@@ -37,16 +37,16 @@ const size_t epochs_per_frame = 103;
 const float rate = 1.0f;
 bool paused = true;
 
-void verify_nn_gate(Font font, NN nn, Gym_Rect r)
+void verify_nn_gate(Font font, NN nn, Mat t, Gym_Rect r)
 {
     char buffer[256];
     float s = r.h*0.025;
     float pad = r.h*0.01;
     float f[5] = {0};
 
-    for (size_t i = 0; i < 5; ++i) {
+    for (size_t i = 0; i < 10; ++i) {
         for (size_t j = 0; j < 5; ++j) {
-            float v = 1.0f/(float)((i*j)+1);
+            float v = MAT_AT(t, i, j);
             f[j] = v;
             ROW_AT(NN_INPUT(nn), j) = v;
         }
@@ -65,13 +65,15 @@ int main(void)
     srand(time(NULL));
     Region temp = region_alloc_alloc(256*1024*1024);
 
-    Mat t = mat_alloc(NULL, 20, 6);
-    for (size_t row = 0; row < 20; ++row) {
-            for (size_t coll = 0; coll < 5; ++coll) {
-                MAT_AT(t, row, coll) = rand_float();
-        }
-        MAT_AT(t, row, 5) = rand_float() > 0.5f ? 0.0f : 1.0f;
-    }
+    //Mat t = mat_alloc(NULL, 20, 6);
+    //for (size_t row = 0; row < 20; ++row) {
+    //        for (size_t coll = 0; coll < 5; ++coll) {
+    //            MAT_AT(t, row, coll) = rand_float();
+    //    }
+    //    MAT_AT(t, row, 5) = rand_float() > 0.5f ? 1.0f : 0.0f;
+    //}
+    
+    Mat t = flowers_basic_matrix();
 
     NN nn = nn_alloc(NULL, arch, ARRAY_LEN(arch));
     nn_rand(nn, -1, 1);
@@ -122,7 +124,7 @@ int main(void)
             gym_layout_begin(GLO_HORZ, r, 3, 10);
             gym_plot(plot, gym_layout_slot(), RED);
             gym_render_nn(nn, gym_layout_slot());
-            verify_nn_gate(font, nn, gym_layout_slot());
+            verify_nn_gate(font, nn, t, gym_layout_slot());
             gym_layout_end();
 
             DrawText("Yellow from BZZ!", 5, 5, h*0.025, ORANGE);
