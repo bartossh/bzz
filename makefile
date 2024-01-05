@@ -21,10 +21,14 @@ SOURCE_LIBS = -Ilib
 OSX_OPT = -Llib -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL ./lib/libraylib.a
 
 CFILES = src/main.c
-CFILES += src/bzz.c
+CFILES += src/nn/nn.c
+CFILES += src/bee/bee.c
+CFILES += src/flowers/flowers.c
 
-TFILES = src/bzz_test.c
-TFILES += src/bzz.c
+TFILES = src/nn/nn.c
+TFILES += src/bee/bee.c
+TFILES += src/flowers/flowers.c
+TFILES += src/tests/tests.c
 
 .PHONY: run
 run: build
