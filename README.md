@@ -1,6 +1,6 @@
 # BZZ
 
-Bzz is to bzzzzz. I don't know why, what or when.
+Bzz is to bzzzzz. Teach your bee to bzzzzz safely.
 
 ![BZZ Logo](https://github.com/bartossh/bzz/blob/main/artefacts/logo.png)
 
