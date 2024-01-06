@@ -1,19 +1,19 @@
 #include "view.h"
 #include "raylib.h"
 
-PageMain page_main_new(const char *path)
+ViewMain viewMainNew(const char *path)
 {
     Image image = LoadImage(path);
     Texture2D logo = LoadTextureFromImage(image); 
     UnloadImage(image);
-    PageMain pm = {
+    ViewMain pm = {
         .logo = logo,
     };
 
     return pm;
 }
 
-void draw_main_page(PageMain m, Font font)
+void drawMainView(ViewMain m, Font font)
 {
     BeginDrawing(); 
         int h = GetScreenHeight();
@@ -24,7 +24,7 @@ void draw_main_page(PageMain m, Font font)
 }
 
 
-void cleanup_main_page(PageMain m)
+void cleanupMainView(ViewMain m)
 {
     UnloadTexture(m.logo);
 }

@@ -1,5 +1,5 @@
-#ifndef PAGE_H
-#define PAGE_H
+#ifndef VIEW_H
+#define VIEW_H
 
 #include <stdbool.h>
 #include "raylib.h"
@@ -9,16 +9,16 @@
 
 typedef struct {
     Texture2D logo;
-} PageMain;
+} ViewMain;
 
-/// page_nn_new return new PageMain.
+/// viewBeeNew return new ViewMain.
 ///
-PageMain page_main_new(const char *path);
+ViewMain viewMainNew(const char *path);
 
-// draw_main_page draws main page in to the screen.
-void draw_main_page(PageMain m, Font font);
+// drawMainView draws main page in to the screen.
+void drawMainView(ViewMain m, Font font);
 
-void cleanup_main_page(PageMain m);
+void cleanupMainView(ViewMain m);
 
 /// PageNN holds all the data required to properly update the nn page view.
 typedef struct {
@@ -32,17 +32,17 @@ typedef struct {
     FlowersDataset fl;
     Mat t;
     NN nn;
-    Gym_Plot plot;
-} PageBee;
+    GymPlot plot;
+} ViewBee;
 
-/// page_nn_new return new PageBee.
+/// viewBeeNew return new ViewBee.
 ///
-PageBee page_nn_new(void);
+ViewBee viewBeeNew(void);
 
-/// draw_nn_page draws PageNN in to the screen.
+/// drawBeeView draws PageNN in to the screen.
 ///
-void draw_nn_page(PageBee *bee, Font font);
+void drawBeeView(ViewBee *bee, Font font);
 
-#endif // !PAGE_H
+#endif
 
 

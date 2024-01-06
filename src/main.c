@@ -12,17 +12,17 @@ char screen = 'M';
 int main(void)
 {
     srand(time(NULL));
-    size_t WINDOW_FACTOR = 80;
-    size_t WINDOW_WIDTH = (16*WINDOW_FACTOR);
-    size_t WINDOW_HEIGHT = (9*WINDOW_FACTOR);
+    size_t WindowFactor = 80;
+    size_t WindowWidth = (16*WindowFactor);
+    size_t WindowHeight = (9*WindowFactor);
 
 
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "BZZ!");
+    InitWindow(WindowWidth, WindowHeight, "BZZ!");
 
-    PageMain m = page_main_new("./artefacts/logo.png");
-    PageBee bee = page_nn_new();
+    ViewMain m = viewMainNew("./artefacts/logo.png");
+    ViewBee bee = viewBeeNew();
 
     SetTargetFPS(60);
 
@@ -40,7 +40,7 @@ int main(void)
 
         switch (screen) {
         case 'M':
-            draw_main_page(m, font);
+            drawMainView(m, font);
             break;
         case 'B':
         default:
@@ -53,11 +53,12 @@ int main(void)
                 bee.reset = true;
             }
 
-            draw_nn_page(&bee, font);
+            drawBeeView(
+                    &bee, font);
             break;
         }
     }
-    cleanup_main_page(m);
+    cleanupMainView(m);
     CloseWindow();
 
     return 0;
