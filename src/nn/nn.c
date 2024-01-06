@@ -57,6 +57,7 @@ Mat mat_alloc(Region *r, size_t rows, size_t cols)
     Mat m;
     m.rows = rows;
     m.cols = cols;
+
     m.elements = region_alloc(r, sizeof(*m.elements)*rows*cols);
     NN_ASSERT(m.elements != NULL);
     return m;

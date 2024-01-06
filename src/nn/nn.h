@@ -25,6 +25,7 @@
 #ifndef NN_MALLOC
 #include <stdlib.h>
 #define NN_MALLOC malloc
+#define NN_FREE free
 #endif // NN_MALLOC
 
 #ifndef NN_ASSERT
@@ -136,20 +137,6 @@ typedef struct {
     float cost;
     bool finished;
 } Batch;
-
-void batch_process(Region *r, Batch *b, size_t batch_size, NN nn, Mat t, float rate);
-
-float sigmoidf(float x);
-
-float reluf(float x);
-
-float tanhf(float x);
-
-float dactf(float y, Act act);
-
-float rand_float(void);
-
-Mat mat_alloc(Region *r, size_t rows, size_t cols);
 
 #endif // NN_H_
 
