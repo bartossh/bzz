@@ -16,15 +16,18 @@ int main(void)
     size_t WINDOW_WIDTH = (16*WINDOW_FACTOR);
     size_t WINDOW_HEIGHT = (9*WINDOW_FACTOR);
 
+
+
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "BZZ!");
+
+    PageMain m = page_main_new("./artefacts/logo.png");
+    PageBee bee = page_nn_new();
+
     SetTargetFPS(60);
 
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
-
-    PageMain m = page_main_new("./artefacts/logo.png");
-    PageBee bee = page_nn_new();
 
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_B)) {
@@ -54,6 +57,8 @@ int main(void)
             break;
         }
     }
+    cleanup_main_page(m);
+    CloseWindow();
 
     return 0;
 }

@@ -18,6 +18,8 @@ PageMain page_main_new(const char *path);
 // draw_main_page draws main page in to the screen.
 void draw_main_page(PageMain m, Font font);
 
+void cleanup_main_page(PageMain m);
+
 /// PageNN holds all the data required to properly update the nn page view.
 typedef struct {
     size_t max_epoch;

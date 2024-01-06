@@ -101,7 +101,7 @@ void draw_nn_page(PageBee *bee, Font font)
         verify_nn_gate(font, bee->nn, bee->t, gym_layout_slot());
         gym_layout_end();
     
-        DrawText("Yellow from BZZ!", 5, 5, h*0.025, BLACK);
+        DrawText("Train your BEE!", 5, 5, h*0.025, GREEN);
         char buffer[256];
         snprintf(
             buffer, sizeof(buffer), 

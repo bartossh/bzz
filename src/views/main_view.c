@@ -4,7 +4,7 @@
 PageMain page_main_new(const char *path)
 {
     Image image = LoadImage(path);
-    Texture2D logo = LoadTextureFromImage(image);      // Image converted to texture, uploaded to GPU memory (VRAM)
+    Texture2D logo = LoadTextureFromImage(image); 
     UnloadImage(image);
     PageMain pm = {
         .logo = logo,
@@ -18,7 +18,13 @@ void draw_main_page(PageMain m, Font font)
     BeginDrawing(); 
         int h = GetScreenHeight();
         ClearBackground(DARKGREEN);
-        DrawTextEx(font, "Welcome from bzz!" ,CLITERAL(Vector2){.x = 30, .y = 30}, h*0.02, 0, ORANGE);
-        DrawTextureEx(m.logo, CLITERAL(Vector2){.x = 50, .y = 50}, 0.0f, h*0.4, DARKGREEN);
+        DrawTextEx(font, "Yellow from Bzz!" ,CLITERAL(Vector2){.x = 200, .y = 20}, h*0.03, 0, ORANGE);
+        DrawTextureV(m.logo, CLITERAL(Vector2){.x = 250, .y = 40}, ORANGE);
     EndDrawing();
+}
+
+
+void cleanup_main_page(PageMain m)
+{
+    UnloadTexture(m.logo);
 }
