@@ -8,7 +8,7 @@
 #include "nn.h"
 #include "gym.h"
 
-void gym_render_nn(NN nn, Gym_Rect r)
+void gymRenderNN(NN nn, GymRect r)
 {
     Color low_color = RED;
     Color high_color = DARKBLUE;
@@ -33,7 +33,7 @@ void gym_render_nn(NN nn, Gym_Rect r)
                     // j - cols of ws
                     float cx2 = nn_x + (l+1)*layer_hpad + layer_hpad/2;
                     float cy2 = nn_y + j*layer_vpad2 + layer_vpad2/2;
-                    float value = sigmoidf(MAT_AT(nn.ws[l], i, j));
+                    float value = sigmoidf(MatAt(nn.ws[l], i, j));
                     high_color.a = floorf(255.f*value);
                     float thick = r.h*0.004f;
                     Vector2 start = {cx1, cy1};
@@ -42,7 +42,7 @@ void gym_render_nn(NN nn, Gym_Rect r)
                 }
             }
             if (l > 0) {
-                high_color.a = floorf(255.f*sigmoidf(ROW_AT(nn.bs[l-1], i)));
+                high_color.a = floorf(255.f*sigmoidf(RowAt(nn.bs[l-1], i)));
                 DrawCircle(cx1, cy1, neuron_radius, ColorAlphaBlend(low_color, high_color, WHITE));
             } else {
                 DrawCircle(cx1, cy1, neuron_radius, GRAY);
@@ -51,7 +51,7 @@ void gym_render_nn(NN nn, Gym_Rect r)
     }
 }
 
-void gym_render_mat_as_heatmap(Mat m, Gym_Rect r, size_t max_width)
+void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width)
 {
     Color low_color = RED;
     Color high_color = DARKBLUE;
@@ -63,9 +63,9 @@ void gym_render_mat_as_heatmap(Mat m, Gym_Rect r, size_t max_width)
 
     for (size_t y = 0; y < m.rows; ++y) {
         for (size_t x = 0; x < m.cols; ++x) {
-            high_color.a = floorf(255.f*sigmoidf(MAT_AT(m, y, x)));
+            high_color.a = floorf(255.f*sigmoidf(MatAt(m, y, x)));
             Color color = ColorAlphaBlend(low_color, high_color, WHITE);
-            Gym_Rect slot = {
+            GymRect slot = {
                 r.x + r.w/2 - full_width/2 + x*cell_width,
                 r.y + y*cell_height,
                 cell_width,
@@ -76,7 +76,7 @@ void gym_render_mat_as_heatmap(Mat m, Gym_Rect r, size_t max_width)
     }
 }
 
-void gym_render_nn_weights_heatmap(NN nn, Gym_Rect r)
+void gymRenderNNWeightsHeatmap(NN nn, GymRect r)
 {
     size_t max_width = 0;
     for (size_t i = 0; i < nn.arch_count - 1; ++i) {
@@ -85,14 +85,14 @@ void gym_render_nn_weights_heatmap(NN nn, Gym_Rect r)
         }
     }
 
-    gym_layout_begin(GLO_VERT, r, nn.arch_count - 1, 20);
+    GymLayoutBegin(GloVert, r, nn.arch_count - 1, 20);
     for (size_t i = 0; i < nn.arch_count - 1; ++i) {
-        gym_render_mat_as_heatmap(nn.ws[i], gym_layout_slot(), max_width);
+        gymRenderMatAsHeatmap(nn.ws[i], GymLayoutSlot(), max_width);
     }
-    gym_layout_end();
+    GymLayoutEnd();
 }
 
-void gym_render_nn_activations_heatmap(NN nn, Gym_Rect r)
+void gymRenderNNActivationsHeatmap(NN nn, GymRect r)
 {
     size_t max_width = 0;
     for (size_t i = 0; i < nn.arch_count; ++i) {
@@ -101,14 +101,14 @@ void gym_render_nn_activations_heatmap(NN nn, Gym_Rect r)
         }
     }
 
-    gym_layout_begin(GLO_VERT, r, nn.arch_count, 20);
+    GymLayoutBegin(GloVert, r, nn.arch_count, 20);
     for (size_t i = 0; i < nn.arch_count; ++i) {
-        gym_render_mat_as_heatmap(row_as_mat(nn.as[i]), gym_layout_slot(), max_width);
+        gymRenderMatAsHeatmap(rowAsMat(nn.as[i]), GymLayoutSlot(), max_width);
     }
-    gym_layout_end();
+    GymLayoutEnd();
 }
 
-void gym_plot(Gym_Plot plot, Gym_Rect r, Color c)
+void gymPlot(GymPlot plot, GymRect r, Color c)
 {
     float min = FLT_MAX, max = FLT_MIN;
     for (size_t i = 0; i < plot.count; ++i) {
@@ -138,7 +138,7 @@ void gym_plot(Gym_Plot plot, Gym_Rect r, Color c)
     }
 }
 
-void gym_slider(float *value, bool *dragging, float rx, float ry, float rw, float rh)
+void gymSlider(float *value, bool *dragging, float rx, float ry, float rw, float rh)
 {
     float knob_radius = rh;
     Vector2 bar_size = {
@@ -176,17 +176,17 @@ void gym_slider(float *value, bool *dragging, float rx, float ry, float rw, floa
     }
 }
 
-void gym_nn_image_grayscale(NN nn, void *pixels, size_t width, size_t height, size_t stride, float low, float high)
+void gymNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_t stride, float low, float high)
 {
-    GYM_ASSERT(NN_INPUT(nn).cols >= 2);
-    GYM_ASSERT(NN_OUTPUT(nn).cols >= 1);
+    GYMAssert(NNInput(nn).cols >= 2);
+    GYMAssert(NNOutout(nn).cols >= 1);
     uint32_t *pixels_u32 = pixels;
     for (size_t y = 0; y < height; ++y) {
         for (size_t x = 0; x < width; ++x) {
-            ROW_AT(NN_INPUT(nn), 0) = (float)x/(float)(width - 1);
-            ROW_AT(NN_INPUT(nn), 1) = (float)y/(float)(height - 1);
-            nn_forward(nn);
-            float a = ROW_AT(NN_OUTPUT(nn), 0);
+            RowAt(NNInput(nn), 0) = (float)x/(float)(width - 1);
+            RowAt(NNInput(nn), 1) = (float)y/(float)(height - 1);
+            nnForward(nn);
+            float a = RowAt(NNOutout(nn), 0);
             if (a < low) a = low;
             if (a > high) a = high;
             uint32_t pixel = (a + low)/(high - low)*255.f;
@@ -195,9 +195,9 @@ void gym_nn_image_grayscale(NN nn, void *pixels, size_t width, size_t height, si
     }
 }
 
-Gym_Rect gym_rect(float x, float y, float w, float h)
+GymRect gymRect(float x, float y, float w, float h)
 {
-    Gym_Rect r = {0};
+    GymRect r = {0};
     r.x = x;
     r.y = y;
     r.w = w;
@@ -205,24 +205,24 @@ Gym_Rect gym_rect(float x, float y, float w, float h)
     return r;
 }
 
-Gym_Rect gym_layout_slot_loc(Gym_Layout *l, const char *file_path, int line)
+GymRect gymLayoutSlotLoc(GymLayout *l, const char *file_path, int line)
 {
     if (l->i >= l->count) {
         fprintf(stderr, "%s:%d: ERROR: Layout overflow\n", file_path, line);
         exit(1);
     }
 
-    Gym_Rect r = {0};
+    GymRect r = {0};
 
     switch (l->orient) {
-    case GLO_HORZ:
+    case GloHorz:
         r.w = (l->rect.w - l->gap*(l->count - 1))/l->count;
         r.h = l->rect.h;
         r.x = l->rect.x + l->i*(r.w + l->gap);
         r.y = l->rect.y;
         break;
 
-    case GLO_VERT:
+    case GloVert:
         r.w = l->rect.w;
         r.h = (l->rect.h - l->gap*(l->count - 1))/l->count;
         r.x = l->rect.x;
@@ -230,7 +230,7 @@ Gym_Rect gym_layout_slot_loc(Gym_Layout *l, const char *file_path, int line)
         break;
 
     default:
-        GYM_ASSERT(0 && "Unreachable");
+        GYMAssert(0 && "Unreachable");
     }
 
     l->i += 1;
@@ -238,35 +238,35 @@ Gym_Rect gym_layout_slot_loc(Gym_Layout *l, const char *file_path, int line)
     return r;
 }
 
-void gym_layout_stack_push(Gym_Layout_Stack *ls, Gym_Layout_Orient orient, Gym_Rect rect, size_t count, float gap)
+void gymLayoutStackPush(GymLayoutStack *ls, GymLayoutOrient orient, GymRect rect, size_t count, float gap)
 {
-    Gym_Layout l = {0};
+    GymLayout l = {0};
     l.orient = orient;
     l.rect = rect;
     l.count = count;
     l.gap = gap;
-    da_append(ls, l);
+    DaAppend(ls, l);
 }
 
-Gym_Rect gym_root(void)
+GymRect gymRoot(void)
 {
-    Gym_Rect root = {0};
+    GymRect root = {0};
     root.w = GetScreenWidth();
     root.h = GetScreenHeight();
     return root;
 }
 
-Gym_Rect gym_fit_square(Gym_Rect r)
+GymRect gymFitSquare(GymRect r)
 {
     if (r.w < r.h) {
-        return (Gym_Rect) {
+        return (GymRect) {
             .x = r.x,
             .y = r.y + r.h/2 - r.w/2,
             .w = r.w,
             .h = r.w,
         };
     } else {
-        return (Gym_Rect) {
+        return (GymRect) {
             .x = r.x + r.w/2 - r.h/2,
             .y = r.y,
             .w = r.h,

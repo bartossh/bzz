@@ -12,37 +12,37 @@
 #include <math.h>
 #include <string.h>
 
-// #define NN_BACKPROP_TRADITIONAL
+// #define NNBackpropTraditional
 
-#ifndef NN_ACT
-#define NN_ACT ACT_SIG
-#endif // NN_ACT
+#ifndef NNAct
+#define NNAct ActSig
+#endif // NNAct
 
-#ifndef NN_RELU_PARAM
-#define NN_RELU_PARAM 0.01f
-#endif // NN_RELU_PARAM
+#ifndef NNReluParem
+#define NNReluParem 0.01f
+#endif // NNReluParem
 
-#ifndef NN_MALLOC
+#ifndef NNMalloc
 #include <stdlib.h>
-#define NN_MALLOC malloc
-#define NN_FREE free
-#endif // NN_MALLOC
+#define NNMalloc malloc
+#define NNFree free
+#endif // NNMalloc
 
-#ifndef NN_ASSERT
+#ifndef NNAssert
 #include <assert.h>
-#define NN_ASSERT assert
-#endif // NN_ASSERT
+#define NNAssert assert
+#endif // NNAssert
 
-#define ARRAY_LEN(xs) sizeof((xs))/sizeof((xs)[0])
+#define ArrayLen(xs) sizeof((xs))/sizeof((xs)[0])
 
 typedef enum {
-    ACT_SIG,
-    ACT_RELU,
-    ACT_TANH,
-    ACT_SIN,
+    ActSig,
+    ActRelu,
+    ActThan,
+    ActSin,
 } Act;
 
-float rand_float(void);
+float randFloat(void);
 
 float sigmoidf(float x);
 float reluf(float x);
@@ -62,12 +62,12 @@ typedef struct {
 
 // capacity is in bytes, but it can allocate more just to keep things
 // word aligned
-Region region_alloc_alloc(size_t capacity_bytes);
-void *region_alloc(Region *r, size_t size_bytes);
-#define region_reset(r) (NN_ASSERT((r) != NULL), (r)->size = 0)
-#define region_occupied_bytes(r) (NN_ASSERT((r) != NULL), (r)->size*sizeof(*(r)->words))
-#define region_save(r) (NN_ASSERT((r) != NULL), (r)->size)
-#define region_rewind(r, s) (NN_ASSERT((r) != NULL), (r)->size = s)
+Region regionAllocAlloc(size_t capacity_bytes);
+void *regionAlloc(Region *r, size_t size_bytes);
+#define RegionReset(r) (NNAssert((r) != NULL), (r)->size = 0)
+#define RegionOccupiedBytes(r) (NNAssert((r) != NULL), (r)->size*sizeof(*(r)->words))
+#define RegionSave(r) (NNAssert((r) != NULL), (r)->size)
+#define RegionRewind(r, s) (NNAssert((r) != NULL), (r)->size = s)
 
 typedef struct {
     size_t rows;
@@ -80,29 +80,29 @@ typedef struct {
     float *elements;
 } Row;
 
-#define ROW_AT(row, col) (row).elements[col]
+#define RowAt(row, col) (row).elements[col]
 
-Mat row_as_mat(Row row);
-#define row_alloc(r, cols) mat_row(mat_alloc(r, 1, cols), 0)
-Row row_slice(Row row, size_t i, size_t cols);
-#define row_rand(row, low, high) mat_rand(row_as_mat(row), low, high)
-#define row_fill(row, x) mat_fill(row_as_mat(row), x);
-#define row_print(row, name, padding) mat_print(row_as_mat(row), name, padding)
-#define row_copy(dst, src) mat_copy(row_as_mat(dst), row_as_mat(src))
+Mat rowAsMat(Row row);
+#define RowAlloc(r, cols) matRow(matAlloc(r, 1, cols), 0)
+Row rowSlice(Row row, size_t i, size_t cols);
+#define RowRand(row, low, high) matRand(rowAsMat(row), low, high)
+#define RowFill(row, x) matFill(rowAsMat(row), x);
+#define RowPrint(row, name, padding) matPrintf(rowAsMat(row), name, padding)
+#define RowCopy(dst, src) matCopy(rowAsMat(dst), rowAsMat(src))
 
-#define MAT_AT(m, i, j) (m).elements[(i)*(m).cols + (j)]
+#define MatAt(m, i, j) (m).elements[(i)*(m).cols + (j)]
 
-Mat mat_alloc(Region *r, size_t rows, size_t cols);
-void mat_fill(Mat m, float x);
-void mat_rand(Mat m, float low, float high);
-Row mat_row(Mat m, size_t row);
-void mat_copy(Mat dst, Mat src);
-void mat_dot(Mat dst, Mat a, Mat b);
-void mat_sum(Mat dst, Mat a);
-void mat_act(Mat m);
-void mat_print(Mat m, const char *name, size_t padding);
-void mat_shuffle_rows(Mat m);
-#define MAT_PRINT(m) mat_print(m, #m, 0)
+Mat matAlloc(Region *r, size_t rows, size_t cols);
+void matFill(Mat m, float x);
+void matRand(Mat m, float low, float high);
+Row matRow(Mat m, size_t row);
+void matCopy(Mat dst, Mat src);
+void matDot(Mat dst, Mat a, Mat b);
+void matSum(Mat dst, Mat a);
+void matAct(Mat m);
+void matPrintf(Mat m, const char *name, size_t padding);
+void matShuffleRows(Mat m);
+#define MatPrint(m) matPrintf(m, #m, 0)
 
 typedef struct {
     size_t *arch;
@@ -115,22 +115,19 @@ typedef struct {
     Row *as;
 } NN;
 
-#define NN_INPUT(nn) (NN_ASSERT((nn).arch_count > 0), (nn).as[0])
-#define NN_OUTPUT(nn) (NN_ASSERT((nn).arch_count > 0), (nn).as[(nn).arch_count-1])
+#define NNInput(nn) (NNAssert((nn).arch_count > 0), (nn).as[0])
+#define NNOutout(nn) (NNAssert((nn).arch_count > 0), (nn).as[(nn).arch_count-1])
 
-NN nn_alloc(Region *r, size_t *arch, size_t arch_count);
-void nn_zero(NN nn);
-void nn_print(NN nn, const char *name);
-#define NN_PRINT(nn) nn_print(nn, #nn);
-void nn_rand(NN nn, float low, float high);
-// TODO: make nn_forward signature more natural
-//
-// Something more like `Mat nn_forward(NN nn, Mat in)`
-void nn_forward(NN nn);
-float nn_cost(NN nn, Mat t);
-NN nn_finite_diff(Region *r, NN nn, Mat t, float eps);
-NN nn_backprop(Region *r, NN nn, Mat t);
-void nn_learn(NN nn, NN g, float rate);
+NN nnAlloc(Region *r, size_t *arch, size_t arch_count);
+void nnZero(NN nn);
+void nnPrint(NN nn, const char *name);
+#define NNPrint(nn) nnPrint(nn, #nn);
+void nnRand(NN nn, float low, float high);
+void nnForward(NN nn);
+float nnCost(NN nn, Mat t);
+NN nnFiniteDiff(Region *r, NN nn, Mat t, float eps);
+NN nnBackprop(Region *r, NN nn, Mat t);
+void nnLearn(NN nn, NN g, float rate);
 
 typedef struct {
     size_t begin;
