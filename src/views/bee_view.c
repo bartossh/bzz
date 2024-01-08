@@ -8,6 +8,13 @@
 #include "../nn/nn.h"
 #include "../flowers/flowers.h"
 
+static float absf(float a)
+{
+    if (a > 0.0f) {
+        return a;
+    }
+    return -a;
+}
 
 void gymRenderNN(NN nn, GymRect r)
 {
@@ -15,6 +22,8 @@ void gymRenderNN(NN nn, GymRect r)
     Color high_color = BLACK;
     Color alpha_color = WHITE;
 
+    float thick = r.h*0.002f;
+    
     float neuron_radius = r.h*0.03;
     float layer_border_vpad = r.h*0.08;
     float layer_border_hpad = r.w*0.06;
@@ -37,7 +46,6 @@ void gymRenderNN(NN nn, GymRect r)
                     float cy2 = nn_y + j*layer_vpad2 + layer_vpad2/2;
                     float value = sigmoidf(MatAt(nn.ws[l], i, j));
                     high_color.a = floorf(255.f*value);
-                    float thick = r.h*0.004f;
                     Vector2 start = {cx1, cy1};
                     Vector2 end   = {cx2, cy2};
                     DrawLineEx(start, end, thick, ColorAlphaBlend(low_color, high_color, alpha_color));
@@ -55,8 +63,9 @@ void gymRenderNN(NN nn, GymRect r)
 
 void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width)
 {
-    Color low_color = RED;
-    Color high_color = WHITE;
+    Color low_color = ORANGE;
+    Color high_color = BLACK;
+    Color alpha_color = WHITE;
 
     float cell_width = r.w*m.cols/max_width/m.cols;
     float cell_height = r.h/m.rows;
@@ -66,7 +75,7 @@ void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width)
     for (size_t y = 0; y < m.rows; ++y) {
         for (size_t x = 0; x < m.cols; ++x) {
             high_color.a = floorf(255.f*sigmoidf(MatAt(m, y, x)));
-            Color color = ColorAlphaBlend(low_color, high_color, GREEN);
+            Color color = ColorAlphaBlend(low_color, high_color, alpha_color);
             GymRect slot = {
                 r.x + r.w/2 - full_width/2 + x*cell_width,
                 r.y + y*cell_height,
@@ -297,9 +306,9 @@ static void viewBeeLearn(ViewBee *bee, GymRect r)
         size_t move = printToBuffAtRow(bee->fl, i, buffer, 2056);
         float expected = getExpectedValueAtRowNorm(bee->fl, i);
         float value = RowAt(NNOutout(bee->nn), 0);
-        float diff = ((expected-value) / ((expected+value) / 2));
+        float diff = absf(expected-value);
         high_color.a = floorf(255.f*diff);
-        snprintf(buffer+move, 16, " == [ %.3f ]", value);
+        snprintf(buffer+move, 26, " = ( %.3f ) < %.3f > ", value, diff);
         DrawTextEx(bee->font, buffer, CLITERAL(Vector2){r.x, r.y + i*(s+pad)}, s, 0, ColorAlphaBlend(low_color, high_color, alpha_color));
     }
 }
@@ -366,7 +375,7 @@ void drawBeeView(ViewBee *bee)
     }
     
     BeginDrawing();
-    ClearBackground(DEEPOCEAN);
+    ClearBackground(OCEAN);
         int w = GetScreenWidth();
         int h = GetScreenHeight();
     
@@ -386,10 +395,10 @@ void drawBeeView(ViewBee *bee)
         char buffer[256];
         snprintf(
             buffer, sizeof(buffer), 
-            "<| Epoch: %zu/%zu, Rate: %f, Cost: %f, Temporary Memory: %zu bytes |>", 
-            bee->epoch, bee->max_epoch, bee->rate, nnCost(bee->nn, bee->t), RegionOccupiedBytes(&bee->temp)
+            "<| Epoch: %zu/%zu, Rate: %f, Cost: %f, Temporary Memory: %zu kB |>", 
+            bee->epoch, bee->max_epoch, bee->rate, nnCost(bee->nn, bee->t), RegionOccupiedBytes(&bee->temp)/1024
         );
-        DrawTextEx(bee->font, buffer,CLITERAL(Vector2){.x = 40, .y = 40}, h*0.02, 0, OCEAN);
+        DrawTextEx(bee->font, buffer,CLITERAL(Vector2){.x = 40, .y = 40}, h*0.02, 0, DEEPOCEAN);
     EndDrawing();
     
     RegionReset(&bee->temp);
