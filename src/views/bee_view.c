@@ -8,10 +8,12 @@
 #include "../nn/nn.h"
 #include "../flowers/flowers.h"
 
+
 void gymRenderNN(NN nn, GymRect r)
 {
-    Color low_color = RED;
-    Color high_color = DARKBLUE;
+    Color low_color = ORANGE;
+    Color high_color = BROWN;
+    Color alpha_color = BLACK;
 
     float neuron_radius = r.h*0.03;
     float layer_border_vpad = r.h*0.08;
@@ -38,14 +40,14 @@ void gymRenderNN(NN nn, GymRect r)
                     float thick = r.h*0.004f;
                     Vector2 start = {cx1, cy1};
                     Vector2 end   = {cx2, cy2};
-                    DrawLineEx(start, end, thick, ColorAlphaBlend(low_color, high_color, WHITE));
+                    DrawLineEx(start, end, thick, ColorAlphaBlend(low_color, high_color, alpha_color));
                 }
             }
             if (l > 0) {
                 high_color.a = floorf(255.f*sigmoidf(RowAt(nn.bs[l-1], i)));
-                DrawCircle(cx1, cy1, neuron_radius, ColorAlphaBlend(low_color, high_color, WHITE));
+                DrawPoly((Vector2){.x = cx1, .y = cy1}, 6, neuron_radius, 0.0f, ColorAlphaBlend(low_color, high_color, alpha_color));
             } else {
-                DrawCircle(cx1, cy1, neuron_radius, GRAY);
+                DrawPoly((Vector2){.x = cx1, .y = cy1}, 6, neuron_radius, 0.0f, ColorAlphaBlend(low_color, high_color, alpha_color));
             }
         }
     }
@@ -54,7 +56,7 @@ void gymRenderNN(NN nn, GymRect r)
 void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width)
 {
     Color low_color = RED;
-    Color high_color = DARKBLUE;
+    Color high_color = WHITE;
 
     float cell_width = r.w*m.cols/max_width/m.cols;
     float cell_height = r.h/m.rows;
@@ -64,7 +66,7 @@ void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width)
     for (size_t y = 0; y < m.rows; ++y) {
         for (size_t x = 0; x < m.cols; ++x) {
             high_color.a = floorf(255.f*sigmoidf(MatAt(m, y, x)));
-            Color color = ColorAlphaBlend(low_color, high_color, WHITE);
+            Color color = ColorAlphaBlend(low_color, high_color, GREEN);
             GymRect slot = {
                 r.x + r.w/2 - full_width/2 + x*cell_width,
                 r.y + y*cell_height,
@@ -116,26 +118,23 @@ void gymPlot(GymPlot plot, GymRect r, Color c)
         if (min > plot.items[i]) min = plot.items[i];
     }
 
-    if (min > 0) min = 0;
-    size_t n = plot.count;
-    if (n < 1000) n = 1000;
-    for (size_t i = 0; i+1 < plot.count; ++i) {
-        float x1 = r.x + r.w/n*i;
-        float y1 = r.y + (1 - (plot.items[i] - min)/(max - min))*r.h;
-        float x2 = r.x + (float)r.w/n*(i+1);
-        float y2 = r.y + (1 - (plot.items[i+1] - min)/(max - min))*r.h;
-        DrawLineEx((Vector2){x1, y1}, (Vector2){x2, y2}, r.h*0.005, c);
-    }
 
-    float y0 = r.y + (1 - (0 - min)/(max - min))*r.h;
-    DrawLineEx((Vector2){r.x + 0, y0}, (Vector2){r.x + r.w - 1, y0}, r.h*0.005, WHITE);
-    DrawText("0", r.x + 0, y0 - r.h*0.04, r.h*0.04, WHITE);
-
+    float cost = r.h-r.h*0.08;
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer), "%s", "Cost ");
     if (plot.count > 0) {
-        char buffer[64];
-        snprintf(buffer, sizeof(buffer), "%f", plot.items[plot.count-1]);
-        DrawText(buffer, r.x, r.y, r.h*0.08, WHITE);
+        snprintf(&buffer[5], sizeof(buffer)-5, "%f", plot.items[plot.count-1]);
+        cost = r.y*plot.items[plot.count-1] * 100;
     }
+    DrawText(buffer, r.x, r.y, r.h*0.08, c);
+    if (min > 0) min = 0;
+    float y0 = r.y + (1 - (0 - min)/(max - min))*r.h;
+    if (cost > r.h) {
+        cost = r.h-r.h*0.08;
+    }
+    float padding_front = 25, padding_back = 300; // TODO: Organize plot area better way. 
+    DrawRectangle(padding_front+r.x, y0-cost, padding_front+50, cost, c);
+    DrawLineEx((Vector2){r.x, y0}, (Vector2){r.x + r.w - padding_back, y0}, 2, c);
 }
 
 void gymSlider(float *value, bool *dragging, float rx, float ry, float rw, float rh)
@@ -275,41 +274,36 @@ GymRect gymFitSquare(GymRect r)
     }
 }
 
-
-
-
-static void viewBeeLearn(Font font, NN nn, Mat t, GymRect r) 
+static void viewBeeLearn(ViewBee *bee, GymRect r) 
 {
-    char buffer[256];
+    if (!bee) {
+        exit(1);
+        return;
+    }
+    
+    char buffer[2056];
     float s = r.h*0.025;
-    float pad = r.h*0.01;
-    float f[5] = {0}; // TODO: refactor to use FlowersDataset cols - 1 
+    float pad = r.h*0.005;
 
-    for (size_t i = 0; i < t.rows; ++i) {
-        for (size_t j = 0; j < t.cols-1; ++j) {
-            float v = MatAt(t, i, j);
-            f[j] = v;
-            RowAt(NNInput(nn), j) = v;
+    for (size_t i = 0; i < bee->t.rows; ++i) {
+        Color low_color = ORANGE;
+        Color high_color = BROWN;
+        Color alpha_color = BLACK;
+        
+        for (size_t j = 0; j < bee->t.cols-1; ++j) {
+            RowAt(NNInput(bee->nn), j) = MatAt(bee->t, i, j);
         }
-        nnForward(nn);
-        snprintf(
-            buffer, sizeof(buffer), 
-            "%.3f, %.3f, %.3f, %.3f, %.3f == %.3f", // TODO: refactor to use FlowersDataset cols - 1 
-            f[0], f[1], f[2], f[3], f[4], RowAt(NNOutout(nn), 0)
-        );
-        DrawTextEx(font, buffer, CLITERAL(Vector2){r.x, r.y + i*(s+pad)}, s, 0, WHITE);
+        nnForward(bee->nn);
+        size_t move = printToBuffAtRow(bee->fl, i, buffer, 2056);
+        float value = RowAt(NNOutout(bee->nn), 0);
+        high_color.a = floorf(255.f*value);
+        snprintf(buffer+move, 16, " == [ %.3f ]", value);
+        DrawTextEx(bee->font, buffer, CLITERAL(Vector2){r.x, r.y + i*(s+pad)}, s, 0, ColorAlphaBlend(low_color, high_color, alpha_color));
     }
 }
 
-ViewBee viewBeeNew(void)
+ViewBee viewBeeNew(Font font)
 {
-    const size_t arch_template[] = {5, 10, 5, 1};
-    const size_t arch_len = ArrayLen(arch_template);
-    size_t *arch = NNMalloc(sizeof(arch_template[0])*arch_len);
-    for (size_t i = 0; i < arch_len; ++i) {
-        arch[i] = arch_template[i];
-    }
-
     const size_t max_epoch = 100*1000;
     const size_t epochs_per_frame = 103;
     size_t epoch = 0;
@@ -317,8 +311,15 @@ ViewBee viewBeeNew(void)
     
     Region temp = regionAllocAlloc(8*1024*1024);
      
-    FlowersDataset fl = flowersDatasetNew(Basic_5_30);
+    FlowersDataset fl = flowersDatasetNew(Location_6_60);
     Mat t = flowersToMat(fl);
+    
+    const size_t arch_template[] = {fl.cols-1, 10, 1};
+    const size_t arch_len = ArrayLen(arch_template);
+    size_t *arch = NNMalloc(sizeof(arch_template[0])*arch_len);
+    for (size_t i = 0; i < arch_len; ++i) {
+        arch[i] = arch_template[i];
+    }
    
     NN nn = nnAlloc(NULL, arch, arch_len);
     nnRand(nn, -1, 1);
@@ -336,13 +337,19 @@ ViewBee viewBeeNew(void)
         .t = t,
         .nn = nn,
         .plot = plot,
+        .font = font,
     };
 
     return bee;
 }
 
-void drawBeeView(ViewBee *bee, Font font)
+void drawBeeView(ViewBee *bee)
 {
+    if (!bee) {
+        exit(1);
+        return;
+    }
+
     if (bee->reset) {
         bee->epoch = 0;
         nnRand(bee->nn, -1, 1);
@@ -353,7 +360,7 @@ void drawBeeView(ViewBee *bee, Font font)
         NN g = nnBackprop(&bee->temp, bee->nn, bee->t);
         nnLearn(bee->nn, g, bee->rate);
         bee->epoch += 1;
-         DaAppend(&(bee->plot), nnCost(bee->nn, bee->t));
+        DaAppend(&(bee->plot), nnCost(bee->nn, bee->t));
     }
     
     BeginDrawing();
@@ -362,17 +369,17 @@ void drawBeeView(ViewBee *bee, Font font)
         int h = GetScreenHeight();
     
         GymRect r;
-        r.w = w;
-        r.h = h*2/3;
+        r.w = w*0.8;
+        r.h = h*0.8;
         r.x = 0;
         r.y = h/2 - r.h/2;
-    
+   
         GymLayoutBegin(GloHorz, r, 3, 10);
-        gymPlot(bee->plot, GymLayoutSlot(), YELLOW);
+        gymPlot(bee->plot, GymLayoutSlot(), ORANGE);
         gymRenderNN(bee->nn, GymLayoutSlot());
-        viewBeeLearn(font, bee->nn, bee->t, GymLayoutSlot());
+        viewBeeLearn(bee, GymLayoutSlot());
         GymLayoutEnd();
-    
+
         DrawText("Train your BEE!", 5, 5, h*0.025, GREEN);
         char buffer[256];
         snprintf(
@@ -380,7 +387,7 @@ void drawBeeView(ViewBee *bee, Font font)
             "<| Epoch: %zu/%zu, Rate: %f, Cost: %f, Temporary Memory: %zu bytes |>", 
             bee->epoch, bee->max_epoch, bee->rate, nnCost(bee->nn, bee->t), RegionOccupiedBytes(&bee->temp)
         );
-        DrawTextEx(font, buffer,CLITERAL(Vector2){.x = 40, .y = 30}, h*0.02, 0, ORANGE);
+        DrawTextEx(bee->font, buffer,CLITERAL(Vector2){.x = 40, .y = 40}, h*0.02, 0, ORANGE);
     EndDrawing();
     
     RegionReset(&bee->temp);

@@ -73,7 +73,7 @@ GymRect gymFitSquare(GymRect r);
         if ((da)->count >= (da)->capacity) {                                         \
             (da)->capacity = (da)->capacity == 0 ? DaInitCap : (da)->capacity*2;   \
             (da)->items = realloc((da)->items, (da)->capacity*sizeof(*(da)->items)); \
-            GYMAssert((da)->items != NULL && "Buy more RAM lol");                   \
+            GYMAssert((da)->items != NULL && "MEMORY EXHAUSTED....");                   \
         }                                                                            \
                                                                                      \
         (da)->items[(da)->count++] = (item);                                         \
@@ -89,14 +89,15 @@ void gymNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_
 
 typedef struct {
     Texture2D logo;
+    Font font;
 } ViewManu;
 
 /// viewBeeNew return new ViewManu.
 ///
-ViewManu viewManuNew(const char *path);
+ViewManu viewManuNew(const char *path, Font font);
 
 // drawManuView draws main page in to the screen.
-void drawManuView(ViewManu m, Font font);
+void drawManuView(ViewManu m);
 
 void cleanupManuView(ViewManu m);
 
@@ -113,14 +114,17 @@ typedef struct {
     Mat t;
     NN nn;
     GymPlot plot;
+    Font font;
 } ViewBee;
 
 /// viewBeeNew return new ViewBee.
 ///
-ViewBee viewBeeNew(void);
+/// font - Font that will be used for text drawing.
+ViewBee viewBeeNew(Font font);
 
 /// drawBeeView draws PageNN in to the screen.
 ///
-void drawBeeView(ViewBee *bee, Font font);
+/// bee - pointer to ViewBee structure.
+void drawBeeView(ViewBee *bee);
 
 #endif

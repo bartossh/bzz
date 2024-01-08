@@ -18,12 +18,13 @@ int main(void)
 
     InitWindow(WindowWidth, WindowHeight, "BZZ!");
 
-    ViewManu m = viewManuNew("./artefacts/logo.png");
-    ViewBee bee = viewBeeNew();
+    Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
+    
+    ViewManu m = viewManuNew("./artefacts/logo.png", font);
+    ViewBee bee = viewBeeNew(font);
 
     SetTargetFPS(80);
 
-    Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
 
     while (!WindowShouldClose()) {
@@ -37,7 +38,7 @@ int main(void)
 
         switch (screen) {
         case 'M':
-            drawManuView(m, font);
+            drawManuView(m);
             break;
         case 'B':
         default:
@@ -50,8 +51,7 @@ int main(void)
                 bee.reset = true;
             }
 
-            drawBeeView(
-                    &bee, font);
+            drawBeeView(&bee);
             break;
         }
     }

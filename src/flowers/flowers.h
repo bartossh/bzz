@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include "../nn/nn.h"
 
-#define FlowerParamAt(m, cols, i, j) (m)[(i)*cols + (j)]
+#define FlowerParamAt(m, i, j) (m.ptr)[(i)*((m).cols) + (j)]
 
 #define FlowerRGBMin 0
 #define FlowerRGBMax 255
@@ -17,8 +17,12 @@
 #define FlowerPetalsMin 3
 #define FlowerPetalsMax 89
 
+#define FlowerLocationMin 0
+#define FlowerLocationMax 4
+
 #define FlowerToxicityMin 0
 #define FlowerToxicityMax 4
+
 
 /// ValueNormalizer is a pointer to the function type that is normalizing the dataset column. 
 typedef float (*ValueNormalizer)(int v);
@@ -36,7 +40,8 @@ typedef struct {
 typedef enum {
     Basic_5_10,
     Basic_5_20,
-    Basic_5_30
+    Basic_5_30,
+    Location_6_60
 } FlowersDatasetOption;
 
 
@@ -50,5 +55,13 @@ FlowersDataset flowersDatasetNew(FlowersDatasetOption o);
 /// dt - FlowersDataset that contains unnormalized flowers dataset. 
 Mat flowersToMat(FlowersDataset dt);
 
+/// printToBuffAtRow  prints FlowersDataset into char buff.
+/// Returns number of printed characters.
+///
+/// dt - FlowersDataset to be printed.
+/// next - next row to print.
+/// buff - buffer to print into.
+/// len - len of a buffer.
+size_t printToBuffAtRow(FlowersDataset dt, size_t next, char *buff, size_t len);
 
 #endif
