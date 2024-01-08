@@ -316,7 +316,7 @@ ViewBee viewBeeNew(Font font)
     FlowersDataset fl = flowersDatasetNew(Basic_5_30);
     Mat t = flowersToMat(fl);
     
-    const size_t arch_template[] = {fl.cols-1, fl.cols*2, 1};
+    const size_t arch_template[] = {fl.cols-1, fl.cols+5, fl.cols-1, 1};
     const size_t arch_len = ArrayLen(arch_template);
     size_t *arch = NNMalloc(sizeof(arch_template[0])*arch_len);
     for (size_t i = 0; i < arch_len; ++i) {
