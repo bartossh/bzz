@@ -64,4 +64,10 @@ Mat flowersToMat(FlowersDataset dt);
 /// len - len of a buffer.
 size_t printToBuffAtRow(FlowersDataset dt, size_t next, char *buff, size_t len);
 
+/// getExpectedValueAtRow returns expected value at row.
+///
+/// dt - FlowersDataset to get expected value from.
+/// row - row number.
+float getExpectedValueAtRowNorm(FlowersDataset dt, size_t row);
+
 #endif

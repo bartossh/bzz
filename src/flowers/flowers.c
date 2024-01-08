@@ -25,18 +25,6 @@ const ValueNormalizer value_normalizer_basic[6] = {
     &flowersToxicityNormalizer
 };
 
-const size_t flowersDatasetToxicityLocation_cols =  7; // number of parameters per flower
-
-const ValueNormalizer value_normalizer_location[7] = {
-    &flowersRGBNormalizer, 
-    &flowersRGBNormalizer, 
-    &flowersRGBNormalizer, 
-    &flowersSizeNormalizer, 
-    &flowersPetalsNormalizer, 
-    &flowersLocationNormalizer, 
-    &flowersToxicityNormalizer
-};
-
 /// flowersDatasetToxicityBasic_5_10 represent dataset describing flower toxicity based on parameters [R, G, B, S, P, T].
 ///
 /// - R is red color saturation,
@@ -128,6 +116,18 @@ const int flowersDatasetToxicityBasic_5_30[180] = {
       0,  51, 102, 40, 89, 4,
     128,   0,   0, 45, 89, 4,
     102,   0, 102, 55, 89, 4,
+};
+
+const size_t flowersDatasetToxicityLocation_cols =  7; // number of parameters per flower
+
+const ValueNormalizer value_normalizer_location[7] = {
+    &flowersRGBNormalizer, 
+    &flowersRGBNormalizer, 
+    &flowersRGBNormalizer, 
+    &flowersSizeNormalizer, 
+    &flowersPetalsNormalizer, 
+    &flowersLocationNormalizer, 
+    &flowersToxicityNormalizer
 };
 
 /// flowersDatasetToxicityBasic_6_30 represent dataset describing flower toxicity based on parameters [R, G, B, S, P, L, T].
@@ -299,5 +299,13 @@ size_t printToBuffAtRow(FlowersDataset dt, size_t next, char *buff, size_t len)
     }
 
     return move;
+}
+
+float getExpectedValueAtRowNorm(FlowersDataset dt, size_t row)
+{
+    if (row >= dt.rows) {
+        return 0.0f;
+    }
+    return dt.f[dt.cols-1](FlowerParamAt(dt, row, dt.cols-1));
 }
 

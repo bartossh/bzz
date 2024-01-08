@@ -12,8 +12,8 @@
 void gymRenderNN(NN nn, GymRect r)
 {
     Color low_color = ORANGE;
-    Color high_color = BROWN;
-    Color alpha_color = BLACK;
+    Color high_color = BLACK;
+    Color alpha_color = WHITE;
 
     float neuron_radius = r.h*0.03;
     float layer_border_vpad = r.h*0.08;
@@ -287,16 +287,18 @@ static void viewBeeLearn(ViewBee *bee, GymRect r)
 
     for (size_t i = 0; i < bee->t.rows; ++i) {
         Color low_color = ORANGE;
-        Color high_color = BROWN;
-        Color alpha_color = BLACK;
+        Color high_color = BLACK;
+        Color alpha_color = WHITE;
         
         for (size_t j = 0; j < bee->t.cols-1; ++j) {
             RowAt(NNInput(bee->nn), j) = MatAt(bee->t, i, j);
         }
         nnForward(bee->nn);
         size_t move = printToBuffAtRow(bee->fl, i, buffer, 2056);
+        float expected = getExpectedValueAtRowNorm(bee->fl, i);
         float value = RowAt(NNOutout(bee->nn), 0);
-        high_color.a = floorf(255.f*value);
+        float diff = ((expected-value) / ((expected+value) / 2));
+        high_color.a = floorf(255.f*diff);
         snprintf(buffer+move, 16, " == [ %.3f ]", value);
         DrawTextEx(bee->font, buffer, CLITERAL(Vector2){r.x, r.y + i*(s+pad)}, s, 0, ColorAlphaBlend(low_color, high_color, alpha_color));
     }
@@ -311,10 +313,10 @@ ViewBee viewBeeNew(Font font)
     
     Region temp = regionAllocAlloc(8*1024*1024);
      
-    FlowersDataset fl = flowersDatasetNew(Location_6_60);
+    FlowersDataset fl = flowersDatasetNew(Basic_5_30);
     Mat t = flowersToMat(fl);
     
-    const size_t arch_template[] = {fl.cols-1, 10, 1};
+    const size_t arch_template[] = {fl.cols-1, fl.cols*2, 1};
     const size_t arch_len = ArrayLen(arch_template);
     size_t *arch = NNMalloc(sizeof(arch_template[0])*arch_len);
     for (size_t i = 0; i < arch_len; ++i) {
@@ -387,7 +389,7 @@ void drawBeeView(ViewBee *bee)
             "<| Epoch: %zu/%zu, Rate: %f, Cost: %f, Temporary Memory: %zu bytes |>", 
             bee->epoch, bee->max_epoch, bee->rate, nnCost(bee->nn, bee->t), RegionOccupiedBytes(&bee->temp)
         );
-        DrawTextEx(bee->font, buffer,CLITERAL(Vector2){.x = 40, .y = 40}, h*0.02, 0, ORANGE);
+        DrawTextEx(bee->font, buffer,CLITERAL(Vector2){.x = 40, .y = 40}, h*0.02, 0, OCEAN);
     EndDrawing();
     
     RegionReset(&bee->temp);
