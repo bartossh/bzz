@@ -17,6 +17,7 @@ void logger(const char *path, const char*name, const char *code_file_path, int c
 
 #define LogError(ls, path, name) (IMAssert(ls), logger(path, name, __FILE__, __LINE__))
 #define CandidatesLen(c) sizeof(c)/sizeof(c[0])
+#define PathLen 256
 
 inline static void load(const char *path, const char *name) 
 {
@@ -31,15 +32,25 @@ typedef struct {
     const char *name;
 } Candidate;
 
-int main(void)
-{
-    const Candidate candidates[1] = {
-        (Candidate){.path = "assets/logo.png", .name = "src/assets/logo.h"}
-    };
+int main(int argc, char* argv[]) {
+    if( argc < 3 ) {
+        const Candidate candidates[1] = {
+            (Candidate){.path = "assets/logo.png", .name = "src/assets/logo.h"}
+        };
 
-    size_t len = CandidatesLen(candidates);
-    for (size_t i = 0; i < len; ++i) {
-        load(candidates[i].path, candidates[i].name);
+        size_t len = CandidatesLen(candidates);
+        for (size_t i = 0; i < len; ++i) {
+            load(candidates[i].path, candidates[i].name);
+        }
+        return 0;
     }
+  
+    char input_path[PathLen];
+    snprintf(input_path, PathLen*sizeof(char), "%s", argv[1]);
+    
+    char output_path[PathLen];
+    snprintf(output_path, PathLen*sizeof(char), "%s", argv[2]);
+    load(input_path, output_path);
+    
     return 0;
 }
