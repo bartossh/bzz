@@ -1,3 +1,5 @@
+/// Copyright (c) 2024 Bartosz Lenart
+
 #ifndef VIEW_H
 #define VIEW_H
 
@@ -94,7 +96,7 @@ typedef struct {
 
 /// viewBeeNew return new ViewManu.
 ///
-ViewManu viewManuNew(const char *path, Font font);
+ViewManu viewManuNew(Font font);
 
 // drawManuView draws main page in to the screen.
 void drawManuView(ViewManu m);

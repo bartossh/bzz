@@ -1,3 +1,5 @@
+/// Copyright (c) 2024 Bartosz Lenart
+
 #include <float.h>
 #include <raylib.h>
 #include <raymath.h>
@@ -315,10 +317,10 @@ static void viewBeeLearn(ViewBee *bee, GymRect r)
 
 ViewBee viewBeeNew(Font font)
 {
-    const size_t max_epoch = 100*1000;
-    const size_t epochs_per_frame = 103;
+    const size_t max_epoch = 200*1000;
+    const size_t epochs_per_frame = 300;
     size_t epoch = 0;
-    const float rate = 1.0f;
+    const float rate = 0.7f;
     
     Region temp = regionAllocAlloc(8*1024*1024);
      

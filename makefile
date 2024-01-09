@@ -21,6 +21,7 @@ SOURCE_LIBS = -Ilib
 OSX_OPT = -Llib -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL ./lib/libraylib.a
 
 CFILES = src/main.c
+CFILES += src/assets/*.c
 CFILES += src/nn/*.c
 CFILES += src/bee/*.c
 CFILES += src/flowers/*.c
@@ -30,6 +31,14 @@ TFILES = src/nn/nn.c
 TFILES += src/bee/bee.c
 TFILES += src/flowers/flowers.c
 TFILES += src/tests/tests.c
+
+
+.PHONY: load
+load:
+	@echo Compiling $@
+	@$(CC) $(ASANFLAGS) $(CFLAGS) $(SOURCE_LIBS) $(OSX_OPT) src/image_loader/*c -o build/loader $(LIBS)
+	./build/loader
+	@echo "Load finished"
 
 .PHONY: run
 run: build

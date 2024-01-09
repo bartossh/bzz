@@ -20,7 +20,7 @@ int main(void)
 
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     
-    ViewManu m = viewManuNew("./artefacts/logo.png", font);
+    ViewManu m = viewManuNew(font);
     ViewBee bee = viewBeeNew(font);
 
     SetTargetFPS(80);

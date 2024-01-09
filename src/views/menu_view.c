@@ -1,18 +1,18 @@
+/// Copyright (c) 2024 Bartosz Lenart
+
 #include "view.h"
 #include "raylib.h"
+#include "../assets/assets_loader.h"
 
 const char menu[] = 
 " MENU: \n"
 " KEY B - Train your Bee.\n"
 " KEY M - Main manu.\n";
 
-ViewManu viewManuNew(const char *path, Font font)
+ViewManu viewManuNew(Font font)
 {
-    Image image = LoadImage(path);
-    Texture2D logo = LoadTextureFromImage(image); 
-    UnloadImage(image);
     ViewManu pm = {
-        .logo = logo,
+        .logo = assetLoad(Logo),
         .font = font,
     };
 
