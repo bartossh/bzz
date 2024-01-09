@@ -86,7 +86,8 @@ void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width);
 void gymRenderNNWeightsHeatmap(NN nn, GymRect r);
 void gymRenderNNActivationsHeatmap(NN nn, GymRect r);
 void gymPlot(GymPlot plot, GymRect r, Color c);
-void gymSlider(float *value, bool *dragging, float rx, float ry, float rw, float rh);
+void gymSliderHorizontal(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot);
+void gymSliderVertical(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot);
 void gymNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_t stride, float low, float high);
 
 // DrawTextBoxed draws boxed text allowing for box resizing and text wrapping.

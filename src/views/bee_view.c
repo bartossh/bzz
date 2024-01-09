@@ -149,7 +149,7 @@ void gymPlot(GymPlot plot, GymRect r, Color c)
     DrawLineEx((Vector2){r.x, y0}, (Vector2){r.x + r.w - padding_back, y0}, 2, c);
 }
 
-void gymSlider(float *value, bool *dragging, float rx, float ry, float rw, float rh)
+void gymSliderHorizontal(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot)
 {
     float knob_radius = rh;
     Vector2 bar_size = {
@@ -160,19 +160,57 @@ void gymSlider(float *value, bool *dragging, float rx, float ry, float rw, float
         .x = rx + knob_radius,
         .y = ry + rh/2 - bar_size.y/2
     };
-    DrawRectangleV(bar_position, bar_size, WHITE);
+    DrawRectangleV(bar_position, bar_size, c_slide);
 
     Vector2 knob_position = {
         .x = bar_position.x + bar_size.x*(*value),
         .y = ry + rh/2
     };
-    DrawCircleV(knob_position, knob_radius, RED);
+    DrawCircleV(knob_position, knob_radius, c_dot);
 
     if (*dragging) {
         float x = GetMousePosition().x;
         if (x < bar_position.x) x = bar_position.x;
         if (x > bar_position.x + bar_size.x) x = bar_position.x + bar_size.x;
         *value = (x - bar_position.x)/bar_size.x;
+    }
+
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        Vector2 mouse_position = GetMousePosition();
+        if (Vector2Distance(mouse_position, knob_position) <= knob_radius) {
+            *dragging = true;
+        }
+    }
+
+    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+        *dragging = false;
+    }
+}
+
+void gymSliderVertical(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot)
+{
+    float knob_radius = rh;
+    Vector2 bar_size = {
+        .x = rh*0.25,
+        .y = rw + 2*knob_radius,
+    };
+    Vector2 bar_position = {
+        .x = rx + rh/2 - bar_size.x/2,
+        .y = ry + knob_radius,
+    };
+    DrawRectangleV(bar_position, bar_size, c_slide);
+
+    Vector2 knob_position = {
+        .x = rx + rh/2, 
+        .y = bar_position.y + bar_size.y*(*value),
+    };
+    DrawCircleV(knob_position, knob_radius, c_dot);
+
+    if (*dragging) {
+        float y = GetMousePosition().y;
+        if (y < bar_position.y) y = bar_position.y;
+        if (y > bar_position.y + bar_size.y) y = bar_position.y + bar_size.y;
+        *value = (y - bar_position.y)/bar_size.y;
     }
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -364,6 +402,9 @@ ViewBee viewBeeNew(Font font)
     return bee;
 }
 
+float text_position = 0.0f;
+bool dragging = false;
+
 void drawBeeView(ViewBee *bee)
 {
     if (!bee) {
@@ -388,6 +429,15 @@ void drawBeeView(ViewBee *bee)
     ClearBackground(OCEAN);
         int w = GetScreenWidth();
         int h = GetScreenHeight();
+        
+    DrawText("Train your BEE!", 5, 5, h*0.025, GREEN);
+        char buffer[256];
+        snprintf(
+            buffer, sizeof(buffer), 
+            "<| Epoch: %zu/%zu, Rate: %f, Cost: %f, Temporary Memory: %zu kB |>", 
+            bee->epoch, bee->max_epoch, bee->rate, nnCost(bee->nn, bee->t), RegionOccupiedBytes(&bee->temp)/1024
+        );
+        DrawTextEx(bee->font, buffer,CLITERAL(Vector2){.x = 40, .y = 40}, h*0.02, 0, DEEPOCEAN);
     
         GymRect r;
         r.w = w*0.8;
@@ -396,19 +446,22 @@ void drawBeeView(ViewBee *bee)
         r.y = h/2 - r.h/2;
    
         GymLayoutBegin(GloHorz, r, 3, 10);
-        gymPlot(bee->plot, GymLayoutSlot(), ORANGE);
-        gymRenderNN(bee->nn, GymLayoutSlot());
-        viewBeeLearn(bee, GymLayoutSlot());
+            gymPlot(bee->plot, GymLayoutSlot(), ORANGE);
+            gymRenderNN(bee->nn, GymLayoutSlot());
+            viewBeeLearn(bee, GymLayoutSlot());
         GymLayoutEnd();
+            
+        
+        Color low_color = BLUE;
+        Color high_color = ORANGE;
+        Color alpha_color = WHITE;
+        high_color.a = floorf(255.f*text_position);
 
-        DrawText("Train your BEE!", 5, 5, h*0.025, GREEN);
-        char buffer[256];
-        snprintf(
-            buffer, sizeof(buffer), 
-            "<| Epoch: %zu/%zu, Rate: %f, Cost: %f, Temporary Memory: %zu kB |>", 
-            bee->epoch, bee->max_epoch, bee->rate, nnCost(bee->nn, bee->t), RegionOccupiedBytes(&bee->temp)/1024
+        gymSliderVertical(
+            &text_position, &dragging, w*0.8 + 120, r.y , 500, 5, 
+            ColorAlphaBlend(low_color, high_color, alpha_color), ORANGE
         );
-        DrawTextEx(bee->font, buffer,CLITERAL(Vector2){.x = 40, .y = 40}, h*0.02, 0, DEEPOCEAN);
+    
     EndDrawing();
     
     RegionReset(&bee->temp);
