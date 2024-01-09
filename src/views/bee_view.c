@@ -300,11 +300,7 @@ static void viewBeeLearn(ViewBee *bee, GymRect r)
     float pad = r.w*0.001;
 
     size_t next_pos = 0;
-    for (size_t i = 0; i < bee->t.rows && next_pos < buff_size - inner_buff_size; ++i) {
-        // Color low_color = ORANGE;
-        // Color high_color = BLACK;
-        // Color alpha_color = WHITE;
-        
+    for (size_t i = 0; i < bee->t.rows && next_pos < buff_size - inner_buff_size; ++i) {    
         char inner_buff[inner_buff_size];
         for (size_t j = 0; j < bee->t.cols-1; ++j) {
             RowAt(NNInput(bee->nn), j) = MatAt(bee->t, i, j);
@@ -314,15 +310,10 @@ static void viewBeeLearn(ViewBee *bee, GymRect r)
         float expected = getExpectedValueAtRowNorm(bee->fl, i);
         float value = RowAt(NNOutout(bee->nn), 0);
         float diff = absf(expected-value);
-        //high_color.a = floorf(255.f*diff);
         snprintf(inner_buff+move, 28, " = [%.3f] %.3f\n", value, diff);
         size_t inner_buf_len = strlen(inner_buff);
         strncpy(&buffer[next_pos], inner_buff, inner_buf_len);
         next_pos += inner_buf_len;
-       // DrawTextEx(
-       //     bee->font, buffer, CLITERAL(Vector2){r.x, r.y + i*(s+pad)}, s, 0, 
-       //     ColorAlphaBlend(low_color, high_color, alpha_color)
-       //  );
     }
     char buffer_print[buff_size];
     snprintf(buffer_print, next_pos, "%s", buffer);
