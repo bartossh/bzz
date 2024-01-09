@@ -89,6 +89,9 @@ void gymPlot(GymPlot plot, GymRect r, Color c);
 void gymSlider(float *value, bool *dragging, float rx, float ry, float rw, float rh);
 void gymNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_t stride, float low, float high);
 
+// DrawTextBoxed draws boxed text allowing for box resizing and text wrapping.
+void DrawTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
+
 typedef struct {
     Texture2D logo;
     Font font;

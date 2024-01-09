@@ -283,9 +283,13 @@ size_t printToBuffAtRow(FlowersDataset dt, size_t next, char *buff, size_t len)
         char inner_buff[10];
         int v = FlowerParamAt(dt, next, coll);
         if (coll < dt.cols-1) {
-            snprintf(inner_buff, 10, "%3.i, ", v);
+            if (v == 0 ) {
+                snprintf(inner_buff, 10, "|  0|");
+            } else { 
+                snprintf(inner_buff, 10, "|%3.d|", v);
+            }
         } else {
-            snprintf(inner_buff, 10, "[ %.3f ]",  dt.f[coll](v));
+            snprintf(inner_buff, 10, " [%.3f]",  dt.f[coll](v));
         }
         size_t inner_len = strlen(inner_buff);
 
