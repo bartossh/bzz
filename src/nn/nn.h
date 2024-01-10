@@ -1,3 +1,4 @@
+/// Copyright (c) 2024 Bartosz Lenart
 // Library from rexim.
 //
 // Extended by bartossh

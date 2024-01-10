@@ -1,3 +1,5 @@
+/// Copyright (c) 2024 Bartosz Lenart
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
