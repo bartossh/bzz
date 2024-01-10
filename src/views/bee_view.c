@@ -11,6 +11,10 @@
 #include "../nn/nn.h"
 #include "../flowers/flowers.h"
 
+const float widget_height_multip = 0.8;
+const float widget_width_multip = 0.8;
+const float widget_padding_multip = 0.1;
+
 static float absf(float a)
 {
     if (a > 0.0f) {
@@ -149,26 +153,25 @@ void gymPlot(GymPlot plot, GymRect r, Color c)
     DrawLineEx((Vector2){r.x, y0}, (Vector2){r.x + r.w - padding_back, y0}, 2, c);
 }
 
-void gymSliderHorizontal(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot)
+void gymSliderHorizontal(float *value, bool *slider_dragging, float rx, float ry, float width, float knob_radius, Color c_slide, Color c_dot)
 {
-    float knob_radius = rh;
     Vector2 bar_size = {
-        .x = rw - 2*knob_radius,
-        .y = rh*0.25,
+        .x = width - 2*knob_radius,
+        .y = knob_radius*0.25,
     };
     Vector2 bar_position = {
         .x = rx + knob_radius,
-        .y = ry + rh/2 - bar_size.y/2
+        .y = ry + knob_radius/2 - bar_size.y/2
     };
     DrawRectangleV(bar_position, bar_size, c_slide);
 
     Vector2 knob_position = {
         .x = bar_position.x + bar_size.x*(*value),
-        .y = ry + rh/2
+        .y = ry + knob_radius/2
     };
     DrawCircleV(knob_position, knob_radius, c_dot);
 
-    if (*dragging) {
+    if (*slider_dragging) {
         float x = GetMousePosition().x;
         if (x < bar_position.x) x = bar_position.x;
         if (x > bar_position.x + bar_size.x) x = bar_position.x + bar_size.x;
@@ -178,35 +181,34 @@ void gymSliderHorizontal(float *value, bool *dragging, float rx, float ry, float
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         Vector2 mouse_position = GetMousePosition();
         if (Vector2Distance(mouse_position, knob_position) <= knob_radius) {
-            *dragging = true;
+            *slider_dragging = true;
         }
     }
 
     if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-        *dragging = false;
+        *slider_dragging = false;
     }
 }
 
-void gymSliderVertical(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot)
+void gymSliderVertical(float *value, bool *slider_dragging, float rx, float ry, float width, float knob_radius, Color c_slide, Color c_dot)
 {
-    float knob_radius = rh;
     Vector2 bar_size = {
-        .x = rh*0.25,
-        .y = rw + 2*knob_radius,
+        .x = knob_radius*0.25,
+        .y = width + 2*knob_radius,
     };
     Vector2 bar_position = {
-        .x = rx + rh/2 - bar_size.x/2,
+        .x = rx + knob_radius/2 - bar_size.x/2,
         .y = ry + knob_radius,
     };
     DrawRectangleV(bar_position, bar_size, c_slide);
 
     Vector2 knob_position = {
-        .x = rx + rh/2, 
+        .x = rx + knob_radius/2, 
         .y = bar_position.y + bar_size.y*(*value),
     };
     DrawCircleV(knob_position, knob_radius, c_dot);
 
-    if (*dragging) {
+    if (*slider_dragging) {
         float y = GetMousePosition().y;
         if (y < bar_position.y) y = bar_position.y;
         if (y > bar_position.y + bar_size.y) y = bar_position.y + bar_size.y;
@@ -216,12 +218,12 @@ void gymSliderVertical(float *value, bool *dragging, float rx, float ry, float r
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         Vector2 mouse_position = GetMousePosition();
         if (Vector2Distance(mouse_position, knob_position) <= knob_radius) {
-            *dragging = true;
+            *slider_dragging = true;
         }
     }
 
     if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-        *dragging = false;
+        *slider_dragging = false;
     }
 }
 
@@ -324,21 +326,34 @@ GymRect gymFitSquare(GymRect r)
     }
 }
 
-static void viewBeeLearn(ViewBee *bee, GymRect r) 
+static void viewBeeLearn(ViewBee *bee, GymRect r, float *slider_position, bool *slider_dragging) 
 {
     if (!bee) {
         exit(1);
         return;
     }
 
+    Color low_color = BLUE;
+    Color high_color = ORANGE;
+    Color alpha_color = WHITE;
+    high_color.a = floorf(255.f*(*slider_position));
+
+    gymSliderVertical(
+        slider_position, slider_dragging, r.x + r.w + 200, 
+        r.y + r.h*widget_padding_multip, r.h*(widget_height_multip-widget_padding_multip), 10, 
+        ColorAlphaBlend(low_color, high_color, alpha_color), ORANGE
+    );
+
     const size_t buff_size = 8192, inner_buff_size = 256;
 
     char buffer[buff_size];
-    float s = r.h*0.021;
-    float pad = r.w*0.001;
+    const float s = r.h*0.021;
+    const float pad = r.w*0.001;
+    const size_t elements_per_page = 32;
 
+    size_t start = (size_t)(*slider_position * (float)(bee->t.rows - elements_per_page));
     size_t next_pos = 0;
-    for (size_t i = 0; i < bee->t.rows && next_pos < buff_size - inner_buff_size; ++i) {    
+    for (size_t i = start; i < bee->t.rows && i < start + elements_per_page && next_pos < buff_size - inner_buff_size; ++i) {    
         char inner_buff[inner_buff_size];
         for (size_t j = 0; j < bee->t.cols-1; ++j) {
             RowAt(NNInput(bee->nn), j) = MatAt(bee->t, i, j);
@@ -370,7 +385,7 @@ ViewBee viewBeeNew(Font font)
     
     Region temp = regionAllocAlloc(8*1024*1024);
      
-    FlowersDataset fl = flowersDatasetNew(Basic_5_30);
+    FlowersDataset fl = flowersDatasetNew(Location_6_60);
     Mat t = flowersToMat(fl);
     
     const size_t arch_template[] = {fl.cols-1, fl.cols+5, fl.cols-1, 1};
@@ -402,8 +417,8 @@ ViewBee viewBeeNew(Font font)
     return bee;
 }
 
-float text_position = 0.0f;
-bool dragging = false;
+float slider_position = 0.0f;
+bool slider_dragging = false;
 
 void drawBeeView(ViewBee *bee)
 {
@@ -440,29 +455,18 @@ void drawBeeView(ViewBee *bee)
         DrawTextEx(bee->font, buffer,CLITERAL(Vector2){.x = 40, .y = 40}, h*0.02, 0, DEEPOCEAN);
     
         GymRect r;
-        r.w = w*0.8;
-        r.h = h*0.8;
+        r.w = w*widget_height_multip;
+        r.h = h*widget_width_multip;
         r.x = 0;
         r.y = h/2 - r.h/2;
    
         GymLayoutBegin(GloHorz, r, 3, 10);
             gymPlot(bee->plot, GymLayoutSlot(), ORANGE);
             gymRenderNN(bee->nn, GymLayoutSlot());
-            viewBeeLearn(bee, GymLayoutSlot());
+            viewBeeLearn(bee, GymLayoutSlot(), &slider_position, &slider_dragging);
         GymLayoutEnd();
-            
-        
-        Color low_color = BLUE;
-        Color high_color = ORANGE;
-        Color alpha_color = WHITE;
-        high_color.a = floorf(255.f*text_position);
-
-        gymSliderVertical(
-            &text_position, &dragging, w*0.8 + 120, r.y , 500, 5, 
-            ColorAlphaBlend(low_color, high_color, alpha_color), ORANGE
-        );
-    
+ 
     EndDrawing();
-    
+
     RegionReset(&bee->temp);
 }
