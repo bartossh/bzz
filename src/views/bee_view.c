@@ -333,25 +333,28 @@ static void viewBeeLearn(ViewBee *bee, GymRect r, float *slider_position, bool *
         return;
     }
 
-    Color low_color = BLUE;
-    Color high_color = ORANGE;
-    Color alpha_color = WHITE;
-    high_color.a = floorf(255.f*(*slider_position));
-
-    gymSliderVertical(
-        slider_position, slider_dragging, r.x + r.w + 200, 
-        r.y + r.h*widget_padding_multip, r.h*(widget_height_multip-widget_padding_multip), 10, 
-        ColorAlphaBlend(low_color, high_color, alpha_color), ORANGE
-    );
-
     const size_t buff_size = 8192, inner_buff_size = 256;
 
     char buffer[buff_size];
     const float s = r.h*0.021;
     const float pad = r.w*0.001;
     const size_t elements_per_page = 32;
+   
+    size_t start = 0;
+    if (bee->t.rows > elements_per_page && bee->paused) { 
+        Color low_color = BLUE;
+        Color high_color = ORANGE;
+        Color alpha_color = WHITE;
+        high_color.a = floorf(255.f*(*slider_position));
 
-    size_t start = (size_t)(*slider_position * (float)(bee->t.rows - elements_per_page));
+        gymSliderVertical(
+            slider_position, slider_dragging, r.x + r.w + 200, 
+            r.y + r.h*widget_padding_multip, r.h*(widget_height_multip-widget_padding_multip), 10, 
+            ColorAlphaBlend(low_color, high_color, alpha_color), ORANGE
+        );
+
+        start = (size_t)(*slider_position * (float)(bee->t.rows - elements_per_page));
+    }
     size_t next_pos = 0;
     for (size_t i = start; i < bee->t.rows && i < start + elements_per_page && next_pos < buff_size - inner_buff_size; ++i) {    
         char inner_buff[inner_buff_size];
@@ -384,7 +387,6 @@ ViewBee viewBeeNew(Font font)
     const float rate = 0.7f;
     
     Region temp = regionAllocAlloc(8*1024*1024);
-     
     FlowersDataset fl = flowersDatasetNew(Location_6_60);
     Mat t = flowersToMat(fl);
     
