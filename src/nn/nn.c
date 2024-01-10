@@ -322,8 +322,8 @@ NN nnBackprop(Region *r, NN nn, Mat t)
                 float qa = dactf(a, NNAct);
                 RowAt(g.bs[l - 1], j) += s * da * qa;
                 for (size_t k = 0; k < nn.as[l - 1].cols; ++k) {
-                // j - weight matrix col
-                // k - weight matrix row
+                    // j - weight matrix col
+                    // k - weight matrix row
                     float pa = RowAt(nn.as[l - 1], k);
                     float w = MatAt(nn.ws[l - 1], k, j);
                     MatAt(g.ws[l - 1], k, j) += s * da * qa * pa;
