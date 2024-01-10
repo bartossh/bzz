@@ -65,6 +65,28 @@ Mat matAlloc(Region *r, size_t rows, size_t cols)
     return m;
 }
 
+void matFree(Mat *m)
+{
+    if (!m) {
+        return;
+    }
+
+    free(m->elements);
+    m->elements = NULL;
+    m->rows = 0;
+    m->cols = 0;
+}
+
+
+void rowFree(Row *r) {
+    if (!r) {
+        return;
+    }
+    free(r->elements);
+    r->elements = NULL;
+    r->cols =0;
+}
+
 void matDot(Mat dst, Mat a, Mat b)
 {
     NNAssert(a.cols == b.rows);
@@ -175,6 +197,24 @@ NN nnAlloc(Region *r, size_t *arch, size_t arch_count)
     }
 
     return nn;
+}
+
+
+void nnFree(NN *nn)
+{
+    if (!nn) {
+        return;
+    }
+
+    free(nn->arch);
+    nn->arch = NULL;
+    nn->arch_count = 0;
+    matFree(nn->ws);
+    nn->ws = NULL;
+    rowFree(nn->bs);
+    nn->bs = NULL;
+    rowFree(nn->as);
+    nn->as = NULL;
 }
 
 void nnZero(NN nn)
@@ -413,6 +453,18 @@ Region regionAllocAlloc(size_t capacity_bytes)
     r.capacity = capacity_words;
     r.words = words;
     return r;
+}
+
+void regionFree(Region *r)
+{
+    if (!r) {
+        return;
+    }
+
+    free(r->words);
+    r->words = NULL;
+    r->capacity = 0;
+    r->size = 0;
 }
 
 void *regionAlloc(Region *r, size_t size_bytes)

@@ -128,9 +128,19 @@ typedef struct {
 /// font - Font that will be used for text drawing.
 ViewBee viewBeeNew(Font font);
 
+/// viewBeeRandomize - randomizes ViewBee.
+///
+/// bee -ViewBee to be randomized. 
+void viewBeeRandomize(ViewBee *bee);
+
 /// drawBeeView draws PageNN in to the screen.
 ///
 /// bee - pointer to ViewBee structure.
 void drawBeeView(ViewBee *bee);
+
+/// void viewBeeFree frees memory allocated for ViewBee.
+///
+/// bee -ViewBee to be freed from memory.
+void viewBeeFree(ViewBee *bee);
 
 #endif

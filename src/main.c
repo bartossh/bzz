@@ -12,6 +12,7 @@ char screen = 'M';
 int main(void)
 {
     srand(time(NULL));
+
     size_t WindowFactor = 100;
     size_t WindowWidth = (16*WindowFactor);
     size_t WindowHeight = (9*WindowFactor);
@@ -44,6 +45,12 @@ int main(void)
         default:
             if (IsKeyPressed(KEY_SPACE)) {
                 bee.paused = !bee.paused;
+            }
+            
+            if (bee.paused && IsKeyPressed(KEY_L)) {
+                Font font = bee.font;
+                viewBeeFree(&bee);
+                bee = viewBeeNew(font);
             }
 
             bee.reset = false;

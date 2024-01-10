@@ -50,6 +50,11 @@ typedef enum {
 /// o - FlowersDatasetOption option representing the new dataset to be created.
 FlowersDataset flowersDatasetNew(FlowersDatasetOption o);
 
+/// void flowersDatasetFree frees the dataset allocated.
+///
+/// dt -FlowersDataset to be freed.
+void flowersDatasetFree(FlowersDataset *dt);
+
 /// flowersToMat returns dataset matrix with normalized values between 0 and 1.
 ///
 /// dt - FlowersDataset that contains unnormalized flowers dataset. 

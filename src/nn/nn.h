@@ -64,6 +64,7 @@ typedef struct {
 // capacity is in bytes, but it can allocate more just to keep things
 // word aligned
 Region regionAllocAlloc(size_t capacity_bytes);
+void regionFree(Region *r);
 void *regionAlloc(Region *r, size_t size_bytes);
 #define RegionReset(r) (NNAssert((r) != NULL), (r)->size = 0)
 #define RegionOccupiedBytes(r) (NNAssert((r) != NULL), (r)->size*sizeof(*(r)->words))
@@ -84,6 +85,7 @@ typedef struct {
 #define RowAt(row, col) (row).elements[col]
 
 Mat rowAsMat(Row row);
+void rowFree(Row *r);
 #define RowAlloc(r, cols) matRow(matAlloc(r, 1, cols), 0)
 Row rowSlice(Row row, size_t i, size_t cols);
 #define RowRand(row, low, high) matRand(rowAsMat(row), low, high)
@@ -94,6 +96,7 @@ Row rowSlice(Row row, size_t i, size_t cols);
 #define MatAt(m, i, j) (m).elements[(i)*(m).cols + (j)]
 
 Mat matAlloc(Region *r, size_t rows, size_t cols);
+void matFree(Mat *m);
 void matFill(Mat m, float x);
 void matRand(Mat m, float low, float high);
 Row matRow(Mat m, size_t row);
@@ -120,6 +123,7 @@ typedef struct {
 #define NNOutout(nn) (NNAssert((nn).arch_count > 0), (nn).as[(nn).arch_count-1])
 
 NN nnAlloc(Region *r, size_t *arch, size_t arch_count);
+void nnFree(NN *n);
 void nnZero(NN nn);
 void nnPrint(NN nn, const char *name);
 #define NNPrint(nn) nnPrint(nn, #nn);

@@ -261,6 +261,19 @@ FlowersDataset flowersDatasetNew(FlowersDatasetOption o)
     return dt;
 }
 
+void flowersDatasetFree(FlowersDataset *dt)
+{
+    if (!dt) {
+        return;
+    }
+    free(dt->ptr);
+    dt->ptr = NULL;
+    free(dt->f);
+    dt->f = NULL;
+    dt->rows = 0;
+    dt->cols = 0;
+}
+
 Mat flowersToMat(FlowersDataset dt)
 {
     Mat m = matAlloc(NULL, dt.rows, dt.cols);

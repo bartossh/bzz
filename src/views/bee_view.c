@@ -389,8 +389,11 @@ ViewBee viewBeeNew(Font font)
     Region temp = regionAllocAlloc(8*1024*1024);
     FlowersDataset fl = flowersDatasetNew(Location_6_60);
     Mat t = flowersToMat(fl);
+
+    size_t r0 = rand() % (fl.cols+20) + fl.cols-1;
+    size_t r1 = rand() % (fl.cols+5) + 2;
     
-    const size_t arch_template[] = {fl.cols-1, fl.cols+5, fl.cols-1, 1};
+    const size_t arch_template[] = {fl.cols-1, r0, r1, 1};
     const size_t arch_len = ArrayLen(arch_template);
     size_t *arch = NNMalloc(sizeof(arch_template[0])*arch_len);
     for (size_t i = 0; i < arch_len; ++i) {
@@ -419,6 +422,25 @@ ViewBee viewBeeNew(Font font)
     return bee;
 }
 
+void viewBeeFree(ViewBee *bee)
+{
+    if (!bee) {
+        return;
+    }
+
+    bee->max_epoch = 0;
+    bee->epochs_per_frame = 0;
+    bee->epoch = 0;
+    bee->rate = 0.0f;
+    bee->paused = true;
+    bee->reset = false;
+    regionFree(&bee->temp);
+    flowersDatasetFree(&bee->fl);
+    matFree(&bee->t);
+    nnFree(&bee->nn);
+    bee->plot = (GymPlot){0};
+}
+
 float slider_position = 0.0f;
 bool slider_dragging = false;
 
@@ -443,11 +465,11 @@ void drawBeeView(ViewBee *bee)
     }
     
     BeginDrawing();
-    ClearBackground(OCEAN);
+        ClearBackground(OCEAN);
         int w = GetScreenWidth();
         int h = GetScreenHeight();
         
-    DrawText("Train your BEE!", 5, 5, h*0.025, GREEN);
+        DrawText("Train your BEE!", 5, 5, h*0.025, GREEN);
         char buffer[256];
         snprintf(
             buffer, sizeof(buffer), 
@@ -455,7 +477,7 @@ void drawBeeView(ViewBee *bee)
             bee->epoch, bee->max_epoch, bee->rate, nnCost(bee->nn, bee->t), RegionOccupiedBytes(&bee->temp)/1024
         );
         DrawTextEx(bee->font, buffer,CLITERAL(Vector2){.x = 40, .y = 40}, h*0.02, 0, DEEPOCEAN);
-    
+        
         GymRect r;
         r.w = w*widget_height_multip;
         r.h = h*widget_width_multip;
