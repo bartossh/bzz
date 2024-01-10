@@ -127,7 +127,7 @@ void matSum(Mat dst, Mat a)
     NNAssert(dst.cols == a.cols);
     for (size_t i = 0; i < dst.rows; ++i) {
         for (size_t j = 0; j < dst.cols; ++j) {
-        MatAt(dst, i, j) += MatAt(a, i, j);
+            MatAt(dst, i, j) += MatAt(a, i, j);
         }
     }
 }
@@ -158,7 +158,7 @@ void matFill(Mat m, float x)
 {
     for (size_t i = 0; i < m.rows; ++i) {
         for (size_t j = 0; j < m.cols; ++j) {
-        MatAt(m, i, j) = x;
+            MatAt(m, i, j) = x;
         }
     }
 }
@@ -349,30 +349,30 @@ NN nnBackprop(Region *r, NN nn, Mat t)
 
 NN nnFiniteDiff(Region *r, NN nn, Mat t, float eps) 
 {
-  float saved;
-  float c = nnCost(nn, t);
+    float saved;
+    float c = nnCost(nn, t);
 
-  NN g = nnAlloc(r, nn.arch, nn.arch_count);
+    NN g = nnAlloc(r, nn.arch, nn.arch_count);
 
-  for (size_t i = 0; i < nn.arch_count - 1; ++i) {
-    for (size_t j = 0; j < nn.ws[i].rows; ++j) {
-      for (size_t k = 0; k < nn.ws[i].cols; ++k) {
-        saved = MatAt(nn.ws[i], j, k);
-        MatAt(nn.ws[i], j, k) += eps;
-        MatAt(g.ws[i], j, k) = (nnCost(nn, t) - c) / eps;
-        MatAt(nn.ws[i], j, k) = saved;
-      }
+    for (size_t i = 0; i < nn.arch_count - 1; ++i) {
+        for (size_t j = 0; j < nn.ws[i].rows; ++j) {
+            for (size_t k = 0; k < nn.ws[i].cols; ++k) {
+                saved = MatAt(nn.ws[i], j, k);
+                MatAt(nn.ws[i], j, k) += eps;
+                MatAt(g.ws[i], j, k) = (nnCost(nn, t) - c) / eps;
+                MatAt(nn.ws[i], j, k) = saved;
+            }
+        }
+
+        for (size_t k = 0; k < nn.bs[i].cols; ++k) {
+            saved = RowAt(nn.bs[i], k);
+            RowAt(nn.bs[i], k) += eps;
+            RowAt(g.bs[i], k) = (nnCost(nn, t) - c) / eps;
+            RowAt(nn.bs[i], k) = saved;
+        }
     }
 
-    for (size_t k = 0; k < nn.bs[i].cols; ++k) {
-      saved = RowAt(nn.bs[i], k);
-      RowAt(nn.bs[i], k) += eps;
-      RowAt(g.bs[i], k) = (nnCost(nn, t) - c) / eps;
-      RowAt(nn.bs[i], k) = saved;
-    }
-  }
-
-  return g;
+    return g;
 }
 
 void nnLearn(NN nn, NN g, float rate) 
