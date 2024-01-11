@@ -41,6 +41,8 @@ typedef struct {
     size_t capacity;
 } GymPlot;
 
+void gymPlotFree(GymPlot *gp);
+
 typedef struct {
     GymLayoutOrient orient;
     GymRect rect;

@@ -157,6 +157,17 @@ void gymPlot(GymPlot plot, GymRect r, Color c)
     DrawLineEx((Vector2){r.x, y0}, (Vector2){r.x + r.w - padding_back, y0}, 2, c);
 }
 
+void gymPlotFree(GymPlot *gp)
+{
+    if (!gp) {
+        return;
+    }
+    free(gp->items);
+    gp->items = NULL;
+    gp->count = 0;
+    gp->capacity = 0;
+}
+
 void gymSliderHorizontal(float *value, bool *slider_dragging, float rx, float ry, float width, float knob_radius, Color c_slide, Color c_dot) 
 {
     Vector2 bar_size = {
@@ -452,7 +463,7 @@ void viewBeeFree(ViewBee *bee)
     flowersDatasetFree(&bee->fl);
     matFree(&bee->t);
     nnFree(&bee->nn);
-    bee->plot = (GymPlot){0};
+    gymPlotFree(&bee->plot);
 }
 
 float slider_position = 0.0f;
@@ -468,7 +479,7 @@ void drawBeeView(ViewBee *bee)
     if (bee->reset) {
         bee->epoch = 0;
         nnRand(bee->nn, -1, 1);
-        bee->plot.count = 0;
+        gymPlotFree(&bee->plot);
     }
 
     for (size_t i = 0;i < bee->epochs_per_frame && !bee->paused && bee->epoch < bee->max_epoch;++i) {
