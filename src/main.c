@@ -8,6 +8,7 @@
 
 bool paused = true;
 char screen = 'M';
+int inner_layers = 1;
 
 int main(void) 
 {
@@ -25,7 +26,7 @@ int main(void)
     GymButton plus_button = gymButtonNewPlus(0.05f, BLACK);
 
     ViewMenu m = viewMenuNew(font);
-    ViewBee bee = viewBeeNew(font, minus_button, plus_button);
+    ViewBee bee = viewBeeNew(font, minus_button, plus_button, inner_layers);
 
     SetTargetFPS(80);
     
@@ -50,10 +51,11 @@ int main(void)
                 bee.paused = !bee.paused;
             }
         
-            if (bee.paused && IsKeyPressed(KEY_L)) {
+            if (bee.paused && bee.inner_layers != inner_layers) {
+                inner_layers = bee.inner_layers;
                 Font font = bee.font;
                 viewBeeFree(&bee);
-                bee = viewBeeNew(font, minus_button, plus_button);
+                bee = viewBeeNew(font, minus_button, plus_button, inner_layers);
             }
         
             bee.reset = false;

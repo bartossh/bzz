@@ -124,8 +124,9 @@ void cleanupMenuView(ViewMenu m);
 typedef struct {
     size_t max_epoch;
     size_t epochs_per_frame;
-    size_t epoch; 
+    size_t epoch;
     float rate;
+    int inner_layers;
     bool paused;
     bool reset;
     Region temp;
@@ -141,7 +142,7 @@ typedef struct {
 /// viewBeeNew return new ViewBee.
 ///
 /// font - Font that will be used for text drawing.
-ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus);
+ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_count);
 
 /// viewBeeRandomize - randomizes ViewBee.
 ///

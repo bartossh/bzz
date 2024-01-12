@@ -15,11 +15,12 @@
 
 #define KILO 1024
 
-
+const float widget_padding_multip = 0.1;
 const float controles_height_multip = 0.95;
 const float widget_height_multip = 0.8;
 const float widget_width_multip = 0.8;
-const float widget_padding_multip = 0.1;
+const int max_bee_brain_inner_layers = 4;
+const int min_bee_brain_inner_layers = 1;
 
 static float absf(float a) 
 {
@@ -467,28 +468,32 @@ static void viewBeeLearn(ViewBee *bee, GymRect r, float *slider_position, bool *
     );
 }
 
-ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus)
+ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_count)
 {
     const size_t max_epoch = 200 * 1000;
     const size_t epochs_per_frame = 300;
     size_t epoch = 0;
     const float rate = 0.7f;
+    int total_layers_count = 2+inner_layers_count; 
 
     Region temp = regionAllocAlloc(8 * KILO * KILO);
     FlowersDataset fl = flowersDatasetNew(Location_6_60);
     Mat t = flowersToMat(fl);
 
-    size_t r0 = rand() % (fl.cols + 20) + fl.cols - 1;
-    size_t r1 = rand() % (fl.cols + 5) + 2;
-
-    const size_t arch_template[] = {fl.cols - 1, r0, r1, 1};
-    const size_t arch_len = ArrayLen(arch_template);
-    size_t *arch = NNMalloc(sizeof(arch_template[0]) * arch_len);
-    for (size_t i = 0; i < arch_len; ++i) {
-        arch[i] = arch_template[i];
+    size_t *arch = NNMalloc(sizeof(size_t) * total_layers_count);
+    for (int i = 0; i < total_layers_count; ++i) {
+        if (i == 0) {
+            arch[i] = fl.cols-1;
+            continue;
+        }
+        if (i == total_layers_count-1) {
+            arch[i] = 1;
+            continue;
+        }
+        arch[i] = rand() % (fl.cols + 20) + fl.cols - 1;
     }
 
-    NN nn = nnAlloc(NULL, arch, arch_len);
+    NN nn = nnAlloc(NULL, arch, total_layers_count);
     nnRand(nn, -1, 1);
     GymPlot plot = {0};
 
@@ -497,6 +502,7 @@ ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus)
         .epochs_per_frame = epochs_per_frame,
         .epoch = epoch,
         .rate = rate,
+        .inner_layers = inner_layers_count,
         .paused = true,
         .reset = false,
         .temp = temp,
@@ -522,6 +528,7 @@ void viewBeeFree(ViewBee *bee)
     bee->epochs_per_frame = 0;
     bee->epoch = 0;
     bee->rate = 0.0f;
+    bee->inner_layers = 0;
     bee->paused = true;
     bee->reset = false;
     regionFree(&bee->temp);
@@ -533,7 +540,6 @@ void viewBeeFree(ViewBee *bee)
 
 float slider_position = 0.0f;
 bool slider_dragging = false;
-int result = 0; 
 
 void drawBeeView(ViewBee *bee) 
 {
@@ -581,10 +587,17 @@ void drawBeeView(ViewBee *bee)
     GymLayoutEnd();
     
     char controles_buffer[256];
-    result -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip}); 
-    result += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip}); 
+    bee->inner_layers -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip}); 
+    bee->inner_layers += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip}); 
+    if (bee->inner_layers > max_bee_brain_inner_layers) {
+        bee->inner_layers = max_bee_brain_inner_layers;
+    }
+    if (bee->inner_layers < min_bee_brain_inner_layers) {
+        bee->inner_layers = min_bee_brain_inner_layers;
+    }
+
     snprintf(controles_buffer, sizeof(controles_buffer),
-             "Bee brain has [ %i ] preceptron layers", result + 2);
+             "Bee brain has [ %i ] preceptron layers", bee->inner_layers + 2);
     DrawTextEx(bee->font, controles_buffer, CLITERAL(Vector2){.x = 20, .y = h*controles_height_multip+10}, h * 0.016, 0, YELLOW);
 
     EndDrawing();
