@@ -1,13 +1,14 @@
 /// Copyright (c) 2024 Bartosz Lenart
 
 #include "raylib.h"
-#include "views/view.h"
+#include "views/views.h"
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
 
 bool paused = true;
 char screen = 'M';
+int inner_layers = 1;
 
 int main(void) 
 {
@@ -21,9 +22,12 @@ int main(void)
     
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     
-    ViewManu m = viewManuNew(font);
-    ViewBee bee = viewBeeNew(font);
-    
+    GymButton minus_button = gymButtonNewMinus(0.05f, BLACK);
+    GymButton plus_button = gymButtonNewPlus(0.05f, BLACK);
+
+    ViewMenu m = viewMenuNew(font);
+    ViewBee bee = viewBeeNew(font, minus_button, plus_button, inner_layers);
+
     SetTargetFPS(80);
     
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
@@ -39,7 +43,7 @@ int main(void)
     
         switch (screen) {
         case 'M':
-            drawManuView(m);
+            drawMenuView(m);
             break;
         case 'B':
         default:
@@ -47,10 +51,11 @@ int main(void)
                 bee.paused = !bee.paused;
             }
         
-            if (bee.paused && IsKeyPressed(KEY_L)) {
+            if (bee.paused && bee.inner_layers != inner_layers) {
+                inner_layers = bee.inner_layers;
                 Font font = bee.font;
                 viewBeeFree(&bee);
-                bee = viewBeeNew(font);
+                bee = viewBeeNew(font, minus_button, plus_button, inner_layers);
             }
         
             bee.reset = false;
@@ -62,7 +67,10 @@ int main(void)
             break;
         }
     }
-    cleanupManuView(m);
+    cleanupMenuView(m);
+    UnloadFont(font);
+    gymUnloadButton(minus_button);
+    gymUnloadButton(plus_button);
     CloseWindow();
     
     return 0;

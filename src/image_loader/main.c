@@ -34,8 +34,10 @@ typedef struct {
 
 int main(int argc, char* argv[]) {
     if( argc < 3 ) {
-        const Candidate candidates[1] = {
-            (Candidate){.path = "assets/logo.png", .name = "src/assets/logo.h"}
+        const Candidate candidates[3] = {
+            (Candidate){.path = "assets/logo.png", .name = "src/assets/logo.h"},
+            (Candidate){.path = "assets/plus.png", .name = "src/assets/plus_button.h"},
+            (Candidate){.path = "assets/minus.png", .name = "src/assets/minus_button.h"},
         };
 
         size_t len = CandidatesLen(candidates);
