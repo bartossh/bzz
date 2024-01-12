@@ -15,6 +15,8 @@
 
 #define KILO 1024
 
+
+const float controles_height_multip = 0.95;
 const float widget_height_multip = 0.8;
 const float widget_width_multip = 0.8;
 const float widget_padding_multip = 0.1;
@@ -559,12 +561,12 @@ void drawBeeView(ViewBee *bee)
     int h = GetScreenHeight();
 
     DrawText("Train your BEE!", 5, 5, h * 0.025, GREEN);
-    char buffer[256];
-    snprintf(buffer, sizeof(buffer),
+    char description_buffer[256];
+    snprintf(description_buffer, sizeof(description_buffer),
              "<| Epoch: %zu/%zu, Rate: %f, Cost: %f, Temporary Memory: %zu kB |>",
              bee->epoch, bee->max_epoch, bee->rate, nnCost(bee->nn, bee->t),
              RegionOccupiedBytes(&bee->temp) / KILO);
-    DrawTextEx(bee->font, buffer, CLITERAL(Vector2){.x = 40, .y = 40}, h * 0.02, 0, DEEPOCEAN);
+    DrawTextEx(bee->font, description_buffer, CLITERAL(Vector2){.x = 40, .y = 40}, h * 0.02, 0, DEEPOCEAN);
 
     GymRect r;
     r.w = w * widget_height_multip;
@@ -578,10 +580,12 @@ void drawBeeView(ViewBee *bee)
         viewBeeLearn(bee, GymLayoutSlot(), &slider_position, &slider_dragging);
     GymLayoutEnd();
     
-    result -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = 40, .y = h*0.95}); 
-    result += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = 80, .y = h*0.95}); 
-
-    printf("\n\nRESULT : [ %i ]\n\n", result);
+    char controles_buffer[256];
+    result -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip}); 
+    result += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip}); 
+    snprintf(controles_buffer, sizeof(controles_buffer),
+             "Bee brain has [ %i ] preceptron layers", result + 2);
+    DrawTextEx(bee->font, controles_buffer, CLITERAL(Vector2){.x = 20, .y = h*controles_height_multip+10}, h * 0.016, 0, YELLOW);
 
     EndDrawing();
 
