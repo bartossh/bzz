@@ -8,6 +8,8 @@
 /// AssetTexture2D are predefined types of textures to load.
 enum AssetTexture2D {
     Logo,
+    MinusButton,
+    PlusButton
 };
 
 /// assetLoad loads assets to the GPU and returns texture 2d.

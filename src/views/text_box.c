@@ -1,5 +1,5 @@
 #include "raylib.h"
-#include "view.h"
+#include "views.h"
 
 // Draw text using font inside rectangle limits with support for text selection
 inline static void 
