@@ -23,6 +23,8 @@
 
 #define MAX_INNER_LAYERS 4
 #define MIN_INNER_LAYERS 1
+#define MAX_PERCEPTRONS 20
+#define MIN_PERCEPTRONS 2 
 
 typedef struct {
     float x;
@@ -86,7 +88,6 @@ GymRect gymFitSquare(GymRect r);
         (da)->items[(da)->count++] = (item);                                         \
     } while (0)
 
-void gymRenderNN(NN nn, GymRect r);
 void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width);
 void gymRenderNNWeightsHeatmap(NN nn, GymRect r);
 void gymRenderNNActivationsHeatmap(NN nn, GymRect r);
@@ -133,6 +134,7 @@ typedef struct {
     int inner_layers[MAX_INNER_LAYERS];
     bool paused;
     bool reset;
+    bool modified;
     Region temp;
     FlowersDataset fl;
     Mat t;
@@ -162,5 +164,14 @@ void drawBeeView(ViewBee *bee);
 ///
 /// bee -ViewBee to be freed from memory.
 void viewBeeFree(ViewBee *bee);
+
+/// gymRenderNN renders NN from ViewBee with controls.
+///
+/// bee - ViewBee containing NN.
+/// r - GymRect representing render rectangle.
+void gymRenderNN(ViewBee *bee, GymRect r);
+
+/// isModified returns true if bee is modified or false otherwise.
+bool isModified(ViewBee *bee);
 
 #endif

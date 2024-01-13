@@ -29,7 +29,7 @@ int main(void)
     ViewMenu m = viewMenuNew(font);
     ViewBee bee = viewBeeNew(font, minus_button, plus_button, inner_layers_count, inner_layers);
 
-    SetTargetFPS(80);
+    SetTargetFPS(70);
     
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
     
@@ -52,7 +52,7 @@ int main(void)
                 bee.paused = !bee.paused;
             }
         
-            if (bee.paused && bee.inner_layers_count != inner_layers_count) {
+            if (bee.paused && isModified(&bee)) {
                 inner_layers_count = bee.inner_layers_count;
                 Font font = bee.font;
                 viewBeeFree(&bee);

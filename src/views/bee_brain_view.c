@@ -84,7 +84,7 @@ void gymUnloadButton(GymButton btn)
     UnloadTexture(btn.tx);  
 }
 
-void gymRenderNN(NN nn, GymRect r)
+void gymRenderNN(ViewBee *bee, GymRect r)
 {
     Color low_color = ORANGE;
     Color high_color = BLACK;
@@ -99,20 +99,20 @@ void gymRenderNN(NN nn, GymRect r)
     float nn_height = r.h - 2 * layer_border_vpad;
     float nn_x = r.x + r.w / 2 - nn_width / 2;
     float nn_y = r.y + r.h / 2 - nn_height / 2;
-    float layer_hpad = nn_width / nn.arch_count;
-    for (size_t l = 0; l < nn.arch_count; ++l) {
-        float layer_vpad1 = nn_height / nn.as[l].cols;
-        for (size_t i = 0; i < nn.as[l].cols; ++i) {
-            float cx1 = nn_x + l * layer_hpad + layer_hpad / 2;
+    float layer_hpad = nn_width / bee->nn.arch_count;
+    for (size_t l = 0; l < bee->nn.arch_count; ++l) {
+        float layer_vpad1 = nn_height / bee->nn.as[l].cols;
+        float cx1 = nn_x + l * layer_hpad + layer_hpad / 2;
+        for (size_t i = 0; i < bee->nn.as[l].cols; ++i) {
             float cy1 = nn_y + i * layer_vpad1 + layer_vpad1 / 2;
-            if (l + 1 < nn.arch_count) {
-                float layer_vpad2 = nn_height / nn.as[l + 1].cols;
-                for (size_t j = 0; j < nn.as[l + 1].cols; ++j) {
+            if (l + 1 < bee->nn.arch_count) {
+                float layer_vpad2 = nn_height / bee->nn.as[l + 1].cols;
+                for (size_t j = 0; j < bee->nn.as[l + 1].cols; ++j) {
                     // i - rows of ws
                     // j - cols of ws
                     float cx2 = nn_x + (l + 1) * layer_hpad + layer_hpad / 2;
                     float cy2 = nn_y + j * layer_vpad2 + layer_vpad2 / 2;
-                    float value = sigmoidf(MatAt(nn.ws[l], i, j));
+                    float value = sigmoidf(MatAt(bee->nn.ws[l], i, j));
                     high_color.a = floorf(255.f * value);
                     Vector2 start = {cx1, cy1};
                     Vector2 end = {cx2, cy2};
@@ -121,12 +121,19 @@ void gymRenderNN(NN nn, GymRect r)
                 }
             }
             if (l > 0) {
-                high_color.a = floorf(255.f * sigmoidf(RowAt(nn.bs[l - 1], i)));
-                DrawPoly((Vector2){.x = cx1, .y = cy1}, 6, neuron_radius, 0.0f,
-                ColorAlphaBlend(low_color, high_color, alpha_color));
+                high_color.a = floorf(255.f * sigmoidf(RowAt(bee->nn.bs[l - 1], i)));
+                DrawPoly((Vector2){.x = cx1, .y = cy1}, 6, neuron_radius, 0.0f, ColorAlphaBlend(low_color, high_color, alpha_color));
             } else {
-                DrawPoly((Vector2){.x = cx1, .y = cy1}, 6, neuron_radius, 0.0f,
-                ColorAlphaBlend(low_color, high_color, alpha_color));
+                DrawPoly((Vector2){.x = cx1, .y = cy1}, 6, neuron_radius, 0.0f, ColorAlphaBlend(low_color, high_color, alpha_color));
+            }
+        }
+        if (l != 0 && l != bee->nn.arch_count-1) {
+            int result = 0;
+            result += gymRenderButton(bee->plus, (Vector2){.x = cx1, .y = r.y-10});
+            result -= gymRenderButton(bee->minus, (Vector2){.x = cx1, .y = r.y+20});
+            if ((bee->inner_layers[l-1] < MAX_PERCEPTRONS && result > 0) || (bee->inner_layers[l-1] > MIN_PERCEPTRONS && result < 0)) {
+                bee->modified = true;
+                bee->inner_layers[l-1] += result;
             }
         }
     }
@@ -503,6 +510,7 @@ ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_
         .inner_layers_count = inner_layers_count,
         .paused = true,
         .reset = false,
+        .modified = false,
         .temp = temp,
         .fl = fl,
         .t = t,
@@ -533,6 +541,7 @@ void viewBeeFree(ViewBee *bee)
     bee->inner_layers_count = 0;
     bee->paused = true;
     bee->reset = false;
+    bee->modified = false;
     regionFree(&bee->temp);
     flowersDatasetFree(&bee->fl);
     matFree(&bee->t);
@@ -584,29 +593,36 @@ void drawBeeView(ViewBee *bee)
 
     GymLayoutBegin(GloHorz, r, 3, 10);
         gymPlot(bee->plot, GymLayoutSlot(), ORANGE);
-        gymRenderNN(bee->nn, GymLayoutSlot());
+        gymRenderNN(bee, GymLayoutSlot());
         viewBeeLearn(bee, GymLayoutSlot(), &slider_position, &slider_dragging);
     GymLayoutEnd();
     
     char controles_buffer[256];
     int inner_layers_count = bee->inner_layers_count;
-    bee->inner_layers_count -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip}); 
-    bee->inner_layers_count += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip});
-    if (bee->inner_layers_count > inner_layers_count) {
+    inner_layers_count -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip}); 
+    inner_layers_count += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip});
+    if (bee->inner_layers_count < inner_layers_count && bee->inner_layers_count < MAX_INNER_LAYERS) {
+        bee->inner_layers_count = inner_layers_count;
         bee->inner_layers[bee->inner_layers_count-1] = 5;
+        bee->modified = true;
     }
-    if (bee->inner_layers_count > MAX_INNER_LAYERS ) {
-        bee->inner_layers_count = MAX_INNER_LAYERS;
-    }
-    if (bee->inner_layers_count < MIN_INNER_LAYERS) {
-        bee->inner_layers_count =  MIN_INNER_LAYERS;
+    if (bee->inner_layers_count > inner_layers_count && bee->inner_layers_count > MIN_INNER_LAYERS ) {
+        bee->inner_layers_count = inner_layers_count;
+        bee->modified = true;
     }
 
     snprintf(controles_buffer, sizeof(controles_buffer),
-             "Bee brain has [ %i ] preceptron layers", bee->inner_layers_count + 2);
+             "Bee brain arch: [ %i %i %i %i ]", 
+             bee->inner_layers[0], bee->inner_layers[1], bee->inner_layers[2], bee->inner_layers[3]
+             );
     DrawTextEx(bee->font, controles_buffer, CLITERAL(Vector2){.x = 20, .y = h*controles_height_multip+10}, h * 0.016, 0, YELLOW);
 
     EndDrawing();
 
     RegionReset(&bee->temp);
+}
+
+bool isModified(ViewBee *bee)
+{
+    return  bee->modified;
 }
