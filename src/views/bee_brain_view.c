@@ -19,8 +19,6 @@ const float widget_padding_multip = 0.1;
 const float controles_height_multip = 0.95;
 const float widget_height_multip = 0.8;
 const float widget_width_multip = 0.8;
-const int max_bee_brain_inner_layers = 4;
-const int min_bee_brain_inner_layers = 1;
 
 static float absf(float a) 
 {
@@ -468,7 +466,7 @@ static void viewBeeLearn(ViewBee *bee, GymRect r, float *slider_position, bool *
     );
 }
 
-ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_count)
+ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
 {
     const size_t max_epoch = 200 * 1000;
     const size_t epochs_per_frame = 300;
@@ -490,7 +488,7 @@ ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_
             arch[i] = 1;
             continue;
         }
-        arch[i] = rand() % (fl.cols + 20) + fl.cols - 1;
+        arch[i] = inner_layers[i-1];
     }
 
     NN nn = nnAlloc(NULL, arch, total_layers_count);
@@ -502,7 +500,7 @@ ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_
         .epochs_per_frame = epochs_per_frame,
         .epoch = epoch,
         .rate = rate,
-        .inner_layers = inner_layers_count,
+        .inner_layers_count = inner_layers_count,
         .paused = true,
         .reset = false,
         .temp = temp,
@@ -514,6 +512,10 @@ ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_
         .minus = minus,
         .plus = plus
     };
+
+    for (int i = 0; i < MAX_INNER_LAYERS; i++) {
+        bee.inner_layers[i] = inner_layers[i];
+    }
 
     return bee;
 }
@@ -528,7 +530,7 @@ void viewBeeFree(ViewBee *bee)
     bee->epochs_per_frame = 0;
     bee->epoch = 0;
     bee->rate = 0.0f;
-    bee->inner_layers = 0;
+    bee->inner_layers_count = 0;
     bee->paused = true;
     bee->reset = false;
     regionFree(&bee->temp);
@@ -587,17 +589,21 @@ void drawBeeView(ViewBee *bee)
     GymLayoutEnd();
     
     char controles_buffer[256];
-    bee->inner_layers -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip}); 
-    bee->inner_layers += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip}); 
-    if (bee->inner_layers > max_bee_brain_inner_layers) {
-        bee->inner_layers = max_bee_brain_inner_layers;
+    int inner_layers_count = bee->inner_layers_count;
+    bee->inner_layers_count -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip}); 
+    bee->inner_layers_count += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip});
+    if (bee->inner_layers_count > inner_layers_count) {
+        bee->inner_layers[bee->inner_layers_count-1] = 5;
     }
-    if (bee->inner_layers < min_bee_brain_inner_layers) {
-        bee->inner_layers = min_bee_brain_inner_layers;
+    if (bee->inner_layers_count > MAX_INNER_LAYERS ) {
+        bee->inner_layers_count = MAX_INNER_LAYERS;
+    }
+    if (bee->inner_layers_count < MIN_INNER_LAYERS) {
+        bee->inner_layers_count =  MIN_INNER_LAYERS;
     }
 
     snprintf(controles_buffer, sizeof(controles_buffer),
-             "Bee brain has [ %i ] preceptron layers", bee->inner_layers + 2);
+             "Bee brain has [ %i ] preceptron layers", bee->inner_layers_count + 2);
     DrawTextEx(bee->font, controles_buffer, CLITERAL(Vector2){.x = 20, .y = h*controles_height_multip+10}, h * 0.016, 0, YELLOW);
 
     EndDrawing();

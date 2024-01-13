@@ -13,13 +13,16 @@
 #endif // OCEAN
 
 #ifndef DEEPOCEAN
-#define DEEPOCEAN  CLITERAL(Color){ 0, 51, 102, 255 } // OCEAN
+#define DEEPOCEAN  CLITERAL(Color){ 0, 51, 102, 255 } // DEEPOCEAN
 #endif // DEEPOCEAN
 
 #ifndef GYMAssert
 #define GYMAssert NNAssert
 #endif // GYMAssert
 
+
+#define MAX_INNER_LAYERS 4
+#define MIN_INNER_LAYERS 1
 
 typedef struct {
     float x;
@@ -126,7 +129,8 @@ typedef struct {
     size_t epochs_per_frame;
     size_t epoch;
     float rate;
-    int inner_layers;
+    int inner_layers_count;
+    int inner_layers[MAX_INNER_LAYERS];
     bool paused;
     bool reset;
     Region temp;
@@ -142,7 +146,7 @@ typedef struct {
 /// viewBeeNew return new ViewBee.
 ///
 /// font - Font that will be used for text drawing.
-ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_count);
+ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]);
 
 /// viewBeeRandomize - randomizes ViewBee.
 ///
