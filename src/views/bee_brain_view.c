@@ -131,7 +131,8 @@ void gymRenderNN(ViewBee *bee, GymRect r)
             int result = 0;
             result += gymRenderButton(bee->plus, (Vector2){.x = cx1, .y = r.y-10});
             result -= gymRenderButton(bee->minus, (Vector2){.x = cx1, .y = r.y+20});
-            if ((bee->inner_layers[l-1] < MAX_PERCEPTRONS && result > 0) || (bee->inner_layers[l-1] > MIN_PERCEPTRONS && result < 0)) {
+            if ((bee->paused && bee->inner_layers[l-1] < MAX_PERCEPTRONS && result > 0) || 
+                (bee->paused && bee->inner_layers[l-1] > MIN_PERCEPTRONS && result < 0)) {
                 bee->modified = true;
                 bee->inner_layers[l-1] += result;
             }
@@ -601,12 +602,12 @@ void drawBeeView(ViewBee *bee)
     int inner_layers_count = bee->inner_layers_count;
     inner_layers_count -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip}); 
     inner_layers_count += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip});
-    if (bee->inner_layers_count < inner_layers_count && bee->inner_layers_count < MAX_INNER_LAYERS) {
+    if (bee->paused && bee->inner_layers_count < inner_layers_count && bee->inner_layers_count < MAX_INNER_LAYERS) {
         bee->inner_layers_count = inner_layers_count;
         bee->inner_layers[bee->inner_layers_count-1] = 5;
         bee->modified = true;
     }
-    if (bee->inner_layers_count > inner_layers_count && bee->inner_layers_count > MIN_INNER_LAYERS ) {
+    if (bee->paused && bee->inner_layers_count > inner_layers_count && bee->inner_layers_count > MIN_INNER_LAYERS ) {
         bee->inner_layers_count = inner_layers_count;
         bee->modified = true;
     }
