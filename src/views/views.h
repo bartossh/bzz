@@ -13,13 +13,18 @@
 #endif // OCEAN
 
 #ifndef DEEPOCEAN
-#define DEEPOCEAN  CLITERAL(Color){ 0, 51, 102, 255 } // OCEAN
+#define DEEPOCEAN  CLITERAL(Color){ 0, 51, 102, 255 } // DEEPOCEAN
 #endif // DEEPOCEAN
 
 #ifndef GYMAssert
 #define GYMAssert NNAssert
 #endif // GYMAssert
 
+
+#define MAX_INNER_LAYERS 4
+#define MIN_INNER_LAYERS 1
+#define MAX_PERCEPTRONS 20
+#define MIN_PERCEPTRONS 2 
 
 typedef struct {
     float x;
@@ -83,7 +88,6 @@ GymRect gymFitSquare(GymRect r);
         (da)->items[(da)->count++] = (item);                                         \
     } while (0)
 
-void gymRenderNN(NN nn, GymRect r);
 void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width);
 void gymRenderNNWeightsHeatmap(NN nn, GymRect r);
 void gymRenderNNActivationsHeatmap(NN nn, GymRect r);
@@ -126,9 +130,11 @@ typedef struct {
     size_t epochs_per_frame;
     size_t epoch;
     float rate;
-    int inner_layers;
+    int inner_layers_count;
+    int inner_layers[MAX_INNER_LAYERS];
     bool paused;
     bool reset;
+    bool modified;
     Region temp;
     FlowersDataset fl;
     Mat t;
@@ -142,7 +148,7 @@ typedef struct {
 /// viewBeeNew return new ViewBee.
 ///
 /// font - Font that will be used for text drawing.
-ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_count);
+ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]);
 
 /// viewBeeRandomize - randomizes ViewBee.
 ///
@@ -158,5 +164,14 @@ void drawBeeView(ViewBee *bee);
 ///
 /// bee -ViewBee to be freed from memory.
 void viewBeeFree(ViewBee *bee);
+
+/// gymRenderNN renders NN from ViewBee with controls.
+///
+/// bee - ViewBee containing NN.
+/// r - GymRect representing render rectangle.
+void gymRenderNN(ViewBee *bee, GymRect r);
+
+/// isModified returns true if bee is modified or false otherwise.
+bool isModified(ViewBee *bee);
 
 #endif
