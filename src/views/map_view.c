@@ -9,10 +9,10 @@ void renderMapView(BeeParams *bee, ScreenView *screen)
 {
     int w = GetScreenWidth();
     BeginDrawing(); 
-        ClearBackground(OCEAN);
-        int pressed = gymRenderButton(bee->bee_button, CLITERAL(Vector2){.x = w - 50 , .y = 20 });
-        if (pressed) {
-           *screen = BeeTrainScreen;  
-        }
+    ClearBackground(GRASS);
+    int pressed = gymRenderButton(bee->bee_button, CLITERAL(Vector2){.x = w - 50 , .y = 20 });
+    if (pressed) {
+       *screen = BeeTrainScreen;  
+    }
     EndDrawing();
 }

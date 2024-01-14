@@ -9,12 +9,16 @@
 #include "../flowers/flowers.h"
 
 #ifndef OCEAN
-#define OCEAN  CLITERAL(Color){ 0, 102, 102, 255 } // OCEAN
+#define OCEAN CLITERAL(Color){ 0, 102, 102, 255 } // OCEAN
 #endif // OCEAN
 
 #ifndef DEEPOCEAN
-#define DEEPOCEAN  CLITERAL(Color){ 0, 51, 102, 255 } // DEEPOCEAN
+#define DEEPOCEAN CLITERAL(Color){ 0, 51, 102, 255 } // DEEPOCEAN
 #endif // DEEPOCEAN
+
+#ifndef GRASS
+#define GRASS CLITERAL(Color){ 14, 129, 3, 250 } // GRASS
+#endif // GRASS
 
 #ifndef GYMAssert
 #define GYMAssert NNAssert

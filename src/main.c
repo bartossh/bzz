@@ -29,7 +29,7 @@ int main(void)
     GymButton map_button = gymButtonNewMap(0.09f, ORANGE);
     GymButton learn_button = gymButtonNewLearn(0.09f, ORANGE);
     GymButton update_button = gymButtonNewUpdate(0.09f, ORANGE);
-    GymButton logo_button = gymButtonNewLogo(0.5, ORANGE);
+    GymButton logo_button = gymButtonNewLogo(1.0f, ORANGE);
 
     ViewMenu m = viewMenuNew(font, logo_button);
     BeeParams bee = viewBeeNew(
