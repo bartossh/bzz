@@ -130,16 +130,22 @@ void bzzUnloadButton(BzzButton btn);
 typedef struct {
     Texture2D tx;
     Color color;
-    float scale;
     int frame;
     int total_frames;
 } BzzMovable;
 
-/// bzzMovableNewBee creates moveable bee object
+/// bzzMovableNewBee creates new movable bee object.
+/// 
+/// scale - scale of the object applied to render.
+/// color - blend color. 
+BzzMovable bzzMovableNewBee(Color color);
+
+/// bzzRenderMovable creates moveable bee object
 ///
-/// scale - scale of the moveable bee.
-/// color - blend color of the moveable bee.
-BzzMovable bzzMovableNewBee(float scale, Color color);
+/// mvb - BzzMovable bee object.
+/// pos - Vector2 position to render object.
+/// rotation - rotation of the object.
+int bzzRenderMovable(BzzMovable *mvb, Vector2 pos, float rotation);
 
 /// bzzUnloadMovable unloads texture from the movable object.
 ///
@@ -186,6 +192,7 @@ typedef struct {
     BzzButton update_button;
     BzzButton map_button;
     BzzButton bee_button;
+    BzzMovable bee_movable;
     Font font;
 } BeeParams;
 
@@ -202,8 +209,8 @@ typedef struct {
 /// inner_layers - architecture of inner layers.
 BeeParams viewBeeNew(
     Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
-    );
+    BzzButton map_button, BzzButton bee_button, BzzMovable bee_movable, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
+);
 
 /// viewBeeRandomize - randomizes BeeParams.
 ///

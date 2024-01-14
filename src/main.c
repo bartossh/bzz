@@ -30,11 +30,12 @@ int main(void)
     BzzButton learn_button = bzzButtonNewLearn(0.09f, ORANGE);
     BzzButton update_button = bzzButtonNewUpdate(0.09f, ORANGE);
     BzzButton logo_button = bzzButtonNewLogo(1.0f, ORANGE);
+    BzzMovable bee_movable = bzzMovableNewBee(ORANGE);
 
     ViewMenu m = viewMenuNew(font, logo_button);
     BeeParams bee = viewBeeNew(
         font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-        inner_layers_count, inner_layers
+        bee_movable, inner_layers_count, inner_layers
     );
 
     SetTargetFPS(70);
@@ -57,7 +58,7 @@ int main(void)
                 viewBeeFree(&bee);
                 bee = viewBeeNew(
                     font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-                    inner_layers_count, bee.inner_layers
+                    bee_movable, inner_layers_count, bee.inner_layers
                 );
             }
             renderBeeView(&bee, &screen);
@@ -72,6 +73,7 @@ int main(void)
     bzzUnloadButton(learn_button);
     bzzUnloadButton(update_button);
     bzzUnloadButton(logo_button);
+    bzzUnloadMovable(bee_movable);
     CloseWindow();
     
     return 0;
