@@ -152,38 +152,38 @@ typedef struct {
     GymButton update;
     GymButton map;
     Font font;
-} ViewBee;
+} BeeParams;
 
-/// viewBeeNew return new ViewBee.
+/// viewBeeNew return new BeeParams.
 ///
 /// font - Font that will be used for text rendering.
-ViewBee viewBeeNew(
+BeeParams viewBeeNew(
         Font font, GymButton minus, GymButton plus, GymButton learn, GymButton update, GymButton map, 
         int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
     );
 
-/// viewBeeRandomize - randomizes ViewBee.
+/// viewBeeRandomize - randomizes BeeParams.
 ///
-/// bee -ViewBee to be randomized. 
-void viewBeeRandomize(ViewBee *bee);
+/// bee -BeeParams to be randomized. 
+void viewBeeRandomize(BeeParams *bee);
 
 /// renderBeeView renders PageNN in to the screen.
 ///
-/// bee - pointer to ViewBee structure.
-void renderBeeView(ViewBee *bee, char *screen);
+/// bee - pointer to BeeParams structure.
+void renderBeeView(BeeParams *bee, char *screen);
 
-/// void viewBeeFree frees memory allocated for ViewBee.
+/// void viewBeeFree frees memory allocated for BeeParams.
 ///
-/// bee -ViewBee to be freed from memory.
-void viewBeeFree(ViewBee *bee);
+/// bee -BeeParams to be freed from memory.
+void viewBeeFree(BeeParams *bee);
 
-/// gymRenderNN renders NN from ViewBee with controls.
+/// gymRenderNN renders NN from BeeParams with controls.
 ///
-/// bee - ViewBee containing NN.
+/// bee - BeeParams containing NN.
 /// r - GymRect representing render rectangle.
-void gymRenderNN(ViewBee *bee, GymRect r);
+void gymRenderNN(BeeParams *bee, GymRect r);
 
 /// isModified returns true if bee is modified or false otherwise.
-bool isModified(ViewBee *bee);
+bool isModified(BeeParams *bee);
 
 #endif

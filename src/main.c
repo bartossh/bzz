@@ -31,7 +31,7 @@ int main(void)
     GymButton update_button = gymButtonNewUpdate(0.09f, ORANGE);
 
     ViewMenu m = viewMenuNew(font, bee_button);
-    ViewBee bee = viewBeeNew(font, minus_button, plus_button, learn_button, update_button, map_button, inner_layers_count, inner_layers);
+    BeeParams bee = viewBeeNew(font, minus_button, plus_button, learn_button, update_button, map_button, inner_layers_count, inner_layers);
 
     SetTargetFPS(70);
     

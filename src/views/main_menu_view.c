@@ -25,7 +25,8 @@ void renderMenuView(ViewMenu m, char *screen)
 
     BeginDrawing(); 
         ClearBackground(OCEAN);
-        DrawTextEx(m.font, "YELLOW FROM BZZ GAME." ,CLITERAL(Vector2){.x = 50, .y = 20}, 50, 0, ORANGE);
+        DrawTextEx(m.font, "BZZ - train your bees to cope in a world full of dangers.",
+                   CLITERAL(Vector2){.x = 200, .y = 120 }, 30, 0, ORANGE);
         int pressed = gymRenderButton(m.bee_button, CLITERAL(Vector2){.x = w - 50 , .y = 20 });
         if (pressed) {
            *screen = 'B';  
