@@ -99,6 +99,13 @@ void gymNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_
 // renderTextBoxed renders boxed text allowing for box resizing and text wrapping.
 void renderTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
 
+/// ScreenView represents the screen view to be rendered.
+typedef enum {
+    BeeTrainScreen,
+    BeeMapScreen,
+    MainMenuScreen
+} ScreenView;
+
 /// GymButton holds functionality to render buttons.
 typedef struct {
     Texture2D tx;
@@ -112,23 +119,27 @@ GymButton gymButtonNewBee(float scale, Color color);
 GymButton gymButtonNewMap(float scale, Color color);
 GymButton gymButtonNewLearn(float scale, Color color);
 GymButton gymButtonNewUpdate(float scale, Color color);
+GymButton gymButtonNewLogo(float scale, Color color);
 int gymRenderButton(GymButton btn, Vector2 pos);
 void gymUnloadButton(GymButton btn);
 
+// ViewMenu structure representing menu view.
 typedef struct {
-    Texture2D logo;
-    GymButton bee_button;
+    GymButton logo_button;
     Font font;
 } ViewMenu;
 
 /// viewBeeNew return new ViewMenu.
 ///
-ViewMenu viewMenuNew(Font font, GymButton bee_button);
+/// font - font used for text rendering.
+/// bee_button - bee GymButton object. 
+ViewMenu viewMenuNew(Font font, GymButton logo_button);
 
 // renderMenuView renders main page in to the screen.
-void renderMenuView(ViewMenu m, char *screen);
-
-void cleanupMenuView(ViewMenu m);
+//
+// m - ViewMenu object holding functionality to render main menu. 
+// screen - screen value representing screen to render.
+void renderMenuView(ViewMenu m, ScreenView *screen);
 
 /// PageNN holds all the data required to properly update the nn page view.
 typedef struct {
@@ -146,20 +157,29 @@ typedef struct {
     Mat t;
     NN nn;
     GymPlot plot;
-    GymButton minus;
-    GymButton plus;
-    GymButton learn;
-    GymButton update;
-    GymButton map;
+    GymButton minus_button;
+    GymButton plus_button;
+    GymButton learn_button;
+    GymButton update_button;
+    GymButton map_button;
+    GymButton bee_button;
     Font font;
 } BeeParams;
 
 /// viewBeeNew return new BeeParams.
 ///
 /// font - Font that will be used for text rendering.
+/// minus_button - minus GymButton object.
+/// plus_button - plus GymButton object.
+/// learn_button - learn GymButton object.
+/// update_button - update GymButton object.
+/// map_button - map GymButton object.
+/// bee_button - bee GymButton object.
+/// inner_layers_count - number of inner NN layers.
+/// inner_layers - architecture of inner layers.
 BeeParams viewBeeNew(
-        Font font, GymButton minus, GymButton plus, GymButton learn, GymButton update, GymButton map, 
-        int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
+    Font font, GymButton minus_button, GymButton plus_button, GymButton learn_button, GymButton update_button,
+    GymButton map_button, GymButton bee_button, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
     );
 
 /// viewBeeRandomize - randomizes BeeParams.
@@ -170,7 +190,8 @@ void viewBeeRandomize(BeeParams *bee);
 /// renderBeeView renders PageNN in to the screen.
 ///
 /// bee - pointer to BeeParams structure.
-void renderBeeView(BeeParams *bee, char *screen);
+// screen - screen value representing screen to render.
+void renderBeeView(BeeParams *bee, ScreenView *screen);
 
 /// void viewBeeFree frees memory allocated for BeeParams.
 ///
@@ -185,5 +206,11 @@ void gymRenderNN(BeeParams *bee, GymRect r);
 
 /// isModified returns true if bee is modified or false otherwise.
 bool isModified(BeeParams *bee);
+
+/// renderMapView renders a map view.
+///
+/// bee - BeeParams holding bee functionality parameters.
+// screen - screen value representing screen to render.
+void renderMapView(BeeParams *bee, ScreenView *screen);
 
 #endif

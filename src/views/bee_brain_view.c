@@ -72,8 +72,8 @@ void gymRenderNN(BeeParams *bee, GymRect r)
         }
         if (l != 0 && l != bee->nn.arch_count-1) {
             int result = 0;
-            result += gymRenderButton(bee->plus, (Vector2){.x = cx1, .y = r.y-10});
-            result -= gymRenderButton(bee->minus, (Vector2){.x = cx1, .y = r.y+20});
+            result += gymRenderButton(bee->plus_button, (Vector2){.x = cx1, .y = r.y-10});
+            result -= gymRenderButton(bee->minus_button, (Vector2){.x = cx1, .y = r.y+20});
             if ((bee->paused && bee->inner_layers[l-1] < MAX_PERCEPTRONS && result > 0) || 
                 (bee->paused && bee->inner_layers[l-1] > MIN_PERCEPTRONS && result < 0)) {
                 bee->modified = true;
@@ -83,7 +83,7 @@ void gymRenderNN(BeeParams *bee, GymRect r)
     }
 }
 
-void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width) 
+void gymRenderMatAsHeatmap_button(Mat m, GymRect r, size_t max_width) 
 {
     Color low_color = ORANGE;
     Color high_color = BLACK;
@@ -109,7 +109,7 @@ void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width)
     }
 }
 
-void gymRenderNNWeightsHeatmap(NN nn, GymRect r) {
+void gymRenderNNWeightsHeatmap_button(NN nn, GymRect r) {
     size_t max_width = 0;
     for (size_t i = 0; i < nn.arch_count - 1; ++i) {
         if (max_width < nn.ws[i].cols) {
@@ -119,12 +119,12 @@ void gymRenderNNWeightsHeatmap(NN nn, GymRect r) {
 
     GymLayoutBegin(GloVert, r, nn.arch_count - 1, 20);
     for (size_t i = 0; i < nn.arch_count - 1; ++i) {
-        gymRenderMatAsHeatmap(nn.ws[i], GymLayoutSlot(), max_width);
+        gymRenderMatAsHeatmap_button(nn.ws[i], GymLayoutSlot(), max_width);
     }
     GymLayoutEnd();
 }
 
-void gymRenderNNActivationsHeatmap(NN nn, GymRect r) 
+void gymRenderNNActivationsHeatmap_button(NN nn, GymRect r) 
 {
     size_t max_width = 0;
     for (size_t i = 0; i < nn.arch_count; ++i) {
@@ -135,7 +135,7 @@ void gymRenderNNActivationsHeatmap(NN nn, GymRect r)
 
     GymLayoutBegin(GloVert, r, nn.arch_count, 20);
     for (size_t i = 0; i < nn.arch_count; ++i) {
-        gymRenderMatAsHeatmap(rowAsMat(nn.as[i]), GymLayoutSlot(), max_width);
+        gymRenderMatAsHeatmap_button(rowAsMat(nn.as[i]), GymLayoutSlot(), max_width);
     }
     GymLayoutEnd();
 }
@@ -417,8 +417,8 @@ static void viewBeeLearn(BeeParams *bee, GymRect r, float *slider_position, bool
 }
 
 BeeParams viewBeeNew(
-    Font font, GymButton minus, GymButton plus, GymButton learn, GymButton update,
-    GymButton map, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
+    Font font, GymButton minus_button, GymButton plus_button, GymButton learn_button, GymButton update_button,
+    GymButton map_button, GymButton bee_button, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
 {
     const size_t max_epoch = 200 * 1000;
     const size_t epochs_per_frame = 300;
@@ -462,11 +462,12 @@ BeeParams viewBeeNew(
         .nn = nn,
         .plot = plot,
         .font = font,
-        .minus = minus,
-        .plus = plus,
-        .learn = learn,
-        .update = update,
-        .map = map
+        .minus_button = minus_button,
+        .plus_button = plus_button,
+        .learn_button = learn_button,
+        .update_button = update_button,
+        .map_button = map_button,
+        .bee_button = bee_button
     };
 
     for (int i = 0; i < MAX_INNER_LAYERS; i++) {
@@ -500,7 +501,7 @@ void viewBeeFree(BeeParams *bee)
 float slider_position = 0.0f;
 bool slider_dragging = false;
 
-void renderBeeView(BeeParams *bee, char *screen) 
+void renderBeeView(BeeParams *bee, ScreenView *screen) 
 {
     if (!bee || !screen) {
         exit(1);
@@ -528,17 +529,17 @@ void renderBeeView(BeeParams *bee, char *screen)
 
     DrawText("Train your BEE!", 22, 5, h * 0.025, GREEN);
     
-    int pressed = gymRenderButton(bee->map, CLITERAL(Vector2){.x = w - 50, .y = 20});
+    int pressed = gymRenderButton(bee->map_button, CLITERAL(Vector2){.x = w - 50, .y = 20});
     if (pressed) {
-        *screen = 'M';
+        *screen = BeeMapScreen;
     }
-    float map_end = bee->map.tx.height*bee->map.scale + 60; // map button is before
-    pressed = gymRenderButton(bee->learn, CLITERAL(Vector2){.x = w - 50, .y = map_end + 10 }); 
+    float map_button_end = bee->map_button.tx.height*bee->map_button.scale + 60; // map button is before
+    pressed = gymRenderButton(bee->learn_button, CLITERAL(Vector2){.x = w - 50, .y = map_button_end + 10 }); 
     if (pressed || (!bee->paused && bee->epoch == bee->max_epoch)) {
         bee->paused = !bee->paused;
     }
-    float learn_end = map_end + 10 + bee->learn.tx.height*bee->learn.scale; // learn button is before
-    pressed = gymRenderButton(bee->update, CLITERAL(Vector2){.x = w - 50, .y = learn_end + 10 });
+    float learn_button_end = map_button_end + 10 + bee->learn_button.tx.height*bee->learn_button.scale; // learn button is before
+    pressed = gymRenderButton(bee->update_button, CLITERAL(Vector2){.x = w - 50, .y = learn_button_end + 10 });
     if (pressed) {
         bee->reset = true;
     }
@@ -565,8 +566,8 @@ void renderBeeView(BeeParams *bee, char *screen)
     
     char controles_buffer[256];
     int inner_layers_count = bee->inner_layers_count;
-    inner_layers_count -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip-20}); 
-    inner_layers_count += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip-20});
+    inner_layers_count -= gymRenderButton(bee->minus_button, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip-20}); 
+    inner_layers_count += gymRenderButton(bee->plus_button, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip-20});
     if (bee->paused && bee->inner_layers_count < inner_layers_count && bee->inner_layers_count < MAX_INNER_LAYERS) {
         bee->inner_layers_count = inner_layers_count;
         bee->inner_layers[bee->inner_layers_count-1] = 5;

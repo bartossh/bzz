@@ -75,6 +75,18 @@ GymButton gymButtonNewUpdate(float scale, Color color)
     return btn;
 }
 
+GymButton gymButtonNewLogo(float scale, Color color)
+{
+    GymButton btn = {
+        .tx = assetLoad(Logo),
+        .color = color,
+        .scale = scale,
+    };
+
+    return btn;
+}
+
+
 int gymRenderButton(GymButton btn, Vector2 pos)
 { 
     float width = btn.tx.width * btn.scale;

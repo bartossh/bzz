@@ -7,7 +7,7 @@
 #include <time.h>
 
 bool paused = true;
-char screen = 'M';
+ScreenView screen = MainMenuScreen;
 int inner_layers_count = 1;
 int inner_layers[MAX_INNER_LAYERS] = {5};
 
@@ -29,9 +29,13 @@ int main(void)
     GymButton map_button = gymButtonNewMap(0.09f, ORANGE);
     GymButton learn_button = gymButtonNewLearn(0.09f, ORANGE);
     GymButton update_button = gymButtonNewUpdate(0.09f, ORANGE);
+    GymButton logo_button = gymButtonNewLogo(0.5, ORANGE);
 
-    ViewMenu m = viewMenuNew(font, bee_button);
-    BeeParams bee = viewBeeNew(font, minus_button, plus_button, learn_button, update_button, map_button, inner_layers_count, inner_layers);
+    ViewMenu m = viewMenuNew(font, logo_button);
+    BeeParams bee = viewBeeNew(
+        font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
+        inner_layers_count, inner_layers
+    );
 
     SetTargetFPS(70);
     
@@ -39,22 +43,27 @@ int main(void)
     
     while (!WindowShouldClose()) {  
         switch (screen) {
-        case 'M':
+        case MainMenuScreen:
             renderMenuView(m, &screen);
             break;
-        case 'B':
+        case BeeMapScreen:
+            renderMapView(&bee, &screen);
+            break;
+        case BeeTrainScreen:
         default: 
             if (bee.paused && isModified(&bee)) {
                 inner_layers_count = bee.inner_layers_count;
                 Font font = bee.font;
                 viewBeeFree(&bee);
-                bee = viewBeeNew(font, minus_button, plus_button, learn_button, update_button, map_button, inner_layers_count, bee.inner_layers);
-            } 
+                bee = viewBeeNew(
+                    font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
+                    inner_layers_count, bee.inner_layers
+                );
+            }
             renderBeeView(&bee, &screen);
             break;
         }
     }
-    cleanupMenuView(m);
     UnloadFont(font);
     gymUnloadButton(minus_button);
     gymUnloadButton(plus_button);
@@ -62,6 +71,7 @@ int main(void)
     gymUnloadButton(map_button);
     gymUnloadButton(learn_button);
     gymUnloadButton(update_button);
+    gymUnloadButton(logo_button);
     CloseWindow();
     
     return 0;
