@@ -9,7 +9,13 @@
 enum AssetTexture2D {
     Logo,
     MinusButton,
-    PlusButton
+    PlusButton,
+    UpdateButton,
+    BeeButton,
+    BeeFlying,
+    Honeycomb,
+    MapButton,
+    LearnButton
 };
 
 /// assetLoad loads assets to the GPU and returns texture 2d.

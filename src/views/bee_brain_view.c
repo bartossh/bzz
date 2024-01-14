@@ -9,7 +9,6 @@
 #include "views.h"
 #include "../nn/nn.h"
 #include "../flowers/flowers.h"
-#include "../assets/assets_loader.h"
 
 #include <stdio.h>
 
@@ -26,62 +25,6 @@ static float absf(float a)
         return a;
     }
     return -a;
-}
-
-GymButton gymButtonNewMinus(float scale, Color color)
-{
-    GymButton btn = {
-        .tx = assetLoad(MinusButton),
-        .color = color,
-        .scale = scale,
-    };
-
-    return btn;
-}
-
-GymButton gymButtonNewPlus(float scale, Color color)
-{
-    GymButton btn = {
-        .tx = assetLoad(PlusButton),
-        .color = color,
-        .scale = scale,
-    };
-
-    return btn;
-}
-
-int gymRenderButton(GymButton btn, Vector2 pos)
-{ 
-    float width = btn.tx.width * btn.scale;
-    float height = btn.tx.height *btn.scale;
-    
-    Rectangle btnBounds = { pos.x, pos.y, width, height };
-    Vector2 mousePoint = GetMousePosition();
-
-    float resize = 1.0f;
-    int result = 0;
-
-    if (CheckCollisionPointRec(mousePoint, btnBounds)) {
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            resize = 0.9;
-        }
-
-        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-            result++;
-        }    
-    }
-
-    Vector2 p = { .x = pos.x + (width - width * resize)/2.0f, .y = pos.y + (height - height * resize)/2.0f };
-    
-    DrawTextureEx(btn.tx, p, 0.0f, btn.scale*resize, btn.color);
-
-    return result;
-}
-
-
-void gymUnloadButton(GymButton btn)
-{
-    UnloadTexture(btn.tx);  
 }
 
 void gymRenderNN(ViewBee *bee, GymRect r)
@@ -131,7 +74,8 @@ void gymRenderNN(ViewBee *bee, GymRect r)
             int result = 0;
             result += gymRenderButton(bee->plus, (Vector2){.x = cx1, .y = r.y-10});
             result -= gymRenderButton(bee->minus, (Vector2){.x = cx1, .y = r.y+20});
-            if ((bee->inner_layers[l-1] < MAX_PERCEPTRONS && result > 0) || (bee->inner_layers[l-1] > MIN_PERCEPTRONS && result < 0)) {
+            if ((bee->paused && bee->inner_layers[l-1] < MAX_PERCEPTRONS && result > 0) || 
+                (bee->paused && bee->inner_layers[l-1] > MIN_PERCEPTRONS && result < 0)) {
                 bee->modified = true;
                 bee->inner_layers[l-1] += result;
             }
@@ -467,13 +411,15 @@ static void viewBeeLearn(ViewBee *bee, GymRect r, float *slider_position, bool *
     }
     char buffer_print[buff_size];
     snprintf(buffer_print, next_pos, "%s", buffer);
-    DrawTextBoxed(
+    renderTextBoxed(
         bee->font, buffer_print, (Rectangle){r.x, r.y, r.w + 200, r.h},
         s, pad, false, ORANGE
     );
 }
 
-ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
+ViewBee viewBeeNew(
+    Font font, GymButton minus, GymButton plus, GymButton learn, GymButton update,
+    GymButton map, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
 {
     const size_t max_epoch = 200 * 1000;
     const size_t epochs_per_frame = 300;
@@ -518,7 +464,10 @@ ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_
         .plot = plot,
         .font = font,
         .minus = minus,
-        .plus = plus
+        .plus = plus,
+        .learn = learn,
+        .update = update,
+        .map = map
     };
 
     for (int i = 0; i < MAX_INNER_LAYERS; i++) {
@@ -552,9 +501,9 @@ void viewBeeFree(ViewBee *bee)
 float slider_position = 0.0f;
 bool slider_dragging = false;
 
-void drawBeeView(ViewBee *bee) 
+void renderBeeView(ViewBee *bee, char *screen) 
 {
-    if (!bee) {
+    if (!bee || !screen) {
         exit(1);
         return;
     }
@@ -564,6 +513,7 @@ void drawBeeView(ViewBee *bee)
         nnRand(bee->nn, -1, 1);
         gymPlotFree(&bee->plot);
     }
+    bee->reset = false;
 
     for (size_t i = 0;i < bee->epochs_per_frame && !bee->paused && bee->epoch < bee->max_epoch;++i) {
         NN g = nnBackprop(&bee->temp, bee->nn, bee->t);
@@ -577,7 +527,24 @@ void drawBeeView(ViewBee *bee)
     int w = GetScreenWidth();
     int h = GetScreenHeight();
 
-    DrawText("Train your BEE!", 5, 5, h * 0.025, GREEN);
+    DrawText("Train your BEE!", 22, 5, h * 0.025, GREEN);
+    
+    int pressed = gymRenderButton(bee->map, CLITERAL(Vector2){.x = w - 50, .y = 20});
+    if (pressed) {
+        *screen = 'M';
+    }
+    float map_end = bee->map.tx.height*bee->map.scale + 60; // map button is before
+    pressed = gymRenderButton(bee->learn, CLITERAL(Vector2){.x = w - 50, .y = map_end + 10 }); 
+    if (pressed) {
+        bee->paused = !bee->paused;
+    }
+    float learn_end = map_end + 10 + bee->learn.tx.height*bee->learn.scale; // learn button is before
+    pressed = gymRenderButton(bee->update, CLITERAL(Vector2){.x = w - 50, .y = learn_end + 10 });
+    if (pressed) {
+        bee->reset = true;
+    }
+
+
     char description_buffer[256];
     snprintf(description_buffer, sizeof(description_buffer),
              "<| Epoch: %zu/%zu, Rate: %f, Cost: %f, Temporary Memory: %zu kB |>",
@@ -601,12 +568,12 @@ void drawBeeView(ViewBee *bee)
     int inner_layers_count = bee->inner_layers_count;
     inner_layers_count -= gymRenderButton(bee->minus, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip}); 
     inner_layers_count += gymRenderButton(bee->plus, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip});
-    if (bee->inner_layers_count < inner_layers_count && bee->inner_layers_count < MAX_INNER_LAYERS) {
+    if (bee->paused && bee->inner_layers_count < inner_layers_count && bee->inner_layers_count < MAX_INNER_LAYERS) {
         bee->inner_layers_count = inner_layers_count;
         bee->inner_layers[bee->inner_layers_count-1] = 5;
         bee->modified = true;
     }
-    if (bee->inner_layers_count > inner_layers_count && bee->inner_layers_count > MIN_INNER_LAYERS ) {
+    if (bee->paused && bee->inner_layers_count > inner_layers_count && bee->inner_layers_count > MIN_INNER_LAYERS ) {
         bee->inner_layers_count = inner_layers_count;
         bee->modified = true;
     }

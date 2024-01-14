@@ -4,31 +4,35 @@
 #include "raylib.h"
 #include "../assets/assets_loader.h"
 
-const char menu[] = 
-" MENU: \n"
-" KEY B - Train your Bee.\n"
-" KEY M - Main manu.\n";
-
-ViewMenu viewMenuNew(Font font)
+ViewMenu viewMenuNew(Font font, GymButton bee_button)
 {
     ViewMenu pm = {
         .logo = assetLoad(Logo),
         .font = font,
+        .bee_button = bee_button,
     };
 
     return pm;
 }
 
-void drawMenuView(ViewMenu m)
+void renderMenuView(ViewMenu m, char *screen)
 {
+    if (!screen) {
+        exit(1);
+        return;
+    }
+    int w = GetScreenWidth();
+
     BeginDrawing(); 
         ClearBackground(OCEAN);
         DrawTextEx(m.font, "YELLOW FROM BZZ GAME." ,CLITERAL(Vector2){.x = 50, .y = 20}, 50, 0, ORANGE);
-        DrawTextEx(m.font, menu, CLITERAL(Vector2){.x = 80, .y = 100}, 30, 0, ORANGE);
+        int pressed = gymRenderButton(m.bee_button, CLITERAL(Vector2){.x = w - 50 , .y = 20 });
+        if (pressed) {
+           *screen = 'B';  
+        }
         DrawTextureV(m.logo, CLITERAL(Vector2){.x = 550, .y = 150}, ORANGE); 
     EndDrawing();
 }
-
 
 void cleanupMenuView(ViewMenu m)
 {
