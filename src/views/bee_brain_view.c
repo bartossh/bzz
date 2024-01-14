@@ -417,7 +417,9 @@ static void viewBeeLearn(ViewBee *bee, GymRect r, float *slider_position, bool *
     );
 }
 
-ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, GymButton map, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
+ViewBee viewBeeNew(
+    Font font, GymButton minus, GymButton plus, GymButton learn, GymButton update,
+    GymButton map, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
 {
     const size_t max_epoch = 200 * 1000;
     const size_t epochs_per_frame = 300;
@@ -463,6 +465,8 @@ ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, GymButton map, in
         .font = font,
         .minus = minus,
         .plus = plus,
+        .learn = learn,
+        .update = update,
         .map = map
     };
 
@@ -509,6 +513,7 @@ void renderBeeView(ViewBee *bee, char *screen)
         nnRand(bee->nn, -1, 1);
         gymPlotFree(&bee->plot);
     }
+    bee->reset = false;
 
     for (size_t i = 0;i < bee->epochs_per_frame && !bee->paused && bee->epoch < bee->max_epoch;++i) {
         NN g = nnBackprop(&bee->temp, bee->nn, bee->t);
@@ -523,10 +528,22 @@ void renderBeeView(ViewBee *bee, char *screen)
     int h = GetScreenHeight();
 
     DrawText("Train your BEE!", 22, 5, h * 0.025, GREEN);
-    int pressed = gymRenderButton(bee->map, CLITERAL(Vector2){ .x = w - 50, .y = 20});
+    
+    int pressed = gymRenderButton(bee->map, CLITERAL(Vector2){.x = w - 50, .y = 20});
     if (pressed) {
         *screen = 'M';
     }
+    float map_end = bee->map.tx.height*bee->map.scale + 60; // map button is before
+    pressed = gymRenderButton(bee->learn, CLITERAL(Vector2){.x = w - 50, .y = map_end + 10 }); 
+    if (pressed) {
+        bee->paused = !bee->paused;
+    }
+    float learn_end = map_end + 10 + bee->learn.tx.height*bee->learn.scale; // learn button is before
+    pressed = gymRenderButton(bee->update, CLITERAL(Vector2){.x = w - 50, .y = learn_end + 10 });
+    if (pressed) {
+        bee->reset = true;
+    }
+
 
     char description_buffer[256];
     snprintf(description_buffer, sizeof(description_buffer),

@@ -38,11 +38,12 @@ int main(int argc, char* argv[]) {
             (Candidate){.path = "assets/logo.png", .name = "src/assets/logo.h"},
             (Candidate){.path = "assets/plus.png", .name = "src/assets/plus_button.h"},
             (Candidate){.path = "assets/minus.png", .name = "src/assets/minus_button.h"},
-            (Candidate){.path = "assets/update.png", .name = "src/assets/update_button.h"},
+            (Candidate){.path = "assets/update_button.png", .name = "src/assets/update_button.h"},
             (Candidate){.path = "assets/honeycomb.png", .name = "src/assets/honeycomb.h"},
             (Candidate){.path = "assets/bee.png", .name = "src/assets/bee_button.h"},
             (Candidate){.path = "assets/bee_flying.png", .name = "src/assets/bee_flying.h"},
-            (Candidate){.path = "assets/map_button.png", .name = "src/assets/map_button.h"}
+            (Candidate){.path = "assets/map_button.png", .name = "src/assets/map_button.h"},
+            (Candidate){.path = "assets/learn_button.png", .name = "src/assets/learn_button.h"}
         };
 
         size_t len = CandidatesLen(candidates);

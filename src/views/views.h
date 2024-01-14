@@ -108,8 +108,10 @@ typedef struct {
 
 GymButton gymButtonNewMinus(float scale, Color color);
 GymButton gymButtonNewPlus(float scale, Color color);
-GymButton gymButtonBee(float scale, Color color);
-GymButton gymButtonMap(float scale, Color color);
+GymButton gymButtonNewBee(float scale, Color color);
+GymButton gymButtonNewMap(float scale, Color color);
+GymButton gymButtonNewLearn(float scale, Color color);
+GymButton gymButtonNewUpdate(float scale, Color color);
 int gymRenderButton(GymButton btn, Vector2 pos);
 void gymUnloadButton(GymButton btn);
 
@@ -146,6 +148,8 @@ typedef struct {
     GymPlot plot;
     GymButton minus;
     GymButton plus;
+    GymButton learn;
+    GymButton update;
     GymButton map;
     Font font;
 } ViewBee;
@@ -153,7 +157,10 @@ typedef struct {
 /// viewBeeNew return new ViewBee.
 ///
 /// font - Font that will be used for text rendering.
-ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, GymButton map, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]);
+ViewBee viewBeeNew(
+        Font font, GymButton minus, GymButton plus, GymButton learn, GymButton update, GymButton map, 
+        int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
+    );
 
 /// viewBeeRandomize - randomizes ViewBee.
 ///

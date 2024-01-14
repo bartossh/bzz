@@ -31,7 +31,7 @@ GymButton gymButtonNewPlus(float scale, Color color)
 }
 
 
-GymButton gymButtonBee(float scale, Color color)
+GymButton gymButtonNewBee(float scale, Color color)
 {
     GymButton btn = {
         .tx = assetLoad(BeeButton),
@@ -42,10 +42,32 @@ GymButton gymButtonBee(float scale, Color color)
     return btn;
 }
 
-GymButton gymButtonMap(float scale, Color color)
+GymButton gymButtonNewMap(float scale, Color color)
 {
     GymButton btn = {
         .tx = assetLoad(MapButton),
+        .color = color,
+        .scale = scale,
+    };
+
+    return btn;
+}
+
+GymButton gymButtonNewLearn(float scale, Color color)
+{
+    GymButton btn = {
+        .tx = assetLoad(LearnButton),
+        .color = color,
+        .scale = scale,
+    };
+
+    return btn;
+}
+
+GymButton gymButtonNewUpdate(float scale, Color color)
+{
+    GymButton btn = {
+        .tx = assetLoad(UpdateButton),
         .color = color,
         .scale = scale,
     };

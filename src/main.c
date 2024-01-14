@@ -25,11 +25,13 @@ int main(void)
     
     GymButton minus_button = gymButtonNewMinus(0.05f, BLACK);
     GymButton plus_button = gymButtonNewPlus(0.05f, BLACK);
-    GymButton bee_button = gymButtonBee(0.09f, ORANGE);
-    GymButton map_button = gymButtonMap(0.09f, ORANGE);
+    GymButton bee_button = gymButtonNewBee(0.09f, ORANGE);
+    GymButton map_button = gymButtonNewMap(0.09f, ORANGE);
+    GymButton learn_button = gymButtonNewLearn(0.09f, ORANGE);
+    GymButton update_button = gymButtonNewUpdate(0.09f, ORANGE);
 
     ViewMenu m = viewMenuNew(font, bee_button);
-    ViewBee bee = viewBeeNew(font, minus_button, plus_button, map_button, inner_layers_count, inner_layers);
+    ViewBee bee = viewBeeNew(font, minus_button, plus_button, learn_button, update_button, map_button, inner_layers_count, inner_layers);
 
     SetTargetFPS(70);
     
@@ -41,23 +43,13 @@ int main(void)
             renderMenuView(m, &screen);
             break;
         case 'B':
-        default:
-            if (IsKeyPressed(KEY_SPACE)) {
-                bee.paused = !bee.paused;
-            }
-        
+        default: 
             if (bee.paused && isModified(&bee)) {
                 inner_layers_count = bee.inner_layers_count;
                 Font font = bee.font;
                 viewBeeFree(&bee);
-                bee = viewBeeNew(font, minus_button, plus_button, map_button, inner_layers_count, bee.inner_layers);
-            }
-        
-            bee.reset = false;
-            if (IsKeyPressed(KEY_R)) {
-                bee.reset = true;
-            }
-        
+                bee = viewBeeNew(font, minus_button, plus_button, learn_button, update_button, map_button, inner_layers_count, bee.inner_layers);
+            } 
             renderBeeView(&bee, &screen);
             break;
         }
@@ -68,6 +60,8 @@ int main(void)
     gymUnloadButton(plus_button);
     gymUnloadButton(bee_button);
     gymUnloadButton(map_button);
+    gymUnloadButton(learn_button);
+    gymUnloadButton(update_button);
     CloseWindow();
     
     return 0;

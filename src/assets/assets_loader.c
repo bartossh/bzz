@@ -9,6 +9,7 @@
 #include "bee_flying.h"
 #include "honeycomb.h"
 #include "map_button.h"
+#include "learn_button.h"
 
 Texture2D assetLoad(enum AssetTexture2D a)
 {
@@ -70,9 +71,17 @@ Texture2D assetLoad(enum AssetTexture2D a)
         img.data = MAP_BUTTON_DATA;
         img.mipmaps = 1;
         break;
+    case LearnButton:
+        img.format = LEARN_BUTTON_FORMAT;
+        img.height = LEARN_BUTTON_HEIGHT;
+        img.width = LEARN_BUTTON_WIDTH;
+        img.data = LEARN_BUTTON_DATA;
+        img.mipmaps = 1;
+        break;
     default:
         exit(1);
     }
 
     return LoadTextureFromImage(img);
 }
+
