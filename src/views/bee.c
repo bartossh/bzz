@@ -25,20 +25,26 @@ int bzzRenderMovable(BzzMovable *mvb, Vector2 pos, float rotation)
 
     float width = mvb->tx.width;
     float height = mvb->tx.height / mvb->total_frames;
+    float x = pos.x-width/2;
+    float y = pos.y+height/2;
     
-    Rectangle mvbBounds = { pos.x, pos.y, width, height };
+    Rectangle mvbBounds = {x, y-height, width, height};
     Vector2 mousePoint = GetMousePosition();
     int result = 0;
+    float resize = 1.0f;
     if (CheckCollisionPointRec(mousePoint, mvbBounds)) {
         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
             result++;
-        }    
+        }
+
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            resize = 0.8;
+        }
     }
-    Rectangle dstRec =  {pos.x, pos.y, width, height};
-    Rectangle frameRec = { 0.0f, 0.0f, width, height };
-    frameRec.y = (float)mvb->frame*height;
-    Vector2 org = {.x = 0, .y = 0};
-    //DrawTextureRec(mvb->tx, frameRec, pos, mvb->color);
+    Rectangle dstRec =  {x, y, width*resize, height*resize};
+    Rectangle frameRec = {0.0f, 0.0f, width, height};
+    frameRec.y = ((float)mvb->frame)*height;
+    Vector2 org = {.x = 0.0f, .y = 0.0f};
     DrawTexturePro(mvb->tx, frameRec, dstRec, org, rotation, mvb->color);
     mvb->frame++;
     return result;
