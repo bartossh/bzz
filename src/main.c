@@ -38,7 +38,7 @@ int main(void)
         bee_movable, inner_layers_count, inner_layers
     );
 
-    SetTargetFPS(70);
+    SetTargetFPS(60);
     
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
     
