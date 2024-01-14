@@ -7,7 +7,7 @@
 #include <time.h>
 
 bool paused = true;
-char screen = 'M';
+ScreenView screen = MainMenuScreen;
 int inner_layers_count = 1;
 int inner_layers[MAX_INNER_LAYERS] = {5};
 
@@ -23,15 +23,20 @@ int main(void)
     
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     
-    GymButton minus_button = gymButtonNewMinus(0.05f, BLACK);
-    GymButton plus_button = gymButtonNewPlus(0.05f, BLACK);
-    GymButton bee_button = gymButtonNewBee(0.09f, ORANGE);
-    GymButton map_button = gymButtonNewMap(0.09f, ORANGE);
-    GymButton learn_button = gymButtonNewLearn(0.09f, ORANGE);
-    GymButton update_button = gymButtonNewUpdate(0.09f, ORANGE);
+    BzzButton minus_button = bzzButtonNewMinus(0.05f, BLACK);
+    BzzButton plus_button = bzzButtonNewPlus(0.05f, BLACK);
+    BzzButton bee_button = bzzButtonNewBee(0.09f, ORANGE);
+    BzzButton map_button = bzzButtonNewMap(0.09f, ORANGE);
+    BzzButton learn_button = bzzButtonNewLearn(0.09f, ORANGE);
+    BzzButton update_button = bzzButtonNewUpdate(0.09f, ORANGE);
+    BzzButton logo_button = bzzButtonNewLogo(1.0f, ORANGE);
+    BzzMovable bee_movable = bzzMovableNewBee(ORANGE);
 
-    ViewMenu m = viewMenuNew(font, bee_button);
-    ViewBee bee = viewBeeNew(font, minus_button, plus_button, learn_button, update_button, map_button, inner_layers_count, inner_layers);
+    ViewMenu m = viewMenuNew(font, logo_button);
+    BeeParams bee = viewBeeNew(
+        font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
+        bee_movable, inner_layers_count, inner_layers
+    );
 
     SetTargetFPS(70);
     
@@ -39,29 +44,36 @@ int main(void)
     
     while (!WindowShouldClose()) {  
         switch (screen) {
-        case 'M':
+        case MainMenuScreen:
             renderMenuView(m, &screen);
             break;
-        case 'B':
+        case BeeMapScreen:
+            renderMapView(&bee, &screen);
+            break;
+        case BeeTrainScreen:
         default: 
             if (bee.paused && isModified(&bee)) {
                 inner_layers_count = bee.inner_layers_count;
                 Font font = bee.font;
                 viewBeeFree(&bee);
-                bee = viewBeeNew(font, minus_button, plus_button, learn_button, update_button, map_button, inner_layers_count, bee.inner_layers);
-            } 
+                bee = viewBeeNew(
+                    font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
+                    bee_movable, inner_layers_count, bee.inner_layers
+                );
+            }
             renderBeeView(&bee, &screen);
             break;
         }
     }
-    cleanupMenuView(m);
     UnloadFont(font);
-    gymUnloadButton(minus_button);
-    gymUnloadButton(plus_button);
-    gymUnloadButton(bee_button);
-    gymUnloadButton(map_button);
-    gymUnloadButton(learn_button);
-    gymUnloadButton(update_button);
+    bzzUnloadButton(minus_button);
+    bzzUnloadButton(plus_button);
+    bzzUnloadButton(bee_button);
+    bzzUnloadButton(map_button);
+    bzzUnloadButton(learn_button);
+    bzzUnloadButton(update_button);
+    bzzUnloadButton(logo_button);
+    bzzUnloadMovable(bee_movable);
     CloseWindow();
     
     return 0;

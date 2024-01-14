@@ -4,37 +4,34 @@
 #include "raylib.h"
 #include "../assets/assets_loader.h"
 
-ViewMenu viewMenuNew(Font font, GymButton bee_button)
+ViewMenu viewMenuNew(Font font, BzzButton logo_button)
 {
     ViewMenu pm = {
-        .logo = assetLoad(Logo),
         .font = font,
-        .bee_button = bee_button,
+        .logo_button = logo_button
     };
 
     return pm;
 }
 
-void renderMenuView(ViewMenu m, char *screen)
+void renderMenuView(ViewMenu m, ScreenView *screen)
 {
     if (!screen) {
         exit(1);
         return;
     }
     int w = GetScreenWidth();
-
+    int h = GetScreenHeight();
+    float logo_x = w/2 - m.logo_button.tx.width * m.logo_button.scale/2;
+    float logo_y = h/2 - m.logo_button.tx.height * m.logo_button.scale/2;
     BeginDrawing(); 
-        ClearBackground(OCEAN);
-        DrawTextEx(m.font, "YELLOW FROM BZZ GAME." ,CLITERAL(Vector2){.x = 50, .y = 20}, 50, 0, ORANGE);
-        int pressed = gymRenderButton(m.bee_button, CLITERAL(Vector2){.x = w - 50 , .y = 20 });
-        if (pressed) {
-           *screen = 'B';  
-        }
-        DrawTextureV(m.logo, CLITERAL(Vector2){.x = 550, .y = 150}, ORANGE); 
+    ClearBackground(DEEPOCEAN);
+    DrawTextEx(
+        m.font, "BZZ - train your bees to survive in a world full of dangers.",
+        CLITERAL(Vector2){.x = 200, .y = 120 }, 30, 0, ORANGE);
+    int pressed = bzzRenderButton(m.logo_button, CLITERAL(Vector2){.x = logo_x , .y = logo_y });
+    if (pressed) {
+        *screen = BeeMapScreen;  
+    }
     EndDrawing();
-}
-
-void cleanupMenuView(ViewMenu m)
-{
-    UnloadTexture(m.logo);
 }
