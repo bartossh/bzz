@@ -3,7 +3,7 @@
 
 // Draw text using font inside rectangle limits with support for text selection
 inline static void 
-DrawTextBoxedSelectable(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint)
+renderTextBoxedSelectable(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint)
 {
     int length = TextLength(text);  // Total length in bytes of the text, scanned by codepoints in loop
 
@@ -116,7 +116,7 @@ DrawTextBoxedSelectable(Font font, const char *text, Rectangle rec, float fontSi
 }
 
 // Draw text using font inside rectangle limits
-void DrawTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint)
+void renderTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint)
 {
-    DrawTextBoxedSelectable(font, text, rec, fontSize, spacing, wordWrap, tint, 0, 0, WHITE, WHITE);
+    renderTextBoxedSelectable(font, text, rec, fontSize, spacing, wordWrap, tint, 0, 0, WHITE, WHITE);
 }

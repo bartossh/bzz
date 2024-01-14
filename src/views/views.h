@@ -96,9 +96,10 @@ void gymSliderHorizontal(float *value, bool *dragging, float rx, float ry, float
 void gymSliderVertical(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot);
 void gymNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_t stride, float low, float high);
 
-// DrawTextBoxed draws boxed text allowing for box resizing and text wrapping.
-void DrawTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
+// renderTextBoxed renders boxed text allowing for box resizing and text wrapping.
+void renderTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
 
+/// GymButton holds functionality to render buttons.
 typedef struct {
     Texture2D tx;
     Color color;
@@ -107,20 +108,23 @@ typedef struct {
 
 GymButton gymButtonNewMinus(float scale, Color color);
 GymButton gymButtonNewPlus(float scale, Color color);
+GymButton gymButtonBee(float scale, Color color);
+GymButton gymButtonMap(float scale, Color color);
 int gymRenderButton(GymButton btn, Vector2 pos);
 void gymUnloadButton(GymButton btn);
 
 typedef struct {
     Texture2D logo;
+    GymButton bee_button;
     Font font;
 } ViewMenu;
 
 /// viewBeeNew return new ViewMenu.
 ///
-ViewMenu viewMenuNew(Font font);
+ViewMenu viewMenuNew(Font font, GymButton bee_button);
 
-// drawMenuView draws main page in to the screen.
-void drawMenuView(ViewMenu m);
+// renderMenuView renders main page in to the screen.
+void renderMenuView(ViewMenu m, char *screen);
 
 void cleanupMenuView(ViewMenu m);
 
@@ -142,23 +146,24 @@ typedef struct {
     GymPlot plot;
     GymButton minus;
     GymButton plus;
+    GymButton map;
     Font font;
 } ViewBee;
 
 /// viewBeeNew return new ViewBee.
 ///
-/// font - Font that will be used for text drawing.
-ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]);
+/// font - Font that will be used for text rendering.
+ViewBee viewBeeNew(Font font, GymButton minus, GymButton plus, GymButton map, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]);
 
 /// viewBeeRandomize - randomizes ViewBee.
 ///
 /// bee -ViewBee to be randomized. 
 void viewBeeRandomize(ViewBee *bee);
 
-/// drawBeeView draws PageNN in to the screen.
+/// renderBeeView renders PageNN in to the screen.
 ///
 /// bee - pointer to ViewBee structure.
-void drawBeeView(ViewBee *bee);
+void renderBeeView(ViewBee *bee, char *screen);
 
 /// void viewBeeFree frees memory allocated for ViewBee.
 ///

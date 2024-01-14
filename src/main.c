@@ -25,26 +25,20 @@ int main(void)
     
     GymButton minus_button = gymButtonNewMinus(0.05f, BLACK);
     GymButton plus_button = gymButtonNewPlus(0.05f, BLACK);
+    GymButton bee_button = gymButtonBee(0.09f, ORANGE);
+    GymButton map_button = gymButtonMap(0.09f, ORANGE);
 
-    ViewMenu m = viewMenuNew(font);
-    ViewBee bee = viewBeeNew(font, minus_button, plus_button, inner_layers_count, inner_layers);
+    ViewMenu m = viewMenuNew(font, bee_button);
+    ViewBee bee = viewBeeNew(font, minus_button, plus_button, map_button, inner_layers_count, inner_layers);
 
     SetTargetFPS(70);
     
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
     
-    while (!WindowShouldClose()) {
-        if (IsKeyPressed(KEY_B)) {
-            screen = 'B';
-        }
-    
-        if (IsKeyPressed(KEY_M)) {
-            screen = 'M';
-        }
-    
+    while (!WindowShouldClose()) {  
         switch (screen) {
         case 'M':
-            drawMenuView(m);
+            renderMenuView(m, &screen);
             break;
         case 'B':
         default:
@@ -56,7 +50,7 @@ int main(void)
                 inner_layers_count = bee.inner_layers_count;
                 Font font = bee.font;
                 viewBeeFree(&bee);
-                bee = viewBeeNew(font, minus_button, plus_button, inner_layers_count, bee.inner_layers);
+                bee = viewBeeNew(font, minus_button, plus_button, map_button, inner_layers_count, bee.inner_layers);
             }
         
             bee.reset = false;
@@ -64,7 +58,7 @@ int main(void)
                 bee.reset = true;
             }
         
-            drawBeeView(&bee);
+            renderBeeView(&bee, &screen);
             break;
         }
     }
@@ -72,6 +66,8 @@ int main(void)
     UnloadFont(font);
     gymUnloadButton(minus_button);
     gymUnloadButton(plus_button);
+    gymUnloadButton(bee_button);
+    gymUnloadButton(map_button);
     CloseWindow();
     
     return 0;
