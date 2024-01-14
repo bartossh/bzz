@@ -1,16 +1,13 @@
 /// Copyright (c) 2024 Bartosz Lenart
 
-#include <float.h>
 #include <raylib.h>
-#include <raymath.h>
-#include <string.h>
 #include "raylib.h"
 #include "views.h"
 #include "../assets/assets_loader.h"
 
-GymButton gymButtonNewMinus(float scale, Color color)
+BzzButton bzzButtonNewMinus(float scale, Color color)
 {
-    GymButton btn = {
+    BzzButton btn = {
         .tx = assetLoad(MinusButton),
         .color = color,
         .scale = scale,
@@ -19,9 +16,9 @@ GymButton gymButtonNewMinus(float scale, Color color)
     return btn;
 }
 
-GymButton gymButtonNewPlus(float scale, Color color)
+BzzButton bzzButtonNewPlus(float scale, Color color)
 {
-    GymButton btn = {
+    BzzButton btn = {
         .tx = assetLoad(PlusButton),
         .color = color,
         .scale = scale,
@@ -31,9 +28,9 @@ GymButton gymButtonNewPlus(float scale, Color color)
 }
 
 
-GymButton gymButtonNewBee(float scale, Color color)
+BzzButton bzzButtonNewBee(float scale, Color color)
 {
-    GymButton btn = {
+    BzzButton btn = {
         .tx = assetLoad(BeeButton),
         .color = color,
         .scale = scale,
@@ -42,9 +39,9 @@ GymButton gymButtonNewBee(float scale, Color color)
     return btn;
 }
 
-GymButton gymButtonNewMap(float scale, Color color)
+BzzButton bzzButtonNewMap(float scale, Color color)
 {
-    GymButton btn = {
+    BzzButton btn = {
         .tx = assetLoad(MapButton),
         .color = color,
         .scale = scale,
@@ -53,9 +50,9 @@ GymButton gymButtonNewMap(float scale, Color color)
     return btn;
 }
 
-GymButton gymButtonNewLearn(float scale, Color color)
+BzzButton bzzButtonNewLearn(float scale, Color color)
 {
-    GymButton btn = {
+    BzzButton btn = {
         .tx = assetLoad(LearnButton),
         .color = color,
         .scale = scale,
@@ -64,9 +61,9 @@ GymButton gymButtonNewLearn(float scale, Color color)
     return btn;
 }
 
-GymButton gymButtonNewUpdate(float scale, Color color)
+BzzButton bzzButtonNewUpdate(float scale, Color color)
 {
-    GymButton btn = {
+    BzzButton btn = {
         .tx = assetLoad(UpdateButton),
         .color = color,
         .scale = scale,
@@ -75,9 +72,9 @@ GymButton gymButtonNewUpdate(float scale, Color color)
     return btn;
 }
 
-GymButton gymButtonNewLogo(float scale, Color color)
+BzzButton bzzButtonNewLogo(float scale, Color color)
 {
-    GymButton btn = {
+    BzzButton btn = {
         .tx = assetLoad(Logo),
         .color = color,
         .scale = scale,
@@ -87,7 +84,7 @@ GymButton gymButtonNewLogo(float scale, Color color)
 }
 
 
-int gymRenderButton(GymButton btn, Vector2 pos)
+int bzzRenderButton(BzzButton btn, Vector2 pos)
 { 
     float width = btn.tx.width * btn.scale;
     float height = btn.tx.height *btn.scale;
@@ -115,7 +112,7 @@ int gymRenderButton(GymButton btn, Vector2 pos)
     return result;
 }
 
-void gymUnloadButton(GymButton btn)
+void bzzUnloadButton(BzzButton btn)
 {
     UnloadTexture(btn.tx);  
 }

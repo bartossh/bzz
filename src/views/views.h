@@ -20,9 +20,9 @@
 #define GRASS CLITERAL(Color){ 14, 129, 3, 250 } // GRASS
 #endif // GRASS
 
-#ifndef GYMAssert
-#define GYMAssert NNAssert
-#endif // GYMAssert
+#ifndef bzzAssert
+#define bzzAssert NNAssert
+#endif // bzzAssert
 
 
 #define MAX_INNER_LAYERS 4
@@ -35,50 +35,50 @@ typedef struct {
     float y;
     float w;
     float h;
-} GymRect;
+} BzzRect;
 
-GymRect gymRect(float x, float y, float w, float h);
+BzzRect bzzRect(float x, float y, float w, float h);
 
 typedef enum {
     GloHorz,
     GloVert,
-} GymLayoutOrient;
+} BzzLayoutOrient;
 
 typedef struct {
     float *items;
     size_t count;
     size_t capacity;
-} GymPlot;
+} BzzPlot;
 
-void gymPlotFree(GymPlot *gp);
+void bzzPlotFree(BzzPlot *gp);
 
 typedef struct {
-    GymLayoutOrient orient;
-    GymRect rect;
+    BzzLayoutOrient orient;
+    BzzRect rect;
     size_t count;
     size_t i;
     float gap;
-} GymLayout;
+} BzzLayout;
 
-GymRect gymLayoutSlotLoc(GymLayout *l, const char *file_path, int line);
+BzzRect bzzLayoutSlotLoc(BzzLayout *l, const char *file_path, int line);
 
 typedef struct {
-    GymLayout *items;
+    BzzLayout *items;
     size_t count;
     size_t capacity;
-} GymLayoutStack;
+} BzzLayoutStack;
 
-void gymLayoutStackPush(GymLayoutStack *ls, GymLayoutOrient orient, GymRect rect, size_t count, float gap);
-#define GymLayoutStackSlot(ls) (GYMAssert((ls)->count > 0), gymLayoutSlotLoc(&(ls)->items[(ls)->count - 1], __FILE__, __LINE__))
-#define GymLayoutStackPop(ls) do { GYMAssert((ls)->count > 0); (ls)->count -= 1; } while (0)
+void bzzLayoutStackPush(BzzLayoutStack *ls, BzzLayoutOrient orient, BzzRect rect, size_t count, float gap);
+#define bzzLayoutStackSlot(ls) (bzzAssert((ls)->count > 0), bzzLayoutSlotLoc(&(ls)->items[(ls)->count - 1], __FILE__, __LINE__))
+#define bzzLayoutStackPop(ls) do { bzzAssert((ls)->count > 0); (ls)->count -= 1; } while (0)
 
-static GymLayoutStack defaultGymLayoutStack = {0};
+static BzzLayoutStack defaultbzzLayoutStack = {0};
 
-GymRect gymRoot(void);
-GymRect gymFitSquare(GymRect r);
-#define GymLayoutBegin(orient, rect, count, gap) gymLayoutStackPush(&defaultGymLayoutStack, orient, rect, count, gap)
-#define GymLayoutEnd() GymLayoutStackPop(&defaultGymLayoutStack)
-#define GymLayoutSlot() GymLayoutStackSlot(&defaultGymLayoutStack)
+BzzRect bzzRoot(void);
+BzzRect bzzFitSquare(BzzRect r);
+#define bzzLayoutBegin(orient, rect, count, gap) bzzLayoutStackPush(&defaultbzzLayoutStack, orient, rect, count, gap)
+#define bzzLayoutEnd() bzzLayoutStackPop(&defaultbzzLayoutStack)
+#define bzzLayoutSlot() bzzLayoutStackSlot(&defaultbzzLayoutStack)
 
 #define DaInitCap 256
 #define DaAppend(da, item)                                                          \
@@ -86,19 +86,19 @@ GymRect gymFitSquare(GymRect r);
         if ((da)->count >= (da)->capacity) {                                         \
             (da)->capacity = (da)->capacity == 0 ? DaInitCap : (da)->capacity*2;   \
             (da)->items = realloc((da)->items, (da)->capacity*sizeof(*(da)->items)); \
-            GYMAssert((da)->items != NULL && "MEMORY EXHAUSTED....");                   \
+            bzzAssert((da)->items != NULL && "MEMORY EXHAUSTED....");                   \
         }                                                                            \
                                                                                      \
         (da)->items[(da)->count++] = (item);                                         \
     } while (0)
 
-void gymRenderMatAsHeatmap(Mat m, GymRect r, size_t max_width);
-void gymRenderNNWeightsHeatmap(NN nn, GymRect r);
-void gymRenderNNActivationsHeatmap(NN nn, GymRect r);
-void gymPlot(GymPlot plot, GymRect r, Color c);
-void gymSliderHorizontal(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot);
-void gymSliderVertical(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot);
-void gymNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_t stride, float low, float high);
+void bzzRenderMatAsHeatmap(Mat m, BzzRect r, size_t max_width);
+void bzzRenderNNWeightsHeatmap(NN nn, BzzRect r);
+void bzzRenderNNActivationsHeatmap(NN nn, BzzRect r);
+void bzzPlot(BzzPlot plot, BzzRect r, Color c);
+void bzzSliderHorizontal(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot);
+void bzzSliderVertical(float *value, bool *dragging, float rx, float ry, float rw, float rh, Color c_slide, Color c_dot);
+void bzzNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_t stride, float low, float high);
 
 // renderTextBoxed renders boxed text allowing for box resizing and text wrapping.
 void renderTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
@@ -110,34 +110,53 @@ typedef enum {
     MainMenuScreen
 } ScreenView;
 
-/// GymButton holds functionality to render buttons.
+/// bzzButton holds functionality to render buttons.
 typedef struct {
     Texture2D tx;
     Color color;
     float scale;
-} GymButton;
+} BzzButton;
 
-GymButton gymButtonNewMinus(float scale, Color color);
-GymButton gymButtonNewPlus(float scale, Color color);
-GymButton gymButtonNewBee(float scale, Color color);
-GymButton gymButtonNewMap(float scale, Color color);
-GymButton gymButtonNewLearn(float scale, Color color);
-GymButton gymButtonNewUpdate(float scale, Color color);
-GymButton gymButtonNewLogo(float scale, Color color);
-int gymRenderButton(GymButton btn, Vector2 pos);
-void gymUnloadButton(GymButton btn);
+BzzButton bzzButtonNewMinus(float scale, Color color);
+BzzButton bzzButtonNewPlus(float scale, Color color);
+BzzButton bzzButtonNewBee(float scale, Color color);
+BzzButton bzzButtonNewMap(float scale, Color color);
+BzzButton bzzButtonNewLearn(float scale, Color color);
+BzzButton bzzButtonNewUpdate(float scale, Color color);
+BzzButton bzzButtonNewLogo(float scale, Color color);
+int bzzRenderButton(BzzButton btn, Vector2 pos);
+void bzzUnloadButton(BzzButton btn);
+
+typedef struct {
+    Texture2D tx;
+    Color color;
+    float scale;
+    int frame;
+    int total_frames;
+} BzzMovable;
+
+/// bzzMovableNewBee creates moveable bee object
+///
+/// scale - scale of the moveable bee.
+/// color - blend color of the moveable bee.
+BzzMovable bzzMovableNewBee(float scale, Color color);
+
+/// bzzUnloadMovable unloads texture from the movable object.
+///
+/// mvb - movable object to unload texture from.
+void bzzUnloadMovable(BzzMovable mvb);
 
 // ViewMenu structure representing menu view.
 typedef struct {
-    GymButton logo_button;
+    BzzButton logo_button;
     Font font;
 } ViewMenu;
 
 /// viewBeeNew return new ViewMenu.
 ///
 /// font - font used for text rendering.
-/// bee_button - bee GymButton object. 
-ViewMenu viewMenuNew(Font font, GymButton logo_button);
+/// bee_button - bee bzzButton object. 
+ViewMenu viewMenuNew(Font font, BzzButton logo_button);
 
 // renderMenuView renders main page in to the screen.
 //
@@ -160,30 +179,30 @@ typedef struct {
     FlowersDataset fl;
     Mat t;
     NN nn;
-    GymPlot plot;
-    GymButton minus_button;
-    GymButton plus_button;
-    GymButton learn_button;
-    GymButton update_button;
-    GymButton map_button;
-    GymButton bee_button;
+    BzzPlot plot;
+    BzzButton minus_button;
+    BzzButton plus_button;
+    BzzButton learn_button;
+    BzzButton update_button;
+    BzzButton map_button;
+    BzzButton bee_button;
     Font font;
 } BeeParams;
 
 /// viewBeeNew return new BeeParams.
 ///
 /// font - Font that will be used for text rendering.
-/// minus_button - minus GymButton object.
-/// plus_button - plus GymButton object.
-/// learn_button - learn GymButton object.
-/// update_button - update GymButton object.
-/// map_button - map GymButton object.
-/// bee_button - bee GymButton object.
+/// minus_button - minus BzzButton object.
+/// plus_button - plus BzzButton object.
+/// learn_button - learn BzzButton object.
+/// update_button - update BzzButton object.
+/// map_button - map BzzButton object.
+/// bee_button - bee BzzButton object.
 /// inner_layers_count - number of inner NN layers.
 /// inner_layers - architecture of inner layers.
 BeeParams viewBeeNew(
-    Font font, GymButton minus_button, GymButton plus_button, GymButton learn_button, GymButton update_button,
-    GymButton map_button, GymButton bee_button, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
+    Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
+    BzzButton map_button, BzzButton bee_button, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
     );
 
 /// viewBeeRandomize - randomizes BeeParams.
@@ -202,11 +221,11 @@ void renderBeeView(BeeParams *bee, ScreenView *screen);
 /// bee -BeeParams to be freed from memory.
 void viewBeeFree(BeeParams *bee);
 
-/// gymRenderNN renders NN from BeeParams with controls.
+/// bzzRenderNN renders NN from BeeParams with controls.
 ///
 /// bee - BeeParams containing NN.
-/// r - GymRect representing render rectangle.
-void gymRenderNN(BeeParams *bee, GymRect r);
+/// r - bzzRect representing render rectangle.
+void bzzRenderNN(BeeParams *bee, BzzRect r);
 
 /// isModified returns true if bee is modified or false otherwise.
 bool isModified(BeeParams *bee);

@@ -23,13 +23,13 @@ int main(void)
     
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     
-    GymButton minus_button = gymButtonNewMinus(0.05f, BLACK);
-    GymButton plus_button = gymButtonNewPlus(0.05f, BLACK);
-    GymButton bee_button = gymButtonNewBee(0.09f, ORANGE);
-    GymButton map_button = gymButtonNewMap(0.09f, ORANGE);
-    GymButton learn_button = gymButtonNewLearn(0.09f, ORANGE);
-    GymButton update_button = gymButtonNewUpdate(0.09f, ORANGE);
-    GymButton logo_button = gymButtonNewLogo(1.0f, ORANGE);
+    BzzButton minus_button = bzzButtonNewMinus(0.05f, BLACK);
+    BzzButton plus_button = bzzButtonNewPlus(0.05f, BLACK);
+    BzzButton bee_button = bzzButtonNewBee(0.09f, ORANGE);
+    BzzButton map_button = bzzButtonNewMap(0.09f, ORANGE);
+    BzzButton learn_button = bzzButtonNewLearn(0.09f, ORANGE);
+    BzzButton update_button = bzzButtonNewUpdate(0.09f, ORANGE);
+    BzzButton logo_button = bzzButtonNewLogo(1.0f, ORANGE);
 
     ViewMenu m = viewMenuNew(font, logo_button);
     BeeParams bee = viewBeeNew(
@@ -65,13 +65,13 @@ int main(void)
         }
     }
     UnloadFont(font);
-    gymUnloadButton(minus_button);
-    gymUnloadButton(plus_button);
-    gymUnloadButton(bee_button);
-    gymUnloadButton(map_button);
-    gymUnloadButton(learn_button);
-    gymUnloadButton(update_button);
-    gymUnloadButton(logo_button);
+    bzzUnloadButton(minus_button);
+    bzzUnloadButton(plus_button);
+    bzzUnloadButton(bee_button);
+    bzzUnloadButton(map_button);
+    bzzUnloadButton(learn_button);
+    bzzUnloadButton(update_button);
+    bzzUnloadButton(logo_button);
     CloseWindow();
     
     return 0;

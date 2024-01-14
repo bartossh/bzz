@@ -27,7 +27,7 @@ static float absf(float a)
     return -a;
 }
 
-void gymRenderNN(BeeParams *bee, GymRect r)
+void bzzRenderNN(BeeParams *bee, BzzRect r)
 {
     Color low_color = ORANGE;
     Color high_color = BLACK;
@@ -72,8 +72,8 @@ void gymRenderNN(BeeParams *bee, GymRect r)
         }
         if (l != 0 && l != bee->nn.arch_count-1) {
             int result = 0;
-            result += gymRenderButton(bee->plus_button, (Vector2){.x = cx1, .y = r.y-10});
-            result -= gymRenderButton(bee->minus_button, (Vector2){.x = cx1, .y = r.y+20});
+            result += bzzRenderButton(bee->plus_button, (Vector2){.x = cx1, .y = r.y-10});
+            result -= bzzRenderButton(bee->minus_button, (Vector2){.x = cx1, .y = r.y+20});
             if ((bee->paused && bee->inner_layers[l-1] < MAX_PERCEPTRONS && result > 0) || 
                 (bee->paused && bee->inner_layers[l-1] > MIN_PERCEPTRONS && result < 0)) {
                 bee->modified = true;
@@ -83,7 +83,7 @@ void gymRenderNN(BeeParams *bee, GymRect r)
     }
 }
 
-void gymRenderMatAsHeatmap_button(Mat m, GymRect r, size_t max_width) 
+void bzzRenderMatAsHeatmap_button(Mat m, BzzRect r, size_t max_width) 
 {
     Color low_color = ORANGE;
     Color high_color = BLACK;
@@ -98,7 +98,7 @@ void gymRenderMatAsHeatmap_button(Mat m, GymRect r, size_t max_width)
         for (size_t x = 0; x < m.cols; ++x) {
             high_color.a = floorf(255.f * sigmoidf(MatAt(m, y, x)));
             Color color = ColorAlphaBlend(low_color, high_color, alpha_color);
-            GymRect slot = {
+            BzzRect slot = {
                 .x = r.x + r.w / 2 - full_width / 2 + x * cell_width,
                 .y = r.y + y * cell_height,
                 .w = cell_width,
@@ -109,7 +109,7 @@ void gymRenderMatAsHeatmap_button(Mat m, GymRect r, size_t max_width)
     }
 }
 
-void gymRenderNNWeightsHeatmap_button(NN nn, GymRect r) {
+void bzzRenderNNWeightsHeatmap_button(NN nn, BzzRect r) {
     size_t max_width = 0;
     for (size_t i = 0; i < nn.arch_count - 1; ++i) {
         if (max_width < nn.ws[i].cols) {
@@ -117,14 +117,14 @@ void gymRenderNNWeightsHeatmap_button(NN nn, GymRect r) {
         }
     }
 
-    GymLayoutBegin(GloVert, r, nn.arch_count - 1, 20);
+    bzzLayoutBegin(GloVert, r, nn.arch_count - 1, 20);
     for (size_t i = 0; i < nn.arch_count - 1; ++i) {
-        gymRenderMatAsHeatmap_button(nn.ws[i], GymLayoutSlot(), max_width);
+        bzzRenderMatAsHeatmap_button(nn.ws[i], bzzLayoutSlot(), max_width);
     }
-    GymLayoutEnd();
+    bzzLayoutEnd();
 }
 
-void gymRenderNNActivationsHeatmap_button(NN nn, GymRect r) 
+void bzzRenderNNActivationsHeatmap_button(NN nn, BzzRect r) 
 {
     size_t max_width = 0;
     for (size_t i = 0; i < nn.arch_count; ++i) {
@@ -133,14 +133,14 @@ void gymRenderNNActivationsHeatmap_button(NN nn, GymRect r)
         }
     }
 
-    GymLayoutBegin(GloVert, r, nn.arch_count, 20);
+    bzzLayoutBegin(GloVert, r, nn.arch_count, 20);
     for (size_t i = 0; i < nn.arch_count; ++i) {
-        gymRenderMatAsHeatmap_button(rowAsMat(nn.as[i]), GymLayoutSlot(), max_width);
+        bzzRenderMatAsHeatmap_button(rowAsMat(nn.as[i]), bzzLayoutSlot(), max_width);
     }
-    GymLayoutEnd();
+    bzzLayoutEnd();
 }
 
-void gymPlot(GymPlot plot, GymRect r, Color c) 
+void bzzPlot(BzzPlot plot, BzzRect r, Color c) 
 {
     float min = FLT_MAX, max = FLT_MIN;
     for (size_t i = 0; i < plot.count; ++i) {
@@ -170,7 +170,7 @@ void gymPlot(GymPlot plot, GymRect r, Color c)
     DrawLineEx((Vector2){r.x, y0}, (Vector2){r.x + r.w - padding_back, y0}, 2, c);
 }
 
-void gymPlotFree(GymPlot *gp)
+void bzzPlotFree(BzzPlot *gp)
 {
     if (!gp) {
         return;
@@ -181,7 +181,7 @@ void gymPlotFree(GymPlot *gp)
     gp->capacity = 0;
 }
 
-void gymSliderHorizontal(float *value, bool *slider_dragging, float rx, float ry, float width, float knob_radius, Color c_slide, Color c_dot) 
+void bzzSliderHorizontal(float *value, bool *slider_dragging, float rx, float ry, float width, float knob_radius, Color c_slide, Color c_dot) 
 {
     Vector2 bar_size = {
         .x = width - 2 * knob_radius,
@@ -223,7 +223,7 @@ void gymSliderHorizontal(float *value, bool *slider_dragging, float rx, float ry
     }
 }
 
-void gymSliderVertical(float *value, bool *slider_dragging, float rx, float ry, float width, float knob_radius, Color c_slide, Color c_dot) 
+void bzzSliderVertical(float *value, bool *slider_dragging, float rx, float ry, float width, float knob_radius, Color c_slide, Color c_dot) 
 {
     Vector2 bar_size = {
         .x = knob_radius * 0.25,
@@ -262,10 +262,10 @@ void gymSliderVertical(float *value, bool *slider_dragging, float rx, float ry, 
     }
 }
 
-void gymNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_t stride, float low, float high) 
+void bzzNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_t stride, float low, float high) 
 {
-    GYMAssert(NNInput(nn).cols >= 2);
-    GYMAssert(NNOutout(nn).cols >= 1);
+    bzzAssert(NNInput(nn).cols >= 2);
+    bzzAssert(NNOutout(nn).cols >= 1);
     uint32_t *pixels_u32 = pixels;
     for (size_t y = 0; y < height; ++y) {
             for (size_t x = 0; x < width; ++x) {
@@ -283,9 +283,9 @@ void gymNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_
     }
 }
 
-GymRect gymRect(float x, float y, float w, float h) 
+BzzRect bzzRect(float x, float y, float w, float h) 
 {
-    GymRect r = {0};
+    BzzRect r = {0};
     r.x = x;
     r.y = y;
     r.w = w;
@@ -293,14 +293,14 @@ GymRect gymRect(float x, float y, float w, float h)
     return r;
 }
 
-GymRect gymLayoutSlotLoc(GymLayout *l, const char *file_path, int line) 
+BzzRect bzzLayoutSlotLoc(BzzLayout *l, const char *file_path, int line) 
 {
     if (l->i >= l->count) {
         fprintf(stderr, "%s:%d: ERROR: Layout overflow\n", file_path, line);
         exit(1);
     }
 
-    GymRect r = {0};
+    BzzRect r = {0};
 
     switch (l->orient) {
     case GloHorz:
@@ -317,7 +317,7 @@ GymRect gymLayoutSlotLoc(GymLayout *l, const char *file_path, int line)
         break;
 
     default:
-        GYMAssert(0 && "Unreachable");
+        bzzAssert(0 && "Unreachable");
     }
 
     l->i += 1;
@@ -325,9 +325,9 @@ GymRect gymLayoutSlotLoc(GymLayout *l, const char *file_path, int line)
     return r;
 }
 
-void gymLayoutStackPush(GymLayoutStack *ls, GymLayoutOrient orient, GymRect rect, size_t count, float gap) 
+void bzzLayoutStackPush(BzzLayoutStack *ls, BzzLayoutOrient orient, BzzRect rect, size_t count, float gap) 
 {
-    GymLayout l = {0};
+    BzzLayout l = {0};
     l.orient = orient;
     l.rect = rect;
     l.count = count;
@@ -335,25 +335,25 @@ void gymLayoutStackPush(GymLayoutStack *ls, GymLayoutOrient orient, GymRect rect
     DaAppend(ls, l);
 }
 
-GymRect gymRoot(void) 
+BzzRect bzzRoot(void) 
 {
-    GymRect root = {0};
+    BzzRect root = {0};
     root.w = GetScreenWidth();
     root.h = GetScreenHeight();
     return root;
 }
 
-GymRect gymFitSquare(GymRect r) 
+BzzRect bzzFitSquare(BzzRect r) 
 {
     if (r.w < r.h) {
-        return (GymRect){
+        return (BzzRect){
             .x = r.x,
             .y = r.y + r.h / 2 - r.w / 2,
             .w = r.w,
             .h = r.w,
         };
     } else {
-        return (GymRect){
+        return (BzzRect){
             .x = r.x + r.w / 2 - r.h / 2,
             .y = r.y,
             .w = r.h,
@@ -362,7 +362,7 @@ GymRect gymFitSquare(GymRect r)
     }
 }
 
-static void viewBeeLearn(BeeParams *bee, GymRect r, float *slider_position, bool *slider_dragging) 
+static void viewBeeLearn(BeeParams *bee, BzzRect r, float *slider_position, bool *slider_dragging) 
 {
     if (!bee) {
         exit(1);
@@ -383,7 +383,7 @@ static void viewBeeLearn(BeeParams *bee, GymRect r, float *slider_position, bool
         Color alpha_color = WHITE;
         high_color.a = floorf(255.f * (*slider_position));
 
-        gymSliderVertical(
+        bzzSliderVertical(
             slider_position, slider_dragging, r.x + r.w + 200,
             r.y + r.h * widget_padding_multip,
             r.h * (widget_height_multip - widget_padding_multip), 10,
@@ -417,11 +417,11 @@ static void viewBeeLearn(BeeParams *bee, GymRect r, float *slider_position, bool
 }
 
 BeeParams viewBeeNew(
-    Font font, GymButton minus_button, GymButton plus_button, GymButton learn_button, GymButton update_button,
-    GymButton map_button, GymButton bee_button, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
+    Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
+    BzzButton map_button, BzzButton bee_button, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
 {
     const size_t max_epoch = 200 * 1000;
-    const size_t epochs_per_frame = 300;
+    const size_t epochs_per_frame = 200;
     size_t epoch = 0;
     const float rate = 0.7f;
     int total_layers_count = 2+inner_layers_count; 
@@ -445,7 +445,7 @@ BeeParams viewBeeNew(
 
     NN nn = nnAlloc(NULL, arch, total_layers_count);
     nnRand(nn, -1, 1);
-    GymPlot plot = {0};
+    BzzPlot plot = {0};
 
     BeeParams bee = {
         .max_epoch = max_epoch,
@@ -495,7 +495,7 @@ void viewBeeFree(BeeParams *bee)
     flowersDatasetFree(&bee->fl);
     matFree(&bee->t);
     nnFree(&bee->nn);
-    gymPlotFree(&bee->plot);
+    bzzPlotFree(&bee->plot);
 }
 
 float slider_position = 0.0f;
@@ -511,7 +511,7 @@ void renderBeeView(BeeParams *bee, ScreenView *screen)
     if (bee->reset) {
         bee->epoch = 0;
         nnRand(bee->nn, -1, 1);
-        gymPlotFree(&bee->plot);
+        bzzPlotFree(&bee->plot);
     }
     bee->reset = false;
 
@@ -529,17 +529,17 @@ void renderBeeView(BeeParams *bee, ScreenView *screen)
 
     DrawText("Train your BEE!", 22, 5, h * 0.025, GREEN);
     
-    int pressed = gymRenderButton(bee->map_button, CLITERAL(Vector2){.x = w - 50, .y = 20});
+    int pressed = bzzRenderButton(bee->map_button, CLITERAL(Vector2){.x = w - 50, .y = 20});
     if (pressed) {
         *screen = BeeMapScreen;
     }
     float map_button_end = bee->map_button.tx.height*bee->map_button.scale + 60; // map button is before
-    pressed = gymRenderButton(bee->learn_button, CLITERAL(Vector2){.x = w - 50, .y = map_button_end + 10 }); 
+    pressed = bzzRenderButton(bee->learn_button, CLITERAL(Vector2){.x = w - 50, .y = map_button_end + 10 }); 
     if (pressed || (!bee->paused && bee->epoch == bee->max_epoch)) {
         bee->paused = !bee->paused;
     }
     float learn_button_end = map_button_end + 10 + bee->learn_button.tx.height*bee->learn_button.scale; // learn button is before
-    pressed = gymRenderButton(bee->update_button, CLITERAL(Vector2){.x = w - 50, .y = learn_button_end + 10 });
+    pressed = bzzRenderButton(bee->update_button, CLITERAL(Vector2){.x = w - 50, .y = learn_button_end + 10 });
     if (pressed) {
         bee->reset = true;
     }
@@ -552,22 +552,22 @@ void renderBeeView(BeeParams *bee, ScreenView *screen)
              RegionOccupiedBytes(&bee->temp) / KILO);
     DrawTextEx(bee->font, description_buffer, CLITERAL(Vector2){.x = 40, .y = 40}, h * 0.02, 0, DEEPOCEAN);
 
-    GymRect r;
+    BzzRect r;
     r.w = w * widget_height_multip;
     r.h = h * widget_width_multip;
     r.x = 0;
     r.y = h / 2 - r.h / 2;
 
-    GymLayoutBegin(GloHorz, r, 3, 10);
-        gymPlot(bee->plot, GymLayoutSlot(), ORANGE);
-        gymRenderNN(bee, GymLayoutSlot());
-        viewBeeLearn(bee, GymLayoutSlot(), &slider_position, &slider_dragging);
-    GymLayoutEnd();
+    bzzLayoutBegin(GloHorz, r, 3, 10);
+        bzzPlot(bee->plot, bzzLayoutSlot(), ORANGE);
+        bzzRenderNN(bee, bzzLayoutSlot());
+        viewBeeLearn(bee, bzzLayoutSlot(), &slider_position, &slider_dragging);
+    bzzLayoutEnd();
     
     char controles_buffer[256];
     int inner_layers_count = bee->inner_layers_count;
-    inner_layers_count -= gymRenderButton(bee->minus_button, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip-20}); 
-    inner_layers_count += gymRenderButton(bee->plus_button, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip-20});
+    inner_layers_count -= bzzRenderButton(bee->minus_button, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip-20}); 
+    inner_layers_count += bzzRenderButton(bee->plus_button, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip-20});
     if (bee->paused && bee->inner_layers_count < inner_layers_count && bee->inner_layers_count < MAX_INNER_LAYERS) {
         bee->inner_layers_count = inner_layers_count;
         bee->inner_layers[bee->inner_layers_count-1] = 5;
