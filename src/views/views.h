@@ -54,18 +54,18 @@ void bzzPlotFree(BzzPlot *gp);
 
 typedef struct {
     BzzLayoutOrient orient;
-    BzzRect rect;
-    size_t count;
-    size_t i;
-    float gap;
+    BzzRect         rect;
+    size_t          count;
+    size_t          i;
+    float           gap;
 } BzzLayout;
 
 BzzRect bzzLayoutSlotLoc(BzzLayout *l, const char *file_path, int line);
 
 typedef struct {
     BzzLayout *items;
-    size_t count;
-    size_t capacity;
+    size_t    count;
+    size_t    capacity;
 } BzzLayoutStack;
 
 void bzzLayoutStackPush(BzzLayoutStack *ls, BzzLayoutOrient orient, BzzRect rect, size_t count, float gap);
@@ -113,8 +113,8 @@ typedef enum {
 /// bzzButton holds functionality to render buttons.
 typedef struct {
     Texture2D tx;
-    Color color;
-    float scale;
+    Color     color;
+    float     scale;
 } BzzButton;
 
 BzzButton bzzButtonNewMinus(float scale, Color color);
@@ -127,35 +127,52 @@ BzzButton bzzButtonNewLogo(float scale, Color color);
 int bzzRenderButton(BzzButton btn, Vector2 pos);
 void bzzUnloadButton(BzzButton btn);
 
+typedef enum {
+    LeftRight,
+    TopDown,
+} AnimationLayout ;
+
 typedef struct {
-    Texture2D tx;
-    Color color;
-    int frame;
-    int total_frames;
-} BzzMovable;
+    Texture2D       tx;
+    Color           color;
+    AnimationLayout layout;
+    int             frame;
+    int             total_frames;
+    int             pause_time;
+    float           speed;
+    float           dir;
+    Vector2         pos;
+    Vector2         target;
+} BzzAnimated;
 
-/// bzzMovableNewBee creates new movable bee object.
+/// bzzAnimatedNewBee creates new movable bee object.
 /// 
-/// scale - scale of the object applied to render.
+/// start - starting position at which bee will be drawn.
 /// color - blend color. 
-BzzMovable bzzMovableNewBee(Color color);
+BzzAnimated bzzAnimatedNewBee(Color color, Vector2 start, Vector2 min, Vector2 max, AnimationLayout l);
 
-/// bzzRenderMovable creates moveable bee object
+/// bzzRenderAnimated creates moveable bee object
 ///
-/// mvb - BzzMovable bee object.
-/// pos - Vector2 position to render object.
-/// rotation - rotation of the object.
-int bzzRenderMovable(BzzMovable *mvb, Vector2 pos, float rotation);
+/// b - BzzAnimated bee object.
+/// min - minimum rectangle boundary.
+/// max - maximum rectangle boundary.
+int bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max);
 
-/// bzzUnloadMovable unloads texture from the movable object.
+/// bzzCheckCollision - checks collision between BzzAnimated object and rectangle.
 ///
-/// mvb - movable object to unload texture from.
-void bzzUnloadMovable(BzzMovable mvb);
+/// b - BzzAnimated object to check collision for.
+/// r - Rectangle object to check collision against.
+int bzzCheckCollision(BzzAnimated *b, Rectangle r);
+
+/// bzzUnloadAnimated unloads texture from the movable object.
+///
+/// b - movable object to unload texture from.
+void bzzUnloadAnimated(BzzAnimated b);
 
 // ViewMenu structure representing menu view.
 typedef struct {
     BzzButton logo_button;
-    Font font;
+    Font      font;
 } ViewMenu;
 
 /// viewBeeNew return new ViewMenu.
@@ -172,28 +189,28 @@ void renderMenuView(ViewMenu m, ScreenView *screen);
 
 /// PageNN holds all the data required to properly update the nn page view.
 typedef struct {
-    size_t max_epoch;
-    size_t epochs_per_frame;
-    size_t epoch;
-    float rate;
-    int inner_layers_count;
-    int inner_layers[MAX_INNER_LAYERS];
-    bool paused;
-    bool reset;
-    bool modified;
-    Region temp;
-    FlowersDataset fl;
-    Mat t;
-    NN nn;
-    BzzPlot plot;
-    BzzButton minus_button;
-    BzzButton plus_button;
-    BzzButton learn_button;
-    BzzButton update_button;
-    BzzButton map_button;
-    BzzButton bee_button;
-    BzzMovable bee_movable;
-    Font font;
+    size_t          max_epoch;
+    size_t          epochs_per_frame;
+    size_t          epoch;
+    float           rate;
+    int             inner_layers_count;
+    int             inner_layers[MAX_INNER_LAYERS];
+    bool            paused;
+    bool            reset;
+    bool            modified;
+    Region          temp;
+    FlowersDataset  fl;
+    Mat             t;
+    NN              nn;
+    BzzPlot         plot;
+    BzzButton       minus_button;
+    BzzButton       plus_button;
+    BzzButton       learn_button;
+    BzzButton       update_button;
+    BzzButton       map_button;
+    BzzButton       bee_button;
+    BzzAnimated     bee_movable;
+    Font            font;
 } BeeParams;
 
 /// viewBeeNew return new BeeParams.
@@ -209,7 +226,7 @@ typedef struct {
 /// inner_layers - architecture of inner layers.
 BeeParams viewBeeNew(
     Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, BzzMovable bee_movable, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
+    BzzButton map_button, BzzButton bee_button, BzzAnimated bee_movable, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
 );
 
 /// viewBeeRandomize - randomizes BeeParams.

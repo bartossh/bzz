@@ -1,10 +1,10 @@
 /// Copyright (c) 2024 Bartosz Lenart
 
-#include "raylib.h"
-#include "views/views.h"
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
+#include "raylib.h"
+#include "views/views.h"
 
 bool paused = true;
 ScreenView screen = MainMenuScreen;
@@ -20,6 +20,8 @@ int main(void)
     size_t WindowHeight = (9 * WindowFactor);
     
     InitWindow(WindowWidth, WindowHeight, "BZZ!");
+    int w = GetScreenWidth();
+    int h = GetScreenHeight();
     
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     
@@ -30,7 +32,12 @@ int main(void)
     BzzButton learn_button = bzzButtonNewLearn(0.09f, ORANGE);
     BzzButton update_button = bzzButtonNewUpdate(0.09f, ORANGE);
     BzzButton logo_button = bzzButtonNewLogo(1.0f, ORANGE);
-    BzzMovable bee_movable = bzzMovableNewBee(ORANGE);
+    BzzAnimated bee_movable = bzzAnimatedNewBee(
+        ORANGE, CLITERAL(Vector2){.x = w/2, .y = h/2},
+        CLITERAL(Vector2){.x = 0.0f, .y = 0.0f}, 
+        CLITERAL(Vector2){.x = (float)w, .y = (float)h},
+        TopDown
+    );
 
     ViewMenu m = viewMenuNew(font, logo_button);
     BeeParams bee = viewBeeNew(
@@ -73,7 +80,7 @@ int main(void)
     bzzUnloadButton(learn_button);
     bzzUnloadButton(update_button);
     bzzUnloadButton(logo_button);
-    bzzUnloadMovable(bee_movable);
+    bzzUnloadAnimated(bee_movable);
     CloseWindow();
     
     return 0;
