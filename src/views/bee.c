@@ -1,56 +1,125 @@
 /// Copyright (c) 2024 Bartosz Lenart
 
+#include <stdio.h>
 #include <raylib.h>
-#include "raylib.h"
+#include <raymath.h>
+#include <stdbool.h>
 #include "views.h"
 #include "../assets/assets_loader.h"
 
-BzzMovable bzzMovableNewBee(Color color)
+#define PAUSE_TIME 60
+
+inline static float randInRange(float a, float b)
 {
-    BzzMovable btn = {
+    float r = (float)rand() / (float)RAND_MAX;
+    return a + r * (b - a); 
+}
+
+inline static bool vector2Equals(Vector2 a, Vector2 b)
+{
+    return a.x == b.x && a.y == b.y;
+}
+
+inline static void nextPosition(BzzAnimated *b, Vector2 min, Vector2 max)
+{
+    if (vector2Equals(b->pos, b->target) && b->pause_time) {
+        b->pause_time--;
+        return;
+    } else if (vector2Equals(b->pos, b->target)) {
+        b->pause_time = PAUSE_TIME; 
+        b->target.x = randInRange(min.x, max.x);
+        b->target.y = randInRange(min.y, max.y);
+    }
+
+    b->pos = Vector2MoveTowards(b->pos, b->target, b->speed);
+}
+
+inline static void calcDirection(BzzAnimated *b)
+{
+    if (vector2Equals(b->pos, b->target) && b->pause_time) { 
+       b->dir += randInRange(-5.0f, 5.0f);
+       return ;
+    }
+    b->dir = Vector2Angle(b->pos, b->target);
+}
+
+inline static float calcResize(BzzAnimated *b)
+{
+    if (vector2Equals(b->pos, b->target) && b->pause_time) { 
+       return 0.85;
+    }
+    return 1.0f;
+}
+
+BzzAnimated bzzAnimatedNewBee(Color color, Vector2 start, Vector2 min, Vector2 max, AnimationLayout l)
+{
+    float speed = randInRange(1.0f, 5.0f);
+    Vector2 target = {0};
+    target.x = randInRange(min.x, max.x);
+    target.y = randInRange(min.y, max.y);
+
+    BzzAnimated btn = {
         .tx = assetLoad(BeeFlying),
         .color = color,
+        .layout = l,
         .frame = 0,
-        .total_frames = 4
+        .total_frames = 4,
+        .pause_time = PAUSE_TIME,
+        .speed = speed,
+        .dir = 0.0f,
+        .pos = start,
+        .target = target
     };
 
     return btn;
 }
 
-int bzzRenderMovable(BzzMovable *mvb, Vector2 pos, float rotation)
+int bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max)
 {
-    if (mvb->frame == mvb->total_frames) {
-        mvb->frame = 0;
+    if (!b) {
+        exit(1);
     }
 
-    float width = mvb->tx.width;
-    float height = mvb->tx.height / mvb->total_frames;
-    float x = pos.x-width/2;
-    float y = pos.y+height/2;
+    if (b->frame == b->total_frames) {
+        b->frame = 0;
+    }
+
+    nextPosition(b, min, max);
+    calcDirection(b);
+    float resize = calcResize(b);
+    float width = b->tx.width;
+    float height = b->tx.height / b->total_frames;
+    float x = b->pos.x-width/2;
+    float y = b->pos.y-height/2;
     
-    Rectangle mvbBounds = {x, y-height, width, height};
-    Vector2 mousePoint = GetMousePosition();
     int result = 0;
-    float resize = 1.0f;
-    if (CheckCollisionPointRec(mousePoint, mvbBounds)) {
-        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-            result++;
-        }
-
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            resize = 0.8;
-        }
+    float rot = 0.0f;
+    switch (b->layout) {
+    case TopDown:
+        rot = - 90.0f;
+        break;
+    case LeftRight:
+    default:
+        rot = 0.0f;
     }
+
     Rectangle dstRec =  {x, y, width*resize, height*resize};
     Rectangle frameRec = {0.0f, 0.0f, width, height};
-    frameRec.y = ((float)mvb->frame)*height;
+    frameRec.y = ((float)b->frame)*height;
     Vector2 org = {.x = 0.0f, .y = 0.0f};
-    DrawTexturePro(mvb->tx, frameRec, dstRec, org, rotation, mvb->color);
-    mvb->frame++;
+    DrawTexturePro(b->tx, frameRec, dstRec, org, b->dir+rot, b->color);
+    b->frame++;
     return result;
 }
 
-void bzzUnloadMovable(BzzMovable mvb)
+int bzzCheckCollision(BzzAnimated *b, Rectangle r)
 {
-    UnloadTexture(mvb.tx);  
+    (void) b;
+    (void) r;
+    return 0;
+}
+
+void bzzUnloadAnimated(BzzAnimated b)
+{
+    UnloadTexture(b.tx);  
 }

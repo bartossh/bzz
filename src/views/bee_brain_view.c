@@ -418,7 +418,7 @@ static void viewBeeLearn(BeeParams *bee, BzzRect r, float *slider_position, bool
 
 BeeParams viewBeeNew(
     Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, BzzMovable bee_movable, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
+    BzzButton map_button, BzzButton bee_button, BzzAnimated bee_movable, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
 {
     const size_t max_epoch = 200 * 1000;
     const size_t epochs_per_frame = 200;
