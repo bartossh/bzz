@@ -3,7 +3,6 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <stdbool.h>
-#include "../assets/assets_loader.h"
 #include "game.h"
 
 #define PAUSE_TIME 120
@@ -72,7 +71,7 @@ BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 min, Vector2
     return btn;
 }
 
-int bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max)
+void bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max)
 {
     if (!b) {
         exit(1);
@@ -90,7 +89,6 @@ int bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max)
     float x = b->pos.x-width/2;
     float y = b->pos.y-height/2;
     
-    int result = 0;
     float rot = 0.0f;
     switch (b->layout) {
     case TopDown:
@@ -107,7 +105,6 @@ int bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max)
     Vector2 org = {.x = 0.0f, .y = 0.0f};
     DrawTexturePro(b->obj.tx, frameRec, dstRec, org, b->dir+rot, b->obj.color);
     b->frame++;
-    return result;
 }
 
 int bzzCheckCollision(BzzAnimated *b, Rectangle r)

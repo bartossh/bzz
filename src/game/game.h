@@ -169,6 +169,13 @@ typedef struct {
 
 BzzStationary bzzStationaryNewFlower(BzzObject obj, Vector2 pos, float scale);
 
+/// bzzRenderStationary renders stationary object.
+///
+/// b - BzzStationary animated object.
+/// min - minimum rectangle boundary.
+/// max - maximum rectangle boundary.
+void bzzRenderStationary(BzzStationary *b);
+
 /// BzzAnimated is an animated and movable object.
 typedef struct {
     BzzObject       obj;
@@ -189,12 +196,12 @@ typedef struct {
 /// color - blend color. 
 BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 min, Vector2 max, AnimationLayout l);
 
-/// bzzRenderAnimated creates moveable bee object
+/// bzzRenderAnimated renders moveable object.
 ///
-/// b - BzzAnimated bee object.
+/// b - BzzAnimated animated object.
 /// min - minimum rectangle boundary.
 /// max - maximum rectangle boundary.
-int bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max);
+void bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max);
 
 /// bzzCheckCollision - checks collision between BzzAnimated object and rectangle.
 ///

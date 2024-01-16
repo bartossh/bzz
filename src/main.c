@@ -36,6 +36,9 @@ int main(void)
     BzzButton update_button = bzzButtonNewUpdate(0.09f, ORANGE);
     BzzButton logo_button = bzzButtonNewLogo(1.0f, ORANGE);
     BzzObject bee_object = bzzObjectNewBee(ORANGE);
+
+    BzzStationaries stationaries = bzzStationariesNew();
+
     BzzSwarm swarm = bzzSwarmNew();
     for (int i = 0; i < starting_number_of_bees; i++) {
         BzzAnimated bee_movable = bzzAnimatedNewBee(
@@ -47,8 +50,6 @@ int main(void)
         );
         bzzSwarmAppend(&swarm, bee_movable);
     }
-
-    BzzStationaries stationaries = bzzStationariesNew();
 
     ViewMenu m = viewMenuNew(font, logo_button);
     BzzBeeGame bee = bzzBzzBeeGameNew(
