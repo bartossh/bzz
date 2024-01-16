@@ -32,8 +32,10 @@ int main(void)
     BzzButton learn_button = bzzButtonNewLearn(0.09f, ORANGE);
     BzzButton update_button = bzzButtonNewUpdate(0.09f, ORANGE);
     BzzButton logo_button = bzzButtonNewLogo(1.0f, ORANGE);
+    BzzObject bee_object = bzzObjectNewBee(ORANGE);
     BzzAnimated bee_movable = bzzAnimatedNewBee(
-        ORANGE, CLITERAL(Vector2){.x = w/2, .y = h/2},
+        bee_object,
+        CLITERAL(Vector2){.x = w/2, .y = h/2},
         CLITERAL(Vector2){.x = 0.0f, .y = 0.0f}, 
         CLITERAL(Vector2){.x = (float)w, .y = (float)h},
         TopDown
@@ -80,7 +82,7 @@ int main(void)
     bzzUnloadButton(learn_button);
     bzzUnloadButton(update_button);
     bzzUnloadButton(logo_button);
-    bzzUnloadAnimated(bee_movable);
+    bzzUnloadObject(bee_object);
     CloseWindow();
     
     return 0;

@@ -28,7 +28,9 @@ CFILES += src/views/*.c
 
 TFILES = src/nn/nn.c
 TFILES += src/flowers/flowers.c
-TFILES += src/tests/tests.c
+TFILES += src/assets/*.c
+TFILES += src/views/*.c
+TFILES += src/tests.c
 
 
 .PHONY: load

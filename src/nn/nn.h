@@ -109,14 +109,14 @@ void matShuffleRows(Mat m);
 #define MatPrint(m) matPrintf(m, #m, 0)
 
 typedef struct {
-    size_t *arch;
-    size_t arch_count;
-    Mat *ws; // The amount of activations is arch_count-1
-    Row *bs; // The amount of activations is arch_count-1
+    size_t  *arch;
+    size_t  arch_count;
+    Mat     *ws; // The amount of activations is arch_count-1
+    Row     *bs; // The amount of activations is arch_count-1
 
     // TODO: maybe remove these? It would be better to allocate them in a
     // temporary region during the actual forwarding
-    Row *as;
+    Row     *as;
 } NN;
 
 #define NNInput(nn) (NNAssert((nn).arch_count > 0), (nn).as[0])
@@ -135,9 +135,9 @@ NN nnBackprop(Region *r, NN nn, Mat t);
 void nnLearn(NN nn, NN g, float rate);
 
 typedef struct {
-    size_t begin;
-    float cost;
-    bool finished;
+    size_t  begin;
+    float   cost;
+    bool    finished;
 } Batch;
 
 #endif // NN_H_

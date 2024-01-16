@@ -1,13 +1,12 @@
 /// Copyright (c) 2024 Bartosz Lenart
 
-#include <stdio.h>
 #include <raylib.h>
 #include <raymath.h>
 #include <stdbool.h>
-#include "views.h"
 #include "../assets/assets_loader.h"
+#include "views.h"
 
-#define PAUSE_TIME 60
+#define PAUSE_TIME 120
 
 inline static float randInRange(float a, float b)
 {
@@ -51,7 +50,7 @@ inline static float calcResize(BzzAnimated *b)
     return 1.0f;
 }
 
-BzzAnimated bzzAnimatedNewBee(Color color, Vector2 start, Vector2 min, Vector2 max, AnimationLayout l)
+BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 min, Vector2 max, AnimationLayout l)
 {
     float speed = randInRange(1.0f, 5.0f);
     Vector2 target = {0};
@@ -59,8 +58,7 @@ BzzAnimated bzzAnimatedNewBee(Color color, Vector2 start, Vector2 min, Vector2 m
     target.y = randInRange(min.y, max.y);
 
     BzzAnimated btn = {
-        .tx = assetLoad(BeeFlying),
-        .color = color,
+        .obj = obj,
         .layout = l,
         .frame = 0,
         .total_frames = 4,
@@ -87,8 +85,8 @@ int bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max)
     nextPosition(b, min, max);
     calcDirection(b);
     float resize = calcResize(b);
-    float width = b->tx.width;
-    float height = b->tx.height / b->total_frames;
+    float width = b->obj.tx.width;
+    float height = b->obj.tx.height / b->total_frames;
     float x = b->pos.x-width/2;
     float y = b->pos.y-height/2;
     
@@ -107,7 +105,7 @@ int bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max)
     Rectangle frameRec = {0.0f, 0.0f, width, height};
     frameRec.y = ((float)b->frame)*height;
     Vector2 org = {.x = 0.0f, .y = 0.0f};
-    DrawTexturePro(b->tx, frameRec, dstRec, org, b->dir+rot, b->color);
+    DrawTexturePro(b->obj.tx, frameRec, dstRec, org, b->dir+rot, b->obj.color);
     b->frame++;
     return result;
 }
@@ -117,9 +115,4 @@ int bzzCheckCollision(BzzAnimated *b, Rectangle r)
     (void) b;
     (void) r;
     return 0;
-}
-
-void bzzUnloadAnimated(BzzAnimated b)
-{
-    UnloadTexture(b.tx);  
 }

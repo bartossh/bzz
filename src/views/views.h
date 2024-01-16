@@ -28,7 +28,9 @@
 #define MAX_INNER_LAYERS 4
 #define MIN_INNER_LAYERS 1
 #define MAX_PERCEPTRONS 20
-#define MIN_PERCEPTRONS 2 
+#define MIN_PERCEPTRONS 2
+
+#define MAX_SWARN_SIZE 64
 
 typedef struct {
     float x;
@@ -132,9 +134,25 @@ typedef enum {
     TopDown,
 } AnimationLayout ;
 
+
+/// BzzObject represents a object that is not scalable. 
 typedef struct {
-    Texture2D       tx;
-    Color           color;
+    Texture2D tx;
+    Color     color;
+} BzzObject;
+
+/// bzzObjectNew creates a new BzzObject.
+///
+/// color - blend color. 
+BzzObject bzzObjectNewBee(Color color);
+
+/// bzzUnloadObject unloads texture from the object.
+///
+/// obj - movable object to unload texture from.
+void bzzUnloadObject(BzzObject obj);
+
+typedef struct {
+    BzzObject       obj;
     AnimationLayout layout;
     int             frame;
     int             total_frames;
@@ -143,13 +161,14 @@ typedef struct {
     float           dir;
     Vector2         pos;
     Vector2         target;
-} BzzAnimated;
+} BzzAnimated; //TODO: Use inner BzzButton {Texture2D tx, Color color, float scale} to load Texture2D only once. Embed in BzzAnimated.
+
 
 /// bzzAnimatedNewBee creates new movable bee object.
 /// 
 /// start - starting position at which bee will be drawn.
 /// color - blend color. 
-BzzAnimated bzzAnimatedNewBee(Color color, Vector2 start, Vector2 min, Vector2 max, AnimationLayout l);
+BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 min, Vector2 max, AnimationLayout l);
 
 /// bzzRenderAnimated creates moveable bee object
 ///
@@ -163,11 +182,6 @@ int bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max);
 /// b - BzzAnimated object to check collision for.
 /// r - Rectangle object to check collision against.
 int bzzCheckCollision(BzzAnimated *b, Rectangle r);
-
-/// bzzUnloadAnimated unloads texture from the movable object.
-///
-/// b - movable object to unload texture from.
-void bzzUnloadAnimated(BzzAnimated b);
 
 // ViewMenu structure representing menu view.
 typedef struct {
@@ -186,6 +200,39 @@ ViewMenu viewMenuNew(Font font, BzzButton logo_button);
 // m - ViewMenu object holding functionality to render main menu. 
 // screen - screen value representing screen to render.
 void renderMenuView(ViewMenu m, ScreenView *screen);
+
+/// BzzSwarn represents swarm buffer. 
+typedef struct {
+    BzzAnimated buffer[MAX_SWARN_SIZE];
+    int         swarm_size;
+} BzzSwarm;
+
+/// bzzSwarmNew creats a new bzzSwarmBuffer.
+///
+BzzSwarm bzzSwarmNew(void);
+
+/// bzzSwarmAppend appends BzzAnimated object to buffer.
+/// 
+/// s - BzzSwarm buffer.
+/// b - BzzAnimated object to append to buffer.
+bool bzzSwarmAppend(BzzSwarm *s, BzzAnimated b); 
+
+/// bzzSwarmGetSize returns size of the buffer;
+///
+/// s - BzzSwarm buffer.
+int bzzSwarmGetSize(BzzSwarm *s);
+
+/// bzzSwarmAt returns pointer to BzzAnimated object at given index or NULL otherwise.
+///
+/// s - BzzSwarm buffer.
+/// idx - index of the BzzAnimated object in swarm.
+BzzAnimated *bzzSwarmAt(BzzSwarm *s, int idx);
+
+/// bzzRemoveAt - removes object at index.
+///
+/// s - BzzSwarm buffer.
+/// idx - index of the BzzAnimated object in swarm.
+bool bzzRemoveAt(BzzSwarm *s, int idx);
 
 /// PageNN holds all the data required to properly update the nn page view.
 typedef struct {
