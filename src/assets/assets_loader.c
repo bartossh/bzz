@@ -1,3 +1,6 @@
+/// Copyright (c) 2024 Bartosz Lenart
+
+#include <stdio.h>
 #include <raylib.h>
 #include <stdlib.h>
 #include "assets_loader.h"
@@ -10,6 +13,8 @@
 #include "honeycomb.h"
 #include "map_button.h"
 #include "learn_button.h"
+
+#define printfError(str) printf("ERROR: %s \n", str)
 
 Texture2D assetLoad(enum AssetTexture2D a)
 {
@@ -79,8 +84,11 @@ Texture2D assetLoad(enum AssetTexture2D a)
         img.mipmaps = 1;
         break;
     default:
+        printfError("unknown resource");
         exit(1);
     }
+
+    printf("image: %p, %i, %0.3d, %0.3d \n", img.data, img.format, img.width, img.height);
 
     return LoadTextureFromImage(img);
 }

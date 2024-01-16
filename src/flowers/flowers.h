@@ -30,9 +30,9 @@ typedef float (*ValueNormalizer)(int v);
 
 /// FlowersDataset is a dataset of flowers.
 typedef struct {
-    size_t rows;
-    size_t cols;
-    int *ptr;
+    size_t          rows;
+    size_t          cols;
+    int             *ptr;
     ValueNormalizer *f;
 } FlowersDataset;
 
