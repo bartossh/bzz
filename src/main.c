@@ -8,6 +8,7 @@
 
 bool paused = true;
 ScreenView screen = MainMenuScreen;
+int starting_number_of_bees = 10;
 int inner_layers_count = 1;
 int inner_layers[MAX_INNER_LAYERS] = {5};
 
@@ -33,18 +34,23 @@ int main(void)
     BzzButton update_button = bzzButtonNewUpdate(0.09f, ORANGE);
     BzzButton logo_button = bzzButtonNewLogo(1.0f, ORANGE);
     BzzObject bee_object = bzzObjectNewBee(ORANGE);
-    BzzAnimated bee_movable = bzzAnimatedNewBee(
-        bee_object,
-        CLITERAL(Vector2){.x = w/2, .y = h/2},
-        CLITERAL(Vector2){.x = 0.0f, .y = 0.0f}, 
-        CLITERAL(Vector2){.x = (float)w, .y = (float)h},
-        TopDown
-    );
+    BzzSwarm swarm = bzzSwarmNew();
+    for (int i = 0; i < starting_number_of_bees; i++) {
+        BzzAnimated bee_movable = bzzAnimatedNewBee(
+            bee_object,
+            CLITERAL(Vector2){.x = w/2, .y = h/2},
+            CLITERAL(Vector2){.x = 0.0f, .y = 0.0f}, 
+            CLITERAL(Vector2){.x = (float)w, .y = (float)h},
+            TopDown
+        );
+        bzzSwarmAppend(&swarm, bee_movable);
+    }
+    
 
     ViewMenu m = viewMenuNew(font, logo_button);
     BeeParams bee = viewBeeNew(
         font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-        bee_movable, inner_layers_count, inner_layers
+        &swarm, inner_layers_count, inner_layers
     );
 
     SetTargetFPS(60);
@@ -67,7 +73,7 @@ int main(void)
                 viewBeeFree(&bee);
                 bee = viewBeeNew(
                     font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-                    bee_movable, inner_layers_count, bee.inner_layers
+                    &swarm, inner_layers_count, bee.inner_layers
                 );
             }
             renderBeeView(&bee, &screen);

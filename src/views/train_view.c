@@ -10,10 +10,6 @@
 #include "../nn/nn.h"
 #include "../flowers/flowers.h"
 
-#include <stdio.h>
-
-#define KILO 1024
-
 const float widget_padding_multip = 0.1;
 const float controles_height_multip = 0.95;
 const float widget_height_multip = 0.8;
@@ -416,89 +412,6 @@ static void viewBeeLearn(BeeParams *bee, BzzRect r, float *slider_position, bool
     );
 }
 
-BeeParams viewBeeNew(
-    Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, BzzAnimated bee_movable, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
-{
-    const size_t max_epoch = 200 * 1000;
-    const size_t epochs_per_frame = 200;
-    size_t epoch = 0;
-    const float rate = 0.7f;
-    int total_layers_count = 2+inner_layers_count; 
-
-    Region temp = regionAllocAlloc(8 * KILO * KILO);
-    FlowersDataset fl = flowersDatasetNew(Location_6_60);
-    Mat t = flowersToMat(fl);
-
-    size_t *arch = NNMalloc(sizeof(size_t) * total_layers_count);
-    for (int i = 0; i < total_layers_count; ++i) {
-        if (i == 0) {
-            arch[i] = fl.cols-1;
-            continue;
-        }
-        if (i == total_layers_count-1) {
-            arch[i] = 1;
-            continue;
-        }
-        arch[i] = inner_layers[i-1];
-    }
-
-    NN nn = nnAlloc(NULL, arch, total_layers_count);
-    nnRand(nn, -1, 1);
-    BzzPlot plot = {0};
-
-    BeeParams bee = {
-        .max_epoch = max_epoch,
-        .epochs_per_frame = epochs_per_frame,
-        .epoch = epoch,
-        .rate = rate,
-        .inner_layers_count = inner_layers_count,
-        .paused = true,
-        .reset = false,
-        .modified = false,
-        .temp = temp,
-        .fl = fl,
-        .t = t,
-        .nn = nn,
-        .plot = plot,
-        .font = font,
-        .minus_button = minus_button,
-        .plus_button = plus_button,
-        .learn_button = learn_button,
-        .update_button = update_button,
-        .map_button = map_button,
-        .bee_button = bee_button,
-        .bee_movable = bee_movable
-    };
-
-    for (int i = 0; i < MAX_INNER_LAYERS; i++) {
-        bee.inner_layers[i] = inner_layers[i];
-    }
-
-    return bee;
-}
-
-void viewBeeFree(BeeParams *bee) 
-{
-    if (!bee) {
-        return;
-    }
-
-    bee->max_epoch = 0;
-    bee->epochs_per_frame = 0;
-    bee->epoch = 0;
-    bee->rate = 0.0f;
-    bee->inner_layers_count = 0;
-    bee->paused = true;
-    bee->reset = false;
-    bee->modified = false;
-    regionFree(&bee->temp);
-    flowersDatasetFree(&bee->fl);
-    matFree(&bee->t);
-    nnFree(&bee->nn);
-    bzzPlotFree(&bee->plot);
-}
-
 float slider_position = 0.0f;
 bool slider_dragging = false;
 
@@ -590,7 +503,3 @@ void renderBeeView(BeeParams *bee, ScreenView *screen)
     RegionReset(&bee->temp);
 }
 
-bool isModified(BeeParams *bee)
-{
-    return  bee->modified;
-}

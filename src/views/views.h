@@ -30,7 +30,9 @@
 #define MAX_PERCEPTRONS 20
 #define MIN_PERCEPTRONS 2
 
-#define MAX_SWARN_SIZE 64
+#define KILO 1024
+
+#define MAX_SWARN_SIZE 128
 
 typedef struct {
     float x;
@@ -256,7 +258,7 @@ typedef struct {
     BzzButton       update_button;
     BzzButton       map_button;
     BzzButton       bee_button;
-    BzzAnimated     bee_movable;
+    BzzSwarm        *swarm;
     Font            font;
 } BeeParams;
 
@@ -273,7 +275,7 @@ typedef struct {
 /// inner_layers - architecture of inner layers.
 BeeParams viewBeeNew(
     Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, BzzAnimated bee_movable, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
+    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
 );
 
 /// viewBeeRandomize - randomizes BeeParams.
