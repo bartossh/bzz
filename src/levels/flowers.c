@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-#include "flowers.h"
+#include "levels.h"
 #include "../nn/nn.h"
 
 #define CalcFlowersDatasetRows(set, cols) sizeof(set) / (sizeof(set[0])*cols)

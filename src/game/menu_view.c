@@ -1,6 +1,6 @@
 /// Copyright (c) 2024 Bartosz Lenart
 
-#include "views.h"
+#include "game.h"
 #include "raylib.h"
 #include "../assets/assets_loader.h"
 

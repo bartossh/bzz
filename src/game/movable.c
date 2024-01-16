@@ -4,7 +4,7 @@
 #include <raymath.h>
 #include <stdbool.h>
 #include "../assets/assets_loader.h"
-#include "views.h"
+#include "game.h"
 
 #define PAUSE_TIME 120
 

@@ -6,9 +6,9 @@
 #include <string.h>
 #include <time.h>
 #include "raylib.h"
-#include "views.h"
+#include "game.h"
 #include "../nn/nn.h"
-#include "../flowers/flowers.h"
+#include "../levels/levels.h"
 
 const float widget_padding_multip = 0.1;
 const float controles_height_multip = 0.95;
@@ -23,7 +23,7 @@ static float absf(float a)
     return -a;
 }
 
-void bzzRenderNN(BeeParams *bee, BzzRect r)
+void bzzRenderNN(BzzBeeGame *bee, BzzRect r)
 {
     Color low_color = ORANGE;
     Color high_color = BLACK;
@@ -358,7 +358,7 @@ BzzRect bzzFitSquare(BzzRect r)
     }
 }
 
-static void viewBeeLearn(BeeParams *bee, BzzRect r, float *slider_position, bool *slider_dragging) 
+static void viewBeeLearn(BzzBeeGame *bee, BzzRect r, float *slider_position, bool *slider_dragging) 
 {
     if (!bee) {
         exit(1);
@@ -415,7 +415,7 @@ static void viewBeeLearn(BeeParams *bee, BzzRect r, float *slider_position, bool
 float slider_position = 0.0f;
 bool slider_dragging = false;
 
-void renderBeeView(BeeParams *bee, ScreenView *screen) 
+void renderBeeView(BzzBeeGame *bee, ScreenView *screen) 
 {
     if (!bee || !screen) {
         exit(1);

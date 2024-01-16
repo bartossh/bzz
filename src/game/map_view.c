@@ -3,9 +3,9 @@
 #include <math.h>
 #include <raylib.h>
 #include "raylib.h"
-#include "views.h"
+#include "game.h"
 
-void renderMapView(BeeParams *bp, ScreenView *screen)
+void renderMapView(BzzBeeGame *bp, ScreenView *screen)
 {
     int w = GetScreenWidth();
     int h = GetScreenHeight();

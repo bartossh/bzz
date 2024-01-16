@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "raylib.h"
-#include "views/views.h"
+#include "game/game.h"
 
 bool paused = true;
 ScreenView screen = MainMenuScreen;
@@ -15,7 +15,7 @@ int inner_layers[MAX_INNER_LAYERS] = {5};
 int main(void) 
 {
     srand(time(NULL));
-    
+ 
     size_t WindowFactor = 100;
     size_t WindowWidth = (16 * WindowFactor);
     size_t WindowHeight = (9 * WindowFactor);
@@ -23,6 +23,8 @@ int main(void)
     InitWindow(WindowWidth, WindowHeight, "BZZ!");
     int w = GetScreenWidth();
     int h = GetScreenHeight();
+
+    FlowersDataset fl = flowersDatasetNew(Location_6_60);
     
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     
@@ -45,12 +47,13 @@ int main(void)
         );
         bzzSwarmAppend(&swarm, bee_movable);
     }
-    
+
+    BzzStationaries stationaries = bzzStationariesNew();
 
     ViewMenu m = viewMenuNew(font, logo_button);
-    BeeParams bee = viewBeeNew(
+    BzzBeeGame bee = bzzBzzBeeGameNew(
         font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-        &swarm, inner_layers_count, inner_layers
+        &swarm, &stationaries, fl, inner_layers_count, inner_layers
     );
 
     SetTargetFPS(60);
@@ -70,10 +73,10 @@ int main(void)
             if (bee.paused && isModified(&bee)) {
                 inner_layers_count = bee.inner_layers_count;
                 Font font = bee.font;
-                viewBeeFree(&bee);
-                bee = viewBeeNew(
+                bzzBzzBeeGameFree(&bee);
+                bee = bzzBzzBeeGameNew(
                     font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-                    &swarm, inner_layers_count, bee.inner_layers
+                    &swarm, &stationaries, fl, inner_layers_count, bee.inner_layers
                 );
             }
             renderBeeView(&bee, &screen);

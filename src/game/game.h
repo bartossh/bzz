@@ -1,12 +1,12 @@
 /// Copyright (c) 2024 Bartosz Lenart
 
-#ifndef VIEW_H
-#define VIEW_H
+#ifndef GAME_H
+#define GAME_H
 
 #include <stdbool.h>
 #include "raylib.h"
 #include "../nn/nn.h"
-#include "../flowers/flowers.h"
+#include "../levels/levels.h"
 
 #ifndef OCEAN
 #define OCEAN CLITERAL(Color){ 0, 102, 102, 255 } // OCEAN
@@ -33,6 +33,7 @@
 #define KILO 1024
 
 #define MAX_SWARN_SIZE 128
+#define MAX_STATIONARIES_SIZE 512
 
 typedef struct {
     float x;
@@ -143,16 +144,32 @@ typedef struct {
     Color     color;
 } BzzObject;
 
-/// bzzObjectNew creates a new BzzObject.
+/// bzzObjectNewBee creates a new BzzObject of type bee.
 ///
 /// color - blend color. 
 BzzObject bzzObjectNewBee(Color color);
+
+/// bzzObjectNewFlower creates a new BzzObject of type flower.
+///
+/// color - blend color.
+/// int - next type of a flower.
+BzzObject bzzObjectNeeFlower(Color color, int next);
 
 /// bzzUnloadObject unloads texture from the object.
 ///
 /// obj - movable object to unload texture from.
 void bzzUnloadObject(BzzObject obj);
 
+/// BzzStationary is a stationary object.
+typedef struct {
+    BzzObject obj;
+    Vector2   pos;
+    float     scale;
+} BzzStationary;
+
+BzzStationary bzzStationaryNewFlower(BzzObject obj, Vector2 pos, float scale);
+
+/// BzzAnimated is an animated and movable object.
 typedef struct {
     BzzObject       obj;
     AnimationLayout layout;
@@ -163,7 +180,7 @@ typedef struct {
     float           dir;
     Vector2         pos;
     Vector2         target;
-} BzzAnimated; //TODO: Use inner BzzButton {Texture2D tx, Color color, float scale} to load Texture2D only once. Embed in BzzAnimated.
+} BzzAnimated;
 
 
 /// bzzAnimatedNewBee creates new movable bee object.
@@ -191,7 +208,7 @@ typedef struct {
     Font      font;
 } ViewMenu;
 
-/// viewBeeNew return new ViewMenu.
+/// bzzBzzBeeGameNew return new ViewMenu.
 ///
 /// font - font used for text rendering.
 /// bee_button - bee bzzButton object. 
@@ -209,7 +226,7 @@ typedef struct {
     int         swarm_size;
 } BzzSwarm;
 
-/// bzzSwarmNew creats a new bzzSwarmBuffer.
+/// bzzSwarmNew creats a new BzzSwarm buffer.
 ///
 BzzSwarm bzzSwarmNew(void);
 
@@ -227,14 +244,48 @@ int bzzSwarmGetSize(BzzSwarm *s);
 /// bzzSwarmAt returns pointer to BzzAnimated object at given index or NULL otherwise.
 ///
 /// s - BzzSwarm buffer.
-/// idx - index of the BzzAnimated object in swarm.
+/// idx - index of the BzzAnimated object in BzzSwarm.
 BzzAnimated *bzzSwarmAt(BzzSwarm *s, int idx);
+
+/// bzzSwarmRemoveAt - removes object at index.
+///
+/// s - BzzSwarm buffer.
+/// idx - index of the BzzAnimated object in BzzSwarm.
+bool bzzSwarmRemoveAt(BzzSwarm *s, int idx);
+
+
+/// BzzSwarn represents swarm buffer. 
+typedef struct {
+    BzzStationary buffer[MAX_SWARN_SIZE];
+    int         st_size;
+} BzzStationaries;
+
+/// bzzStationariesNew creats a new BzzStationaries buffer.
+///
+BzzStationaries bzzStationariesNew(void);
+
+/// bzzStationariesAppend appends BzzStationary object to buffer.
+/// 
+/// s - BzzStationaries buffer.
+/// b - BzzStationary object to append to buffer.
+bool bzzStationariesAppend(BzzStationaries *s, BzzStationary b); 
+
+/// bzzStationariesGetSize returns size of the buffer;
+///
+/// s - BzzStationaries buffer.
+int bzzStationariesGetSize(BzzStationaries *s);
+
+/// bzzStationaryAt returns pointer to BzzStationaries object at given index or NULL otherwise.
+///
+/// s - BzzStationaries buffer.
+/// idx - index of the AssetTexture2D object in BzzStationaries.
+BzzStationary *bzzStationariesAt(BzzStationaries *s, int idx);
 
 /// bzzRemoveAt - removes object at index.
 ///
-/// s - BzzSwarm buffer.
-/// idx - index of the BzzAnimated object in swarm.
-bool bzzRemoveAt(BzzSwarm *s, int idx);
+/// s - BzzStationaries buffer.
+/// idx - index of the BzzStationaries object in BzzStationaries.
+bool bzzStationatiesRemoveAt(BzzStationaries *s, int idx);
 
 /// PageNN holds all the data required to properly update the nn page view.
 typedef struct {
@@ -259,10 +310,11 @@ typedef struct {
     BzzButton       map_button;
     BzzButton       bee_button;
     BzzSwarm        *swarm;
+    BzzStationaries *stationaries;
     Font            font;
-} BeeParams;
+} BzzBeeGame;
 
-/// viewBeeNew return new BeeParams.
+/// bzzBzzBeeGameNew return new BzzBeeGame.
 ///
 /// font - Font that will be used for text rendering.
 /// minus_button - minus BzzButton object.
@@ -271,42 +323,44 @@ typedef struct {
 /// update_button - update BzzButton object.
 /// map_button - map BzzButton object.
 /// bee_button - bee BzzButton object.
+/// swarm - swarm buffer.
 /// inner_layers_count - number of inner NN layers.
 /// inner_layers - architecture of inner layers.
-BeeParams viewBeeNew(
+BzzBeeGame bzzBzzBeeGameNew(
     Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
+    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, BzzStationaries *stationaries, FlowersDataset fl,
+    int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
 );
 
-/// viewBeeRandomize - randomizes BeeParams.
+/// viewBeeRandomize - randomizes BzzBeeGame.
 ///
-/// bee -BeeParams to be randomized. 
-void viewBeeRandomize(BeeParams *bee);
+/// bee -BzzBeeGame to be randomized. 
+void viewBeeRandomize(BzzBeeGame *bee);
 
 /// renderBeeView renders PageNN in to the screen.
 ///
-/// bee - pointer to BeeParams structure.
+/// bee - pointer to BzzBeeGame structure.
 // screen - screen value representing screen to render.
-void renderBeeView(BeeParams *bee, ScreenView *screen);
+void renderBeeView(BzzBeeGame *bee, ScreenView *screen);
 
-/// void viewBeeFree frees memory allocated for BeeParams.
+/// void bzzBzzBeeGameFree frees memory allocated for BzzBeeGame.
 ///
-/// bee -BeeParams to be freed from memory.
-void viewBeeFree(BeeParams *bee);
+/// bee -BzzBeeGame to be freed from memory.
+void bzzBzzBeeGameFree(BzzBeeGame *bee);
 
-/// bzzRenderNN renders NN from BeeParams with controls.
+/// bzzRenderNN renders NN from BzzBeeGame with controls.
 ///
-/// bee - BeeParams containing NN.
+/// bee - BzzBeeGame containing NN.
 /// r - bzzRect representing render rectangle.
-void bzzRenderNN(BeeParams *bee, BzzRect r);
+void bzzRenderNN(BzzBeeGame *bee, BzzRect r);
 
 /// isModified returns true if bee is modified or false otherwise.
-bool isModified(BeeParams *bee);
+bool isModified(BzzBeeGame *bee);
 
 /// renderMapView renders a map view.
 ///
-/// bee - BeeParams holding bee functionality parameters.
+/// bee - BzzBeeGame holding bee functionality parameters.
 // screen - screen value representing screen to render.
-void renderMapView(BeeParams *bee, ScreenView *screen);
+void renderMapView(BzzBeeGame *bee, ScreenView *screen);
 
 #endif

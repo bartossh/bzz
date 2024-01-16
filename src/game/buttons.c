@@ -2,7 +2,7 @@
 
 #include <raylib.h>
 #include "raylib.h"
-#include "views.h"
+#include "game.h"
 #include "../assets/assets_loader.h"
 
 BzzButton bzzButtonNewMinus(float scale, Color color)

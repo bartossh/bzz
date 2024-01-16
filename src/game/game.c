@@ -6,13 +6,14 @@
 #include <string.h>
 #include <time.h>
 #include "raylib.h"
-#include "views.h"
+#include "game.h"
 #include "../nn/nn.h"
-#include "../flowers/flowers.h"
+#include "../levels/levels.h"
 
-BeeParams viewBeeNew(
+BzzBeeGame bzzBzzBeeGameNew(
     Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
+    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, BzzStationaries *stationaries, FlowersDataset fl,
+    int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
 {
     const size_t max_epoch = 200 * 1000;
     const size_t epochs_per_frame = 200;
@@ -21,7 +22,6 @@ BeeParams viewBeeNew(
     int total_layers_count = 2+inner_layers_count; 
 
     Region temp = regionAllocAlloc(8 * KILO * KILO);
-    FlowersDataset fl = flowersDatasetNew(Location_6_60);
     Mat t = flowersToMat(fl);
 
     size_t *arch = NNMalloc(sizeof(size_t) * total_layers_count);
@@ -41,7 +41,7 @@ BeeParams viewBeeNew(
     nnRand(nn, -1, 1);
     BzzPlot plot = {0};
 
-    BeeParams bee = {
+    BzzBeeGame bee = {
         .max_epoch = max_epoch,
         .epochs_per_frame = epochs_per_frame,
         .epoch = epoch,
@@ -62,7 +62,8 @@ BeeParams viewBeeNew(
         .update_button = update_button,
         .map_button = map_button,
         .bee_button = bee_button,
-        .swarm = swarm
+        .swarm = swarm,
+        .stationaries = stationaries
     };
 
     for (int i = 0; i < MAX_INNER_LAYERS; i++) {
@@ -72,7 +73,7 @@ BeeParams viewBeeNew(
     return bee;
 }
 
-void viewBeeFree(BeeParams *bee) 
+void bzzBzzBeeGameFree(BzzBeeGame *bee) 
 {
     if (!bee) {
         return;
@@ -93,7 +94,7 @@ void viewBeeFree(BeeParams *bee)
     bzzPlotFree(&bee->plot);
 }
 
-bool isModified(BeeParams *bee)
+bool isModified(BzzBeeGame *bee)
 {
     return  bee->modified;
 }
