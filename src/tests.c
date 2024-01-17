@@ -3,10 +3,10 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <raylib.h>
-#include "../test-framework/unity.h"
-#include "flowers/flowers.h"
 #include "nn/nn.h"
-#include "views/views.h"
+#include "game/game.h"
+#include "levels/levels.h"
+#include "../test-framework/unity.h"
 
 #define BuffLen(xs) sizeof((xs))/sizeof((xs)[0])
 
@@ -99,7 +99,7 @@ testCreateCRUDSwarm(void)
     // END: test get at index.
 
     // START: remove at index in range.
-    result = bzzRemoveAt(&s, 9);
+    result = bzzSwarmRemoveAt(&s, 9);
     TEST_ASSERT_TRUE(result);
     size =  bzzSwarmGetSize(&s);
     TEST_ASSERT_EQUAL_INT(max_elems-1, size);
@@ -116,6 +116,7 @@ testCreateCRUDSwarm(void)
 
     // START: cleanup 
     bzzUnloadObject(obj);
+    CloseWindow();
     // END: cleanup 
 }
 

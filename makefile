@@ -23,13 +23,13 @@ OSX_OPT = -Llib -framework CoreVideo -framework IOKit -framework Cocoa -framewor
 CFILES = src/main.c
 CFILES += src/assets/*.c
 CFILES += src/nn/*.c
-CFILES += src/flowers/*.c
-CFILES += src/views/*.c
+CFILES += src/levels/*.c
+CFILES += src/game/*.c
 
-TFILES = src/nn/nn.c
-TFILES += src/flowers/flowers.c
+TFILES = src/nn/*.c
+TFILES += src/levels/*.c
 TFILES += src/assets/*.c
-TFILES += src/views/*.c
+TFILES += src/game/*.c
 TFILES += src/tests.c
 
 
