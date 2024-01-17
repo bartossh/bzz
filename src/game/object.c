@@ -56,7 +56,12 @@ BzzObject bzzObjectNewBee(Color color)
     return obj;
 }
 
-BzzObject bzzCreateNewFlower(Color color, int next)
+int bzzGetTotlaNumberOAvaliablefFlowersTextures(void)
+{
+    return TexturesSize(textures);
+}
+
+BzzObject bzzObjectNewFlower(Color color, int next)
 {
     enum AssetTexture2D tx = textures[next%TexturesSize(textures)];
 

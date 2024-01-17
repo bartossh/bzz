@@ -35,6 +35,8 @@
 #define MAX_SWARN_SIZE 128
 #define MAX_STATIONARIES_SIZE 512
 
+float randInRange(float a, float b);
+
 typedef struct {
     float x;
     float y;
@@ -149,11 +151,15 @@ typedef struct {
 /// color - blend color. 
 BzzObject bzzObjectNewBee(Color color);
 
+/// bzzGetTotlaNumberOAvaliablefFlowersTextures returns total number of flower textures avaliable.
+///
+int bzzGetTotlaNumberOAvaliablefFlowersTextures(void);
+
 /// bzzObjectNewFlower creates a new BzzObject of type flower.
 ///
 /// color - blend color.
 /// int - next type of a flower.
-BzzObject bzzObjectNeeFlower(Color color, int next);
+BzzObject bzzObjectNewFlower(Color color, int next);
 
 /// bzzUnloadObject unloads texture from the object.
 ///
@@ -170,11 +176,12 @@ typedef struct {
 BzzStationary bzzStationaryNewFlower(BzzObject obj, Vector2 pos, float scale);
 
 /// bzzRenderStationary renders stationary object.
+/// Returns 1 if rected on mouse click or 0 otherwise.
 ///
 /// b - BzzStationary animated object.
 /// min - minimum rectangle boundary.
 /// max - maximum rectangle boundary.
-void bzzRenderStationary(BzzStationary *b);
+int bzzRenderStationary(BzzStationary *b);
 
 /// BzzAnimated is an animated and movable object.
 typedef struct {
@@ -194,16 +201,16 @@ typedef struct {
 /// 
 /// start - starting position at which bee will be drawn.
 /// color - blend color. 
-BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 min, Vector2 max, AnimationLayout l);
+BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, AnimationLayout l);
 
 /// bzzRenderAnimated renders moveable object.
 ///
 /// b - BzzAnimated animated object.
-/// min - minimum rectangle boundary.
-/// max - maximum rectangle boundary.
-void bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max);
+/// next - next possition.
+void bzzRenderAnimated(BzzAnimated *b, Vector2 next);
 
 /// bzzCheckCollision - checks collision between BzzAnimated object and rectangle.
+/// Returns 1 if collision or 0 otherwise.
 ///
 /// b - BzzAnimated object to check collision for.
 /// r - Rectangle object to check collision against.

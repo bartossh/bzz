@@ -89,7 +89,7 @@ int bzzRenderButton(BzzButton btn, Vector2 pos)
     float width = btn.tx.width * btn.scale;
     float height = btn.tx.height *btn.scale;
     
-    Rectangle btnBounds = { pos.x, pos.y, width, height };
+    Rectangle btnBounds = {pos.x, pos.y, width, height};
     Vector2 mousePoint = GetMousePosition();
 
     float resize = 1.0f;
@@ -105,7 +105,7 @@ int bzzRenderButton(BzzButton btn, Vector2 pos)
         }    
     }
 
-    Vector2 p = { .x = pos.x + (width - width * resize)/2.0f, .y = pos.y + (height - height * resize)/2.0f };
+    Vector2 p = {.x = pos.x + (width - width * resize)/2.0f, .y = pos.y + (height - height * resize)/2.0f};
     
     DrawTextureEx(btn.tx, p, 0.0f, btn.scale*resize, btn.color);
 

@@ -88,7 +88,6 @@ void bzzBzzBeeGameFree(BzzBeeGame *bee)
     bee->reset = false;
     bee->modified = false;
     regionFree(&bee->temp);
-    flowersDatasetFree(&bee->fl);
     matFree(&bee->t);
     nnFree(&bee->nn);
     bzzPlotFree(&bee->plot);

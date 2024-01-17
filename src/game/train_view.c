@@ -488,6 +488,7 @@ void renderBeeView(BzzBeeGame *bee, ScreenView *screen)
         bee->modified = true;
     }
     if (bee->paused && bee->inner_layers_count > inner_layers_count && bee->inner_layers_count > MIN_INNER_LAYERS ) {
+        bee->inner_layers[bee->inner_layers_count-1] = 0;
         bee->inner_layers_count = inner_layers_count;
         bee->modified = true;
     }

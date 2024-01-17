@@ -7,26 +7,22 @@
 
 #define PAUSE_TIME 120
 
-inline static float randInRange(float a, float b)
-{
-    float r = (float)rand() / (float)RAND_MAX;
-    return a + r * (b - a); 
-}
-
 inline static bool vector2Equals(Vector2 a, Vector2 b)
 {
     return a.x == b.x && a.y == b.y;
 }
 
-inline static void nextPosition(BzzAnimated *b, Vector2 min, Vector2 max)
+inline static void nextPosition(BzzAnimated *b, Vector2 next)
 {
     if (vector2Equals(b->pos, b->target) && b->pause_time) {
         b->pause_time--;
         return;
     } else if (vector2Equals(b->pos, b->target)) {
+        float speed = randInRange(1.0f, 3.0f);
+        b->speed = speed;
         b->pause_time = PAUSE_TIME; 
-        b->target.x = randInRange(min.x, max.x);
-        b->target.y = randInRange(min.y, max.y);
+        b->target.x = next.x;
+        b->target.y = next.y;
     }
 
     b->pos = Vector2MoveTowards(b->pos, b->target, b->speed);
@@ -49,14 +45,10 @@ inline static float calcResize(BzzAnimated *b)
     return 1.0f;
 }
 
-BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 min, Vector2 max, AnimationLayout l)
+BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, AnimationLayout l)
 {
-    float speed = randInRange(1.0f, 5.0f);
-    Vector2 target = {0};
-    target.x = randInRange(min.x, max.x);
-    target.y = randInRange(min.y, max.y);
-
-    BzzAnimated btn = {
+    float speed = randInRange(1.0f, 3.0f);
+    BzzAnimated a = {
         .obj = obj,
         .layout = l,
         .frame = 0,
@@ -65,13 +57,13 @@ BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 min, Vector2
         .speed = speed,
         .dir = 0.0f,
         .pos = start,
-        .target = target
+        .target = next
     };
 
-    return btn;
+    return a;
 }
 
-void bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max)
+void bzzRenderAnimated(BzzAnimated *b, Vector2 next)
 {
     if (!b) {
         exit(1);
@@ -81,7 +73,7 @@ void bzzRenderAnimated(BzzAnimated *b, Vector2 min, Vector2 max)
         b->frame = 0;
     }
 
-    nextPosition(b, min, max);
+    nextPosition(b, next);
     calcDirection(b);
     float resize = calcResize(b);
     float width = b->obj.tx.width;
