@@ -151,9 +151,9 @@ typedef struct {
 /// color - blend color. 
 BzzObject bzzObjectNewBee(Color color);
 
-/// bzzGetTotlaNumberOAvaliablefFlowersTextures returns total number of flower textures avaliable.
+/// bzzGetTotalNumberOfAvaliablefFlowersTextures returns total number of flower textures avaliable.
 ///
-int bzzGetTotlaNumberOAvaliablefFlowersTextures(void);
+int bzzGetTotalNumberOfAvaliablefFlowersTextures(void);
 
 /// bzzObjectNewFlower creates a new BzzObject of type flower.
 ///

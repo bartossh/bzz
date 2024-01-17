@@ -38,7 +38,7 @@ int main(void)
     BzzButton logo_button = bzzButtonNewLogo(1.0f, ORANGE);
     BzzObject bee_object = bzzObjectNewBee(ORANGE);
 
-    int total_flowers_tx = bzzGetTotlaNumberOAvaliablefFlowersTextures();
+    int total_flowers_tx = bzzGetTotalNumberOfAvaliablefFlowersTextures();
     BzzStationaries stationaries = bzzStationariesNew();
     for (int i = 0; i < total_flowers_tx; i++) {
         BzzObject o = bzzObjectNewFlower(WHITE, i);
