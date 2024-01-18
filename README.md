@@ -11,7 +11,7 @@ BZZ depends on:
  
 - [Raylib](https://www.raylib.com/index.html) - raylib is a simple and easy-to-use library to enjoy videogames programming.
 
-### Raylib - build from source
+### Raylib - build from source OSX developemnt
 
 Download version [4.0.0](https://github.com/raysan5/raylib/releases/tag/4.0.0) -> source code.
 
@@ -34,6 +34,13 @@ cmake --build .
 Finally:
 
 Copy `libraylib.a`, `raudio.h`. `raylib.h`, `raymath.h`, `rlgl.h` to `./lib/` folder in this repo root.
+
+
+### Raylib - Web Assembly compilation with emscripten
+
+Follow instruction from [Emscripten web page](https://emscripten.org/docs/getting_started/downloads.html).
+
+If you are using OSX just brew the Emscripten `brew install emscripten`.
 
 
 ## Development

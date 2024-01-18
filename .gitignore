@@ -59,6 +59,7 @@ test
 
 # libraries 
 lib
+lib_wasm
 
 # OS specific
 .DS_Store

@@ -478,7 +478,6 @@ void renderBeeView(BzzBeeGame *bee, ScreenView *screen)
         viewBeeLearn(bee, bzzLayoutSlot(), &slider_position, &slider_dragging);
     bzzLayoutEnd();
     
-    char controles_buffer[256];
     int inner_layers_count = bee->inner_layers_count;
     inner_layers_count -= bzzRenderButton(bee->minus_button, CLITERAL(Vector2){ .x = r.w/3 +40, .y = h*controles_height_multip-20}); 
     inner_layers_count += bzzRenderButton(bee->plus_button, CLITERAL(Vector2){ .x = r.w/3 + 80, .y = h*controles_height_multip-20});
@@ -493,6 +492,7 @@ void renderBeeView(BzzBeeGame *bee, ScreenView *screen)
         bee->modified = true;
     }
 
+    char controles_buffer[256];
     snprintf(controles_buffer, sizeof(controles_buffer),
              "Bee brain arch: [ %i %i %i %i ]", 
              bee->inner_layers[0], bee->inner_layers[1], bee->inner_layers[2], bee->inner_layers[3]

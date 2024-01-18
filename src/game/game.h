@@ -357,10 +357,10 @@ void viewBeeRandomize(BzzBeeGame *bee);
 // screen - screen value representing screen to render.
 void renderBeeView(BzzBeeGame *bee, ScreenView *screen);
 
-/// void bzzBzzBeeGameFree frees memory allocated for BzzBeeGame.
+/// void bzzBzzBeeGameClenup frees memory allocated for BzzBeeGame.
 ///
 /// bee -BzzBeeGame to be freed from memory.
-void bzzBzzBeeGameFree(BzzBeeGame *bee);
+void bzzBzzBeeGameClenup(BzzBeeGame *bee);
 
 /// bzzRenderNN renders NN from BzzBeeGame with controls.
 ///

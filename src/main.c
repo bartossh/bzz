@@ -7,16 +7,40 @@
 #include "levels/levels.h"
 #include "game/game.h"
 
-bool paused = true;
+/// uncoment if compiling WASM or pass flag `-DPLATFORM_WEB`
+//#define PLATFORM_WEB
+
+#if defined(PLATFORM_WEB)
+    #include <emscripten/emscripten.h>
+#endif
+
+void UpdateDrawFrame(void);
+
+bool paused;
 ScreenView screen = MainMenuScreen;
-int starting_number_of_bees = 10;
-int inner_layers_count = 1;
-int inner_layers[MAX_INNER_LAYERS] = {5};
+FlowersDataset fl;
+ViewMenu m;
+BzzBeeGame bee; 
+BzzButton minus_button; 
+BzzButton plus_button;
+BzzButton bee_button; 
+BzzButton map_button; 
+BzzButton learn_button; 
+BzzButton update_button;
+BzzButton logo_button;
+BzzObject bee_object; 
+BzzSwarm swarm;
+BzzStationaries stationaries;
 
 int main(void) 
 {
     srand(time(NULL));
- 
+
+    paused = true;
+    int starting_number_of_bees = 10;
+    int inner_layers_count = 1;
+    int inner_layers[MAX_INNER_LAYERS] = {5};
+    
     size_t WindowFactor = 100;
     size_t WindowWidth = (16 * WindowFactor);
     size_t WindowHeight = (9 * WindowFactor);
@@ -24,22 +48,22 @@ int main(void)
     InitWindow(WindowWidth, WindowHeight, "BZZ!");
     int w = GetScreenWidth();
     int h = GetScreenHeight();
-
-    FlowersDataset fl = flowersDatasetNew(Location_6_60);
+    
+    fl = flowersDatasetNew(Location_6_60);
     
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     
-    BzzButton minus_button = bzzButtonNewMinus(0.05f, BLACK);
-    BzzButton plus_button = bzzButtonNewPlus(0.05f, BLACK);
-    BzzButton bee_button = bzzButtonNewBee(0.09f, ORANGE);
-    BzzButton map_button = bzzButtonNewMap(0.09f, ORANGE);
-    BzzButton learn_button = bzzButtonNewLearn(0.09f, ORANGE);
-    BzzButton update_button = bzzButtonNewUpdate(0.09f, ORANGE);
-    BzzButton logo_button = bzzButtonNewLogo(1.0f, ORANGE);
-    BzzObject bee_object = bzzObjectNewBee(ORANGE);
-
+    minus_button = bzzButtonNewMinus(0.05f, BLACK);
+    plus_button = bzzButtonNewPlus(0.05f, BLACK);
+    bee_button = bzzButtonNewBee(0.09f, ORANGE);
+    map_button = bzzButtonNewMap(0.09f, ORANGE);
+    learn_button = bzzButtonNewLearn(0.09f, ORANGE);
+    update_button = bzzButtonNewUpdate(0.09f, ORANGE);
+    logo_button = bzzButtonNewLogo(1.0f, ORANGE);
+    bee_object = bzzObjectNewBee(ORANGE);
+    
     int total_flowers_tx = bzzGetTotalNumberOfAvaliablefFlowersTextures();
-    BzzStationaries stationaries = bzzStationariesNew();
+    stationaries = bzzStationariesNew();
     for (int i = 0; i < total_flowers_tx; i++) {
         BzzObject o = bzzObjectNewFlower(WHITE, i);
         Vector2 pos = {.x = randInRange(0.0f, (float)w), .y = randInRange(0.0f, (float)h)};
@@ -49,9 +73,9 @@ int main(void)
             exit(1);
         }
     }
-
+    
     int stationaries_size = bzzStationariesGetSize(&stationaries);
-    BzzSwarm swarm = bzzSwarmNew();
+    swarm = bzzSwarmNew();
     for (int i = 0; i < starting_number_of_bees; i++) {
         BzzStationary *s = bzzStationariesAt(&stationaries, (int)randInRange(0.0f, (float)stationaries_size));
         BzzAnimated bee_movable = bzzAnimatedNewBee(
@@ -62,40 +86,27 @@ int main(void)
         );
         bzzSwarmAppend(&swarm, bee_movable);
     }
-
-    ViewMenu m = viewMenuNew(font, logo_button);
-    BzzBeeGame bee = bzzBzzBeeGameNew(
+    
+    m = viewMenuNew(font, logo_button);
+    bee = bzzBzzBeeGameNew(
         font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
         &swarm, &stationaries, fl, inner_layers_count, inner_layers
     );
-
+    
     SetTargetFPS(60);
     
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
     
+#if defined(PLATFORM_WEB)
+    emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
+#else
+
     while (!WindowShouldClose()) {  
-        switch (screen) {
-        case MainMenuScreen:
-            renderMenuView(m, &screen);
-            break;
-        case BeeMapScreen:
-            renderMapView(&bee, &screen);
-            break;
-        case BeeTrainScreen:
-        default: 
-            if (bee.paused && isModified(&bee)) {
-                inner_layers_count = bee.inner_layers_count;
-                Font font = bee.font;
-                bzzBzzBeeGameFree(&bee);
-                bee = bzzBzzBeeGameNew(
-                    font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-                    &swarm, &stationaries, fl, inner_layers_count, bee.inner_layers
-                );
-            }
-            renderBeeView(&bee, &screen);
-            break;
-        }
+        UpdateDrawFrame();
     }
+#endif
+
+
     UnloadFont(font);
     bzzUnloadButton(minus_button);
     bzzUnloadButton(plus_button);
@@ -109,3 +120,28 @@ int main(void)
     
     return 0;
 }
+
+void UpdateDrawFrame(void)
+{   
+    switch (screen) {
+    case MainMenuScreen:
+        renderMenuView(m, &screen);
+        break;
+    case BeeMapScreen:
+        renderMapView(&bee, &screen);
+        break;
+    case BeeTrainScreen:
+    default: 
+        if (bee.paused && isModified(&bee)) {
+            Font font = bee.font;
+            bzzBzzBeeGameClenup(&bee);
+            bee = bzzBzzBeeGameNew(
+                font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
+                &swarm, &stationaries, fl, bee.inner_layers_count, bee.inner_layers
+            );
+        }
+        renderBeeView(&bee, &screen);
+        break;
+    }
+}
+
