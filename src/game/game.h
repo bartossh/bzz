@@ -24,7 +24,6 @@
 #define bzzAssert NNAssert
 #endif // bzzAssert
 
-
 #define MAX_INNER_LAYERS 4
 #define MIN_INNER_LAYERS 1
 #define MAX_PERCEPTRONS 20
@@ -178,10 +177,16 @@ BzzStationary bzzStationaryNewFlower(BzzObject obj, Vector2 pos, float scale);
 /// bzzRenderStationary renders stationary object.
 /// Returns 1 if rected on mouse click or 0 otherwise.
 ///
-/// b - BzzStationary animated object.
+/// s - BzzStationary animated object.
 /// min - minimum rectangle boundary.
 /// max - maximum rectangle boundary.
-int bzzRenderStationary(BzzStationary *b);
+int bzzRenderStationary(BzzStationary *s);
+
+/// bzzGetCenterStationary returns central point of BzzStationary.
+/// Returns Vector2 position.
+///
+/// s - BzzStationary animated object.
+Vector2 bzzGetCenterStationary(BzzStationary *s);
 
 /// BzzAnimated is an animated and movable object.
 typedef struct {

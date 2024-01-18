@@ -32,7 +32,8 @@ typedef struct {
     const char *name;
 } Candidate;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     if( argc < 3 ) {
         const Candidate candidates[] = {
             (Candidate){.path = "assets/logo.png", .name = "src/assets/logo.h"},

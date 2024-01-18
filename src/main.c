@@ -7,8 +7,7 @@
 #include "levels/levels.h"
 #include "game/game.h"
 
-/// uncoment if compiling WASM or pass flag `-DPLATFORM_WEB`
-//#define PLATFORM_WEB
+//#define PLATFORM_WEB /// uncoment if compiling WASM or pass flag `-DPLATFORM_WEB`
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
@@ -37,11 +36,11 @@ int main(void)
     srand(time(NULL));
 
     paused = true;
-    int starting_number_of_bees = 10;
+    int starting_number_of_bees = 20;
     int inner_layers_count = 1;
     int inner_layers[MAX_INNER_LAYERS] = {5};
     
-    size_t WindowFactor = 100;
+    size_t WindowFactor = 80;
     size_t WindowWidth = (16 * WindowFactor);
     size_t WindowHeight = (9 * WindowFactor);
     
@@ -63,10 +62,11 @@ int main(void)
     bee_object = bzzObjectNewBee(ORANGE);
     
     int total_flowers_tx = bzzGetTotalNumberOfAvaliablefFlowersTextures();
+    float padding = 50.0f;
     stationaries = bzzStationariesNew();
     for (int i = 0; i < total_flowers_tx; i++) {
         BzzObject o = bzzObjectNewFlower(WHITE, i);
-        Vector2 pos = {.x = randInRange(0.0f, (float)w), .y = randInRange(0.0f, (float)h)};
+        Vector2 pos = {.x = randInRange(padding, (float)w-padding), .y = randInRange(padding, (float)h-padding)};
         BzzStationary f = bzzStationaryNewFlower(o, pos, 0.08f);
         bool ok = bzzStationariesAppend(&stationaries, f);
         if (!ok) {
@@ -81,7 +81,7 @@ int main(void)
         BzzAnimated bee_movable = bzzAnimatedNewBee(
             bee_object,
             CLITERAL(Vector2){.x = w/2, .y = h/2},
-            CLITERAL(Vector2){.x = s->pos.x+s->obj.tx.width*s->scale, .y = s->pos.y+s->obj.tx.height*s->scale},
+            bzzGetCenterStationary(s),
             TopDown
         );
         bzzSwarmAppend(&swarm, bee_movable);

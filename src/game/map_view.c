@@ -23,7 +23,7 @@ void renderMapView(BzzBeeGame *bp, ScreenView *screen)
     for (int i = 0; i < swarm_size; i++) {
         BzzStationary *s = bzzStationariesAt(bp->stationaries, (int)randInRange(0.0f, (float)stationaries_size));
         BzzAnimated *bee = bzzSwarmAt(bp->swarm, i);
-        bzzRenderAnimated(bee, CLITERAL(Vector2){.x = s->pos.x+s->obj.tx.width*s->scale, .y = s->pos.y+s->obj.tx.height*s->scale});
+        bzzRenderAnimated(bee, bzzGetCenterStationary(s));
     }
  
     int pressed = bzzRenderButton(bp->bee_button, CLITERAL(Vector2){.x = w - 50 , .y = 20});

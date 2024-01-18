@@ -45,3 +45,12 @@ int bzzRenderStationary(BzzStationary *s)
 
     return result;
 }
+
+Vector2 bzzGetCenterStationary(BzzStationary *s)
+{
+    Vector2 pos = {
+        .x = s->pos.x + s->obj.tx.width*s->scale/2,
+        .y = s->pos.y + s->obj.tx.height*s->scale/2
+    };
+    return pos;
+}

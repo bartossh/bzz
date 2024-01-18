@@ -28,7 +28,7 @@ void renderMenuView(ViewMenu m, ScreenView *screen)
     ClearBackground(DEEPOCEAN);
     DrawTextEx(
         m.font, "BZZ - train your bees to survive in a world full of dangers.",
-        CLITERAL(Vector2){.x = 200, .y = 120 }, 30, 0, ORANGE);
+        CLITERAL(Vector2){.x = 150, .y = 120 }, 25, 0, ORANGE);
     int pressed = bzzRenderButton(m.logo_button, CLITERAL(Vector2){.x = logo_x , .y = logo_y });
     if (pressed) {
         *screen = BeeMapScreen;  
