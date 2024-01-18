@@ -42,6 +42,23 @@ Follow instruction from [Emscripten web page](https://emscripten.org/docs/gettin
 
 If you are using OSX just brew the Emscripten `brew install emscripten`.
 
+Build raylib using emscripten compiler.
+
+```sh
+emcc -c rcore.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2
+emcc -c rshapes.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2
+emcc -c rtextures.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2
+emcc -c rtext.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2
+emcc -c rmodels.c -Os -Wall -DPLATFORM_WEB -DGRAPHICS_API_OPENGL_ES2
+emcc -c utils.c -Os -Wall -DPLATFORM_WEB
+emcc -c raudio.c -Os -Wall -DPLATFORM_WEB
+
+emar rcs libraylib.a rcore.o rshapes.o rtextures.o rtext.o rmodels.o utils.o raudio.o
+```
+
+Copy `libraylib.a`, `raudio.h`. `raylib.h`, `raymath.h`, `rlgl.h` to `./wasm_lib/` folder in this repo root.
+
+You are ready to go.
 
 ## Development
 
@@ -61,8 +78,15 @@ This software is still in the beginning of development stage. Keep your expectat
 
 ## Build
 
+### OS PLATFORM
+
 - To build for your current machine OS and architecture run command: `make build`.
- - Now only MAC OS is supported, this will change.
+- Now only MAC OS is supported, this will change.
+
+### WASM
+
+- To build for Wab Assembly run command: `make web`.
+- To check build `cd` in to `web_build` directory and run `python -m http.server 8080` go in your browser to [http://localhost:8080](http://localhost:8080)
 
 
 ## Idea
