@@ -73,17 +73,12 @@ BzzBeeGame bzzBzzBeeGameNew(
     return bee;
 }
 
-void bzzBzzBeeGameFree(BzzBeeGame *bee) 
+void bzzBzzBeeGameClenup(BzzBeeGame *bee) 
 {
     if (!bee) {
         return;
     }
 
-    bee->max_epoch = 0;
-    bee->epochs_per_frame = 0;
-    bee->epoch = 0;
-    bee->rate = 0.0f;
-    bee->inner_layers_count = 0;
     bee->paused = true;
     bee->reset = false;
     bee->modified = false;

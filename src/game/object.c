@@ -56,14 +56,17 @@ BzzObject bzzObjectNewBee(Color color)
     return obj;
 }
 
-int bzzGetTotlaNumberOAvaliablefFlowersTextures(void)
+int bzzGetTotalNumberOfAvaliablefFlowersTextures(void)
 {
     return TexturesSize(textures);
 }
 
 BzzObject bzzObjectNewFlower(Color color, int next)
 {
-    enum AssetTexture2D tx = textures[next%TexturesSize(textures)];
+    if (next >= bzzGetTotalNumberOfAvaliablefFlowersTextures()) {
+        next = 0;
+    }
+    enum AssetTexture2D tx = textures[next];
 
     BzzObject obj = {
         .tx = assetLoad(tx),

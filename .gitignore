@@ -53,12 +53,14 @@ dkms.conf
 
 # build
 build
+web_build
 
 # test
 test
 
 # libraries 
 lib
+lib_wasm
 
 # OS specific
 .DS_Store
