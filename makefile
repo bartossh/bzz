@@ -33,11 +33,18 @@ TFILES += src/game/*.c
 TFILES += src/tests.c
 
 
-.PHONY: load
-load:
+.PHONY: loadimg
+loadimg:
 	@echo Compiling $@
-	@$(CC) $(ASANFLAGS) $(CFLAGS) $(SOURCE_LIBS) $(OSX_OPT) src/image_loader/*c -o build/loader $(LIBS)
-	./build/loader
+	@$(CC) $(ASANFLAGS) $(CFLAGS) $(SOURCE_LIBS) $(OSX_OPT) src/image_loader/*c -o build/image_loader $(LIBS)
+	./build/image_loader
+	@echo "Load finished"
+
+.PHONY: loadfnt
+loadfnt:
+	@echo Compiling $@
+	@$(CC) $(ASANFLAGS) $(CFLAGS) $(SOURCE_LIBS) $(OSX_OPT) src/font_loader/*c -o build/font_loader $(LIBS)
+	./build/font_loader
 	@echo "Load finished"
 
 .PHONY: web

@@ -75,12 +75,7 @@ void bzzRenderAnimated(BzzAnimated *b, Vector2 next)
 
     nextPosition(b, next);
     calcDirection(b);
-    float resize = calcResize(b);
-    float width = b->obj.tx.width;
-    float height = b->obj.tx.height / b->total_frames;
-    float x = b->pos.x-width/2;
-    float y = b->pos.y-height/2;
-    
+    float resize = calcResize(b); 
     float rot = 0.0f;
     switch (b->layout) {
     case TopDown:
@@ -91,10 +86,15 @@ void bzzRenderAnimated(BzzAnimated *b, Vector2 next)
         rot = 0.0f;
     }
 
+    float width = b->obj.tx.width;
+    float height = b->obj.tx.height / b->total_frames;
+    float x = b->pos.x;
+    float y = b->pos.y;
+
     Rectangle dstRec =  {x, y, width*resize, height*resize};
     Rectangle frameRec = {0.0f, 0.0f, width, height};
     frameRec.y = ((float)b->frame)*height;
-    Vector2 org = {.x = 0.0f, .y = 0.0f};
+    Vector2 org = {.x = width/2, .y = height/2};
     DrawTexturePro(b->obj.tx, frameRec, dstRec, org, b->dir+rot, b->obj.color);
     b->frame++;
 }

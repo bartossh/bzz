@@ -380,7 +380,7 @@ static void viewBeeLearn(BzzBeeGame *bee, BzzRect r, float *slider_position, boo
         high_color.a = floorf(255.f * (*slider_position));
 
         bzzSliderVertical(
-            slider_position, slider_dragging, r.x + r.w + 200,
+            slider_position, slider_dragging, r.x + r.w + 150,
             r.y + r.h * widget_padding_multip,
             r.h * (widget_height_multip - widget_padding_multip), 10,
             ColorAlphaBlend(low_color, high_color, alpha_color), ORANGE
@@ -428,13 +428,6 @@ void renderBeeView(BzzBeeGame *bee, ScreenView *screen)
         bzzPlotFree(&bee->plot);
     }
     bee->reset = false;
-
-    for (size_t i = 0;i < bee->epochs_per_frame && !bee->paused && bee->epoch < bee->max_epoch;++i) {
-        NN g = nnBackprop(&bee->temp, bee->nn, bee->t);
-        nnLearn(bee->nn, g, bee->rate);
-        bee->epoch += 1;
-        DaAppend(&(bee->plot), nnCost(bee->nn, bee->t));
-    }
 
     BeginDrawing();
     ClearBackground(OCEAN);
@@ -500,6 +493,13 @@ void renderBeeView(BzzBeeGame *bee, ScreenView *screen)
     DrawTextEx(bee->font, controles_buffer, CLITERAL(Vector2){.x = 120, .y = h*controles_height_multip-10}, h * 0.016, 0, YELLOW);
 
     EndDrawing();
+
+    for (size_t i = 0;i < bee->epochs_per_frame && !pressed && !bee->paused && bee->epoch < bee->max_epoch;++i) {
+        NN g = nnBackprop(&bee->temp, bee->nn, bee->t);
+        nnLearn(bee->nn, g, bee->rate);
+        bee->epoch += 1;
+        DaAppend(&(bee->plot), nnCost(bee->nn, bee->t));
+    }
 
     RegionReset(&bee->temp);
 }
