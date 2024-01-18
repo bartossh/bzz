@@ -53,6 +53,7 @@ dkms.conf
 
 # build
 build
+web_build
 
 # test
 test

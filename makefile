@@ -40,6 +40,10 @@ load:
 	./build/loader
 	@echo "Load finished"
 
+.PHONY: web
+web:
+	emcc -o web_build/game.html $(CFILES) -Os -Wall ./lib_wasm/libraylib.a -I. -Ilib_wasm -L. -Llib_wasm -s USE_GLFW=3 -DPLATFORM_WEB -s TOTAL_MEMORY=128MB -sGL_ENABLE_GET_PROC_ADDRESS
+
 .PHONY: run
 run: build
 	./build/bzz

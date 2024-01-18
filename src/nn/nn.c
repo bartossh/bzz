@@ -187,7 +187,6 @@ NN nnAlloc(Region *r, size_t *arch, size_t arch_count)
     nn.as = regionAlloc(r, sizeof(*nn.as) * nn.arch_count);
     NNAssert(nn.as != NULL);
 
-    printf("arch[0]: %zu\n", arch[0]);
     nn.as[0] = RowAlloc(r, arch[0]);
     for (size_t i = 1; i < arch_count; ++i) {
         nn.ws[i - 1] = matAlloc(r, nn.as[i - 1].cols, arch[i]);
