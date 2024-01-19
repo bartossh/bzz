@@ -85,7 +85,7 @@ This software is still in the beginning of development stage. Keep your expectat
 
 ### WASM
 
-- To build for Wab Assembly run command: `make web`.
+- To build for Wab Assembly run command: `make wasm`.
 - To check build `cd` in to `web_build` directory and run `python -m http.server 8080` go in your browser to [http://localhost:8080](http://localhost:8080)
 
 

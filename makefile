@@ -32,6 +32,9 @@ TFILES += src/assets/*.c
 TFILES += src/game/*.c
 TFILES += src/tests.c
 
+EMCC = emcc
+EMCC_OUT = -o web_build/game.html  
+EMCC_PARAMS = -Os -Wall ./lib_wasm/libraylib.a -I. -Ilib_wasm -L. -Llib_wasm -s USE_GLFW=3 --shell-file artefacts/game.html -DPLATFORM_WEB -s TOTAL_MEMORY=128MB -sGL_ENABLE_GET_PROC_ADDRESS
 
 .PHONY: loadimg
 loadimg:
@@ -47,9 +50,11 @@ loadfnt:
 	./build/font_loader
 	@echo "Load finished"
 
-.PHONY: web
-web:
-	emcc -o web_build/game.html $(CFILES) -Os -Wall ./lib_wasm/libraylib.a -I. -Ilib_wasm -L. -Llib_wasm -s USE_GLFW=3 -DPLATFORM_WEB -s TOTAL_MEMORY=128MB -sGL_ENABLE_GET_PROC_ADDRESS
+.PHONY: wasm
+wasm:
+	@echo Compiling $@
+	@$(EMCC) $(EMCC_OUT) $(CFILES) $(EMCC_PARAMS) 
+	@echo "Building WASM finished"
 
 .PHONY: run
 run: build
