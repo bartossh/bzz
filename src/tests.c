@@ -20,7 +20,7 @@ static void
 testCreateFlowersMat_5_10(void) 
 {
     
-    FlowersDataset fl = flowersDatasetNew(Basic_5_10);
+    LevelsDataset fl = levelsDatasetNew(Basic_5_10);
     Mat m = flowersToMat(fl);
     MatPrint(m);
     TEST_ASSERT_EQUAL_size_t(10, m.rows);
@@ -31,7 +31,7 @@ static void
 testCreateFlowersMat_5_20(void) 
 {
     
-    FlowersDataset fl = flowersDatasetNew(Basic_5_20);
+    LevelsDataset fl = levelsDatasetNew(Basic_5_20);
     Mat m = flowersToMat(fl);
     MatPrint(m);
     TEST_ASSERT_EQUAL_size_t(20, m.rows);
@@ -42,7 +42,7 @@ static void
 testCreateFlowersMat_5_30(void) 
 {
     
-    FlowersDataset fl = flowersDatasetNew(Basic_5_30);
+    LevelsDataset fl = levelsDatasetNew(Basic_5_30);
     Mat m = flowersToMat(fl);
     MatPrint(m);
     TEST_ASSERT_EQUAL_size_t(30, m.rows);

@@ -13,11 +13,11 @@
     #include <emscripten/emscripten.h>
 #endif
 
-void UpdateDrawFrame(void);
+void UpdateDrawFrame(float w, float h);
 
 bool paused;
 ScreenView screen = MainMenuScreen;
-FlowersDataset fl;
+LevelsDataset fl;
 ViewMenu m;
 BzzBeeGame bee; 
 BzzButton minus_button; 
@@ -31,12 +31,42 @@ BzzObject bee_object;
 BzzSwarm swarm;
 BzzStationaries stationaries;
 
+const float padding = 50.0f;
+
+inline static void prepareLevelStationaries(BzzStationaries *stationaries, LevelsDataset *dt, float w, float h)
+{
+    size_t total_flowers_tx = (size_t)bzzGetTotalNumberOfAvaliablefFlowersTextures();
+    size_t size = levelsGetFlowersCount(dt);
+    for (size_t i = 0; i < size && i < total_flowers_tx; i++) {
+        BzzObject o = bzzObjectNewFlower(WHITE, i);
+        Vector2 pos = {.x = randInRange(padding, (float)w-padding), .y = randInRange(padding, (float)h-padding)};
+        BzzStationary f = bzzStationaryNewFlower(o, pos, 0.08f);
+        bool ok = bzzStationariesAppend(stationaries, f);
+        if (!ok) {
+            exit(1);
+        }
+    }
+}
+
+inline static void prepareLevelBees(BzzSwarm *swarm, int starting_number_of_bees, float w, float h)
+{
+    for (int i = 0; i < starting_number_of_bees; i++) {
+        BzzAnimated bee_movable = bzzAnimatedNewBee(
+            bee_object,
+            CLITERAL(Vector2){.x = w/2, .y = h/2},
+            CLITERAL(Vector2){.x = randInRange(padding, w-padding), .y = randInRange(padding, h-padding)},
+            TopDown
+        );
+        bzzSwarmAppend(swarm, bee_movable);
+    }
+}
+
 int main(void) 
 {
     srand(time(NULL));
 
     paused = true;
-    int starting_number_of_bees = 20;
+    int starting_number_of_bees = 10;
     int inner_layers_count = 1;
     int inner_layers[MAX_INNER_LAYERS] = {5};
     
@@ -48,7 +78,7 @@ int main(void)
     int w = GetScreenWidth();
     int h = GetScreenHeight();
     
-    fl = flowersDatasetNew(Location_6_60);
+    fl = levelsDatasetNew(Basic_5_10);
     
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     
@@ -61,31 +91,11 @@ int main(void)
     logo_button = bzzButtonNewLogo(1.0f, ORANGE);
     bee_object = bzzObjectNewBee(ORANGE);
     
-    int total_flowers_tx = bzzGetTotalNumberOfAvaliablefFlowersTextures();
-    float padding = 50.0f;
     stationaries = bzzStationariesNew();
-    for (int i = 0; i < total_flowers_tx; i++) {
-        BzzObject o = bzzObjectNewFlower(WHITE, i);
-        Vector2 pos = {.x = randInRange(padding, (float)w-padding), .y = randInRange(padding, (float)h-padding)};
-        BzzStationary f = bzzStationaryNewFlower(o, pos, 0.08f);
-        bool ok = bzzStationariesAppend(&stationaries, f);
-        if (!ok) {
-            exit(1);
-        }
-    }
+    prepareLevelStationaries(&stationaries, &fl, w, h);
     
-    int stationaries_size = bzzStationariesGetSize(&stationaries);
     swarm = bzzSwarmNew();
-    for (int i = 0; i < starting_number_of_bees; i++) {
-        BzzStationary *s = bzzStationariesAt(&stationaries, (int)randInRange(0.0f, (float)stationaries_size));
-        BzzAnimated bee_movable = bzzAnimatedNewBee(
-            bee_object,
-            CLITERAL(Vector2){.x = w/2, .y = h/2},
-            bzzGetCenterStationary(s),
-            TopDown
-        );
-        bzzSwarmAppend(&swarm, bee_movable);
-    }
+    prepareLevelBees(&swarm, starting_number_of_bees, w, h);
     
     m = viewMenuNew(font, logo_button);
     bee = bzzBzzBeeGameNew(
@@ -102,7 +112,7 @@ int main(void)
 #else
 
     while (!WindowShouldClose()) {  
-        UpdateDrawFrame();
+        UpdateDrawFrame(w, h);
     }
 #endif
 
@@ -121,14 +131,14 @@ int main(void)
     return 0;
 }
 
-void UpdateDrawFrame(void)
+void UpdateDrawFrame(float w, float h)
 {   
     switch (screen) {
     case MainMenuScreen:
         renderMenuView(m, &screen);
         break;
     case BeeMapScreen:
-        renderMapView(&bee, &screen);
+        renderMapView(&bee, &screen, w, h, padding);
         break;
     case BeeTrainScreen:
     default: 

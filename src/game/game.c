@@ -12,7 +12,7 @@
 
 BzzBeeGame bzzBzzBeeGameNew(
     Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, BzzStationaries *stationaries, FlowersDataset fl,
+    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, BzzStationaries *stationaries, LevelsDataset fl,
     int inner_layers_count, int inner_layers[MAX_INNER_LAYERS])
 {
     const size_t max_epoch = 200 * 1000;
@@ -41,6 +41,8 @@ BzzBeeGame bzzBzzBeeGameNew(
     nnRand(nn, -1, 1);
     BzzPlot plot = {0};
 
+    int *discovered = NNMalloc(sizeof(int)*levelsGetFlowersCount(&fl));
+
     BzzBeeGame bee = {
         .max_epoch = max_epoch,
         .epochs_per_frame = epochs_per_frame,
@@ -51,7 +53,6 @@ BzzBeeGame bzzBzzBeeGameNew(
         .reset = false,
         .modified = false,
         .temp = temp,
-        .fl = fl,
         .t = t,
         .nn = nn,
         .plot = plot,
@@ -63,7 +64,9 @@ BzzBeeGame bzzBzzBeeGameNew(
         .map_button = map_button,
         .bee_button = bee_button,
         .swarm = swarm,
-        .stationaries = stationaries
+        .stationaries = stationaries,
+        .fl = fl,
+        .discovered = discovered
     };
 
     for (int i = 0; i < MAX_INNER_LAYERS; i++) {
@@ -86,6 +89,7 @@ void bzzBzzBeeGameClenup(BzzBeeGame *bee)
     matFree(&bee->t);
     nnFree(&bee->nn);
     bzzPlotFree(&bee->plot);
+    free(bee->discovered);
 }
 
 bool isModified(BzzBeeGame *bee)

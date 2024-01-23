@@ -28,51 +28,56 @@
 typedef float (*ValueNormalizer)(int v);
 
 
-/// FlowersDataset is a dataset of flowers.
+/// LevelsDataset is a dataset of flowers.
 typedef struct {
     size_t          rows;
     size_t          cols;
     int             *ptr;
     ValueNormalizer *f;
-} FlowersDataset;
+} LevelsDataset;
 
-/// FlowersDatasetOption is a option representing FlowersDataset.
+/// LevelsDatasetOption is a option representing FlowersDataset.
 typedef enum {
     Basic_5_10,
     Basic_5_20,
     Basic_5_30,
     Location_6_60
-} FlowersDatasetOption;
+} LevelsDatasetOption;
 
 
-/// flowersDatasetNew is a factory of FlowersDataset based on provided option,
+/// levelsDatasettNew is a factory of LevelsDataset based on provided option,
 ///
-/// o - FlowersDatasetOption option representing the new dataset to be created.
-FlowersDataset flowersDatasetNew(FlowersDatasetOption o);
+/// o - LevelsDatasetOption option representing the new dataset to be created.
+LevelsDataset levelsDatasetNew(LevelsDatasetOption o);
 
-/// void flowersDatasetFree frees the dataset allocated.
+/// levelsGetFlowersCount returns number of flowers in dataset.
 ///
-/// dt -FlowersDataset to be freed.
-void flowersDatasetFree(FlowersDataset *dt);
+/// dt - pointer to LevelsDataset.
+size_t levelsGetFlowersCount(LevelsDataset *dt);
+
+/// void levelsDatasettFree frees the dataset allocated.
+///
+/// dt -LevelsDataset to be freed.
+void levelsDatasettFree(LevelsDataset *dt);
 
 /// flowersToMat returns dataset matrix with normalized values between 0 and 1.
 ///
-/// dt - FlowersDataset that contains unnormalized flowers dataset. 
-Mat flowersToMat(FlowersDataset dt);
+/// dt - LevelsDataset that contains unnormalized flowers dataset. 
+Mat flowersToMat(LevelsDataset dt);
 
-/// printToBuffAtRow  prints FlowersDataset into char buff.
+/// printToBuffAtRow  prints LevelsDataset into char buff.
 /// Returns number of printed characters.
 ///
-/// dt - FlowersDataset to be printed.
+/// dt - LevelsDataset to be printed.
 /// next - next row to print.
 /// buff - buffer to print into.
 /// len - len of a buffer.
-size_t printToBuffAtRow(FlowersDataset dt, size_t next, char *buff, size_t len);
+size_t printToBuffAtRow(LevelsDataset dt, size_t next, char *buff, size_t len);
 
 /// getExpectedValueAtRow returns expected value at row.
 ///
-/// dt - FlowersDataset to get expected value from.
+/// dt - LevelsDataset to get expected value from.
 /// row - row number.
-float getExpectedValueAtRowNorm(FlowersDataset dt, size_t row);
+float getExpectedValueAtRowNorm(LevelsDataset dt, size_t row);
 
 #endif

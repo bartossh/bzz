@@ -33,7 +33,7 @@ cmake --build .
 
 Finally:
 
-Copy `libraylib.a`, `raudio.h`. `raylib.h`, `raymath.h`, `rlgl.h` to `./lib/` folder in this repo root.
+Copy `libraylib.a`, `raudio.h`, `raylib.h`, `raymath.h`, `rlgl.h` to `./lib/` folder in this repo root.
 
 
 ### Raylib - Web Assembly compilation with emscripten

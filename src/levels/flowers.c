@@ -6,7 +6,7 @@
 #include "levels.h"
 #include "../nn/nn.h"
 
-#define CalcFlowersDatasetRows(set, cols) sizeof(set) / (sizeof(set[0])*cols)
+#define CalcLevelsDatasetRows(set, cols) sizeof(set) / (sizeof(set[0])*cols)
 
 static float flowersRGBNormalizer(int v) { return (float)((float)(v-FlowerRGBMin)/(float)FlowerRGBMax);}
 static float flowersSizeNormalizer(int v) { return (float)((float)(v-FlowerSizeMin)/(float)FlowerSizeMax);}
@@ -14,7 +14,7 @@ static float flowersPetalsNormalizer(int v) { return (float)((float)(v-FlowerPet
 static float flowersLocationNormalizer(int v) { return (float)((float)(v-FlowerLocationMin)/(float)FlowerLocationMax);}
 static float flowersToxicityNormalizer(int v) { return (float)((float)v/(float)FlowerToxicityMax);}
 
-const size_t flowersDatasetToxicityBasic_cols =  6; // number of parameters per flower
+const size_t levelsDatasetToxicityBasic_cols =  6; // number of parameters per flower
 
 const ValueNormalizer value_normalizer_basic[6] = {
     &flowersRGBNormalizer, 
@@ -25,7 +25,7 @@ const ValueNormalizer value_normalizer_basic[6] = {
     &flowersToxicityNormalizer
 };
 
-/// flowersDatasetToxicityBasic_5_10 represent dataset describing flower toxicity based on parameters [R, G, B, S, P, T].
+/// levelsDatasetToxicityBasic_5_10 represent dataset describing flower toxicity based on parameters [R, G, B, S, P, T].
 ///
 /// - R is red color saturation,
 /// - G is a green color saturation,
@@ -33,7 +33,7 @@ const ValueNormalizer value_normalizer_basic[6] = {
 /// - S is a size of a flower,
 /// - P is a number of petals,
 /// - T is a toxicity level.
-const int flowersDatasetToxicityBasic_5_10[60] = {
+const int levelsDatasetToxicityBasic_5_10[60] = {
     255, 255, 255, 10,  8, 0,
     255,   0, 255, 20, 13, 0,
       0, 255, 255, 20, 21, 0,
@@ -46,7 +46,7 @@ const int flowersDatasetToxicityBasic_5_10[60] = {
     102,   0, 102, 20, 34, 3,
 };
 
-/// flowersDatasetToxicityBasic_5_20 represent dataset describing flower toxicity based on parameters [R, G, B, S, P, T].
+/// levelsDatasetToxicityBasic_5_20 represent dataset describing flower toxicity based on parameters [R, G, B, S, P, T].
 ///
 /// - R is red color saturation,
 /// - G is a green color saturation,
@@ -54,7 +54,7 @@ const int flowersDatasetToxicityBasic_5_10[60] = {
 /// - S is a size of a flower,
 /// - P is a number of petals,
 /// - T is a toxicity level.
-const int flowersDatasetToxicityBasic_5_20[120] = {
+const int levelsDatasetToxicityBasic_5_20[120] = {
     255, 255, 255, 10,  8, 0,
     255,   0, 255, 20, 13, 0,
       0, 255, 255, 20, 21, 0,
@@ -77,7 +77,7 @@ const int flowersDatasetToxicityBasic_5_20[120] = {
     102,   0, 102, 20, 89, 3,
 };
 
-///  flowersDatasetToxicityBasic_5_30 represent dataset describing flower toxicity based on parameters [R, G, B, S, P, T].
+///  levelsDatasetToxicityBasic_5_30 represent dataset describing flower toxicity based on parameters [R, G, B, S, P, T].
 ///
 /// - R is red color saturation,
 /// - G is a green color saturation,
@@ -85,7 +85,7 @@ const int flowersDatasetToxicityBasic_5_20[120] = {
 /// - S is a size of a flower,
 /// - P is a number of petals,
 /// - T is a toxicity level.
-const int flowersDatasetToxicityBasic_5_30[180] = {
+const int levelsDatasetToxicityBasic_5_30[180] = {
     255, 255, 255, 10,  8, 0,
     255,   0, 255, 20, 13, 0,
       0, 255, 255, 20, 21, 0,
@@ -118,7 +118,7 @@ const int flowersDatasetToxicityBasic_5_30[180] = {
     102,   0, 102, 55, 89, 4,
 };
 
-const size_t flowersDatasetToxicityLocation_cols =  7; // number of parameters per flower
+const size_t levelsDatasetToxicityLocation_cols =  7; // number of parameters per flower
 
 const ValueNormalizer value_normalizer_location[7] = {
     &flowersRGBNormalizer, 
@@ -130,7 +130,7 @@ const ValueNormalizer value_normalizer_location[7] = {
     &flowersToxicityNormalizer
 };
 
-/// flowersDatasetToxicityBasic_6_30 represent dataset describing flower toxicity based on parameters [R, G, B, S, P, L, T].
+/// levelsDatasetToxicityBasic_6_30 represent dataset describing flower toxicity based on parameters [R, G, B, S, P, L, T].
 ///
 /// - R is red color saturation,
 /// - G is a green color saturation,
@@ -139,7 +139,7 @@ const ValueNormalizer value_normalizer_location[7] = {
 /// - P is a number of petals,
 /// - L is a location indicator,
 /// - T is a toxicity level.
-const int flowersDatasetToxicityLocation_6_60[420] = {
+const int levelsDatasetToxicityLocation_6_60[420] = {
     255, 255, 255, 10,  8, 1, 0,
     255,   0, 255, 20, 13, 1, 0,
       0, 255, 255, 20, 21, 1, 0,
@@ -202,7 +202,7 @@ const int flowersDatasetToxicityLocation_6_60[420] = {
     102,   0, 102, 55, 89, 2, 4,
 };
 
-FlowersDataset flowersDatasetNew(FlowersDatasetOption o)
+LevelsDataset levelsDatasetNew(LevelsDatasetOption o)
 {
     int *dataset;
     ValueNormalizer *f;
@@ -210,39 +210,39 @@ FlowersDataset flowersDatasetNew(FlowersDatasetOption o)
     size_t rows = 0;
     switch (o) {
     case Basic_5_10:
-        dataset = (int *)flowersDatasetToxicityBasic_5_10;
+        dataset = (int *)levelsDatasetToxicityBasic_5_10;
         f = (ValueNormalizer *)value_normalizer_basic;
-        cols = flowersDatasetToxicityBasic_cols;
-        rows = CalcFlowersDatasetRows(flowersDatasetToxicityBasic_5_10, cols);
+        cols = levelsDatasetToxicityBasic_cols;
+        rows = CalcLevelsDatasetRows(levelsDatasetToxicityBasic_5_10, cols);
         break;
     case Basic_5_20:
-        dataset = (int *)flowersDatasetToxicityBasic_5_20;
+        dataset = (int *)levelsDatasetToxicityBasic_5_20;
         f = (ValueNormalizer *)value_normalizer_basic;
-        cols = flowersDatasetToxicityBasic_cols;
-        rows = CalcFlowersDatasetRows(flowersDatasetToxicityBasic_5_20, cols);
+        cols = levelsDatasetToxicityBasic_cols;
+        rows = CalcLevelsDatasetRows(levelsDatasetToxicityBasic_5_20, cols);
         break;
     case Basic_5_30:
-        dataset = (int *)flowersDatasetToxicityBasic_5_30;
+        dataset = (int *)levelsDatasetToxicityBasic_5_30;
         f = (ValueNormalizer *)value_normalizer_basic;
-        cols = flowersDatasetToxicityBasic_cols;
-        rows = CalcFlowersDatasetRows(flowersDatasetToxicityBasic_5_30, cols);
+        cols = levelsDatasetToxicityBasic_cols;
+        rows = CalcLevelsDatasetRows(levelsDatasetToxicityBasic_5_30, cols);
         break;
     case Location_6_60:
-        dataset = (int *)flowersDatasetToxicityLocation_6_60;
+        dataset = (int *)levelsDatasetToxicityLocation_6_60;
         f = (ValueNormalizer *)value_normalizer_location;
-        cols = flowersDatasetToxicityLocation_cols;
-        rows = CalcFlowersDatasetRows(flowersDatasetToxicityLocation_6_60, cols);
+        cols = levelsDatasetToxicityLocation_cols;
+        rows = CalcLevelsDatasetRows(levelsDatasetToxicityLocation_6_60, cols);
         break;
 
     default:
-        dataset = (int *)flowersDatasetToxicityBasic_5_10;
+        dataset = (int *)levelsDatasetToxicityBasic_5_10;
         f = (ValueNormalizer *)value_normalizer_basic;
-        cols = flowersDatasetToxicityBasic_cols;
-        rows = CalcFlowersDatasetRows(flowersDatasetToxicityBasic_5_10, cols);
+        cols = levelsDatasetToxicityBasic_cols;
+        rows = CalcLevelsDatasetRows(levelsDatasetToxicityBasic_5_10, cols);
     }
 
     size_t len = rows*cols;
-    FlowersDataset dt = {
+    LevelsDataset dt = {
         .rows = rows,
         .cols = cols,
         .ptr = NNMalloc(sizeof(dataset[0])*len),
@@ -260,7 +260,15 @@ FlowersDataset flowersDatasetNew(FlowersDatasetOption o)
     return dt;
 }
 
-void flowersDatasetFree(FlowersDataset *dt)
+size_t levelsGetFlowersCount(LevelsDataset *dt)
+{
+    if (!dt) {
+        return 0;
+    }
+    return dt->rows;
+}
+
+void levelsDatasetFree(LevelsDataset *dt)
 {
     if (!dt) {
         return;
@@ -273,7 +281,7 @@ void flowersDatasetFree(FlowersDataset *dt)
     dt->cols = 0;
 }
 
-Mat flowersToMat(FlowersDataset dt)
+Mat flowersToMat(LevelsDataset dt)
 {
     Mat m = matAlloc(NULL, dt.rows, dt.cols);
     for (size_t row = 0; row < dt.rows; ++row) {
@@ -284,7 +292,7 @@ Mat flowersToMat(FlowersDataset dt)
     return m;
 }
 
-size_t printToBuffAtRow(FlowersDataset dt, size_t next, char *buff, size_t len)
+size_t printToBuffAtRow(LevelsDataset dt, size_t next, char *buff, size_t len)
 {
     if (next >= dt.rows) {
         return 0;
@@ -317,7 +325,7 @@ size_t printToBuffAtRow(FlowersDataset dt, size_t next, char *buff, size_t len)
     return move;
 }
 
-float getExpectedValueAtRowNorm(FlowersDataset dt, size_t row)
+float getExpectedValueAtRowNorm(LevelsDataset dt, size_t row)
 {
     if (row >= dt.rows) {
         return 0.0f;

@@ -12,17 +12,19 @@ inline static bool vector2Equals(Vector2 a, Vector2 b)
     return a.x == b.x && a.y == b.y;
 }
 
-inline static void nextPosition(BzzAnimated *b, Vector2 next)
+inline static void nextPosition(BzzAnimated *b, float w, float h, float padding)
 {
     if (vector2Equals(b->pos, b->target) && b->pause_time) {
         b->pause_time--;
         return;
     } else if (vector2Equals(b->pos, b->target)) {
         float speed = randInRange(1.0f, 3.0f);
+        float x = randInRange(padding, w-padding);
+        float y = randInRange(padding, h-padding);
         b->speed = speed;
         b->pause_time = PAUSE_TIME; 
-        b->target.x = next.x;
-        b->target.y = next.y;
+        b->target.x = x;
+        b->target.y = y;
     }
 
     b->pos = Vector2MoveTowards(b->pos, b->target, b->speed);
@@ -31,7 +33,7 @@ inline static void nextPosition(BzzAnimated *b, Vector2 next)
 inline static void calcDirection(BzzAnimated *b)
 {
     if (vector2Equals(b->pos, b->target) && b->pause_time) { 
-       b->dir += randInRange(-5.0f, 5.0f);
+       b->dir += randInRange(-10.0f, 10.0f);
        return ;
     }
     b->dir = Vector2Angle(b->pos, b->target);
@@ -44,6 +46,7 @@ inline static float calcResize(BzzAnimated *b)
     }
     return 1.0f;
 }
+
 
 BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, AnimationLayout l)
 {
@@ -63,7 +66,7 @@ BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, Animat
     return a;
 }
 
-void bzzRenderAnimated(BzzAnimated *b, Vector2 next)
+void bzzRenderAnimated(BzzAnimated *b, float w, float h, float padding)
 {
     if (!b) {
         exit(1);
@@ -73,7 +76,7 @@ void bzzRenderAnimated(BzzAnimated *b, Vector2 next)
         b->frame = 0;
     }
 
-    nextPosition(b, next);
+    nextPosition(b, w, h, padding);
     calcDirection(b);
     float resize = calcResize(b); 
     float rot = 0.0f;

@@ -211,8 +211,10 @@ BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, Animat
 /// bzzRenderAnimated renders moveable object.
 ///
 /// b - BzzAnimated animated object.
-/// next - next possition.
-void bzzRenderAnimated(BzzAnimated *b, Vector2 next);
+/// w - screen width.
+/// h - screen height.
+/// padding - padding.
+void bzzRenderAnimated(BzzAnimated *b, float w, float h, float padding);
 
 /// bzzCheckCollision - checks collision between BzzAnimated object and rectangle.
 /// Returns 1 if collision or 0 otherwise.
@@ -318,7 +320,6 @@ typedef struct {
     bool            reset;
     bool            modified;
     Region          temp;
-    FlowersDataset  fl;
     Mat             t;
     NN              nn;
     BzzPlot         plot;
@@ -329,7 +330,9 @@ typedef struct {
     BzzButton       map_button;
     BzzButton       bee_button;
     BzzSwarm        *swarm;
+    LevelsDataset   fl;
     BzzStationaries *stationaries;
+    int             *discovered;
     Font            font;
 } BzzBeeGame;
 
@@ -347,7 +350,7 @@ typedef struct {
 /// inner_layers - architecture of inner layers.
 BzzBeeGame bzzBzzBeeGameNew(
     Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, BzzStationaries *stationaries, FlowersDataset fl,
+    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, BzzStationaries *stationaries, LevelsDataset fl,
     int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
 );
 
@@ -380,6 +383,9 @@ bool isModified(BzzBeeGame *bee);
 ///
 /// bee - BzzBeeGame holding bee functionality parameters.
 // screen - screen value representing screen to render.
-void renderMapView(BzzBeeGame *bee, ScreenView *screen);
+// w - screen width with.
+// h - screen width with.
+// padding - padding.
+void renderMapView(BzzBeeGame *bee, ScreenView *screen, float w, float h, float padding);
 
 #endif
