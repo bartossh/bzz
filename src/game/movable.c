@@ -12,19 +12,19 @@ inline static bool vector2Equals(Vector2 a, Vector2 b)
     return a.x == b.x && a.y == b.y;
 }
 
-inline static void nextPosition(BzzAnimated *b, float w, float h, float padding)
+inline static void nextPosition(BzzAnimated *b, BzzStationaries *s)
 {
     if (vector2Equals(b->pos, b->target) && b->pause_time) {
         b->pause_time--;
         return;
     } else if (vector2Equals(b->pos, b->target)) {
-        float speed = randInRange(1.0f, 3.0f);
-        float x = randInRange(padding, w-padding);
-        float y = randInRange(padding, h-padding);
-        b->speed = speed;
-        b->pause_time = PAUSE_TIME; 
-        b->target.x = x;
-        b->target.y = y;
+        int s_size = bzzStationariesGetSize(s);
+        float speed = randInRange(0.5f, 2.0f);
+        int idx = (int)randInRange(0.0f, (float)s_size);
+        BzzStationary* fl = bzzStationariesAt(s, idx);
+        b->target = bzzGetCenterStationary(fl);
+        b->speed = speed; 
+        b->pause_time = PAUSE_TIME;
     }
 
     b->pos = Vector2MoveTowards(b->pos, b->target, b->speed);
@@ -66,7 +66,7 @@ BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, Animat
     return a;
 }
 
-void bzzRenderAnimated(BzzAnimated *b, float w, float h, float padding)
+void bzzRenderAnimated(BzzAnimated *b, BzzStationaries *s)
 {
     if (!b) {
         exit(1);
@@ -76,7 +76,7 @@ void bzzRenderAnimated(BzzAnimated *b, float w, float h, float padding)
         b->frame = 0;
     }
 
-    nextPosition(b, w, h, padding);
+    nextPosition(b, s);
     calcDirection(b);
     float resize = calcResize(b); 
     float rot = 0.0f;

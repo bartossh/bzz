@@ -48,13 +48,17 @@ inline static void prepareLevelStationaries(BzzStationaries *stationaries, Level
     }
 }
 
-inline static void prepareLevelBees(BzzSwarm *swarm, int starting_number_of_bees, float w, float h)
+inline static void prepareLevelBees(BzzSwarm *swarm, int starting_number_of_bees, BzzStationaries *s, float w, float h)
 {
+    int s_size = bzzStationariesGetSize(s);
     for (int i = 0; i < starting_number_of_bees; i++) {
+        int idx = (int)randInRange(0.0f, (float)s_size);
+        BzzStationary* fl = bzzStationariesAt(s, idx);
+        Vector2 target = bzzGetCenterStationary(fl);
         BzzAnimated bee_movable = bzzAnimatedNewBee(
             bee_object,
             CLITERAL(Vector2){.x = w/2, .y = h/2},
-            CLITERAL(Vector2){.x = randInRange(padding, w-padding), .y = randInRange(padding, h-padding)},
+            target,
             TopDown
         );
         bzzSwarmAppend(swarm, bee_movable);
@@ -66,7 +70,7 @@ int main(void)
     srand(time(NULL));
 
     paused = true;
-    int starting_number_of_bees = 10;
+    int starting_number_of_bees = 5;
     int inner_layers_count = 1;
     int inner_layers[MAX_INNER_LAYERS] = {5};
     
@@ -77,6 +81,7 @@ int main(void)
     InitWindow(WindowWidth, WindowHeight, "BZZ!");
     int w = GetScreenWidth();
     int h = GetScreenHeight();
+    BzzBoundingBox boundary = { .x_min = 0.0f, .y_min = 0.0f, .x_max = w, .y_max = h}; 
     
     fl = levelsDatasetNew(Basic_5_10);
     
@@ -95,12 +100,12 @@ int main(void)
     prepareLevelStationaries(&stationaries, &fl, w, h);
     
     swarm = bzzSwarmNew();
-    prepareLevelBees(&swarm, starting_number_of_bees, w, h);
+    prepareLevelBees(&swarm, starting_number_of_bees, &stationaries, w, h);
     
     m = viewMenuNew(font, logo_button);
     bee = bzzBzzBeeGameNew(
         font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-        &swarm, &stationaries, fl, inner_layers_count, inner_layers
+        &swarm, &stationaries, fl, inner_layers_count, inner_layers, boundary
     );
     
     SetTargetFPS(60);
@@ -138,16 +143,17 @@ void UpdateDrawFrame(float w, float h)
         renderMenuView(m, &screen);
         break;
     case BeeMapScreen:
-        renderMapView(&bee, &screen, w, h, padding);
+        renderMapView(&bee, &screen, w);
         break;
     case BeeTrainScreen:
     default: 
         if (bee.paused && isModified(&bee)) {
             Font font = bee.font;
             bzzBzzBeeGameClenup(&bee);
+            BzzBoundingBox boundary = { .x_min = 0.0f, .y_min = 0.0f, .x_max = w, .y_max = h}; 
             bee = bzzBzzBeeGameNew(
                 font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-                &swarm, &stationaries, fl, bee.inner_layers_count, bee.inner_layers
+                &swarm, &stationaries, fl, bee.inner_layers_count, bee.inner_layers, boundary
             );
         }
         renderBeeView(&bee, &screen);
