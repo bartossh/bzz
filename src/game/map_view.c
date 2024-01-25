@@ -5,11 +5,9 @@
 #include "raylib.h"
 #include "game.h"
 
-void renderMapView(BzzBeeGame *bp, ScreenView *screen)
+void renderMapView(BzzBeeGame *bp, ScreenView *screen, float w)
 {
-    int w = GetScreenWidth();
     BeginDrawing();
-
     ClearBackground(GRASS);
     
 
@@ -21,12 +19,11 @@ void renderMapView(BzzBeeGame *bp, ScreenView *screen)
 
     int swarm_size = bzzSwarmGetSize(bp->swarm); 
     for (int i = 0; i < swarm_size; i++) {
-        BzzStationary *s = bzzStationariesAt(bp->stationaries, (int)randInRange(0.0f, (float)stationaries_size));
         BzzAnimated *bee = bzzSwarmAt(bp->swarm, i);
-        bzzRenderAnimated(bee, bzzGetCenterStationary(s));
+        bzzRenderAnimated(bee, bp->stationaries);
     }
  
-    int pressed = bzzRenderButton(bp->bee_button, CLITERAL(Vector2){.x = w - 50 , .y = 20});
+    int pressed = bzzRenderButton(bp->bee_button, CLITERAL(Vector2){ .x = w - 50 , .y = 20 });
     if (pressed) {
        *screen = BeeTrainScreen;  
     }

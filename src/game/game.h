@@ -7,6 +7,7 @@
 #include "raylib.h"
 #include "../nn/nn.h"
 #include "../levels/levels.h"
+#include "../location_hash/location_hash.h"
 
 #ifndef OCEAN
 #define OCEAN CLITERAL(Color){ 0, 102, 102, 255 } // OCEAN
@@ -188,6 +189,39 @@ int bzzRenderStationary(BzzStationary *s);
 /// s - BzzStationary animated object.
 Vector2 bzzGetCenterStationary(BzzStationary *s);
 
+/// BzzSwarn represents swarm buffer. 
+typedef struct {
+    BzzStationary buffer[MAX_SWARN_SIZE];
+    int         st_size;
+} BzzStationaries;
+
+/// bzzStationariesNew creats a new BzzStationaries buffer.
+///
+BzzStationaries bzzStationariesNew(void);
+
+/// bzzStationariesAppend appends BzzStationary object to buffer.
+/// 
+/// s - BzzStationaries buffer.
+/// b - BzzStationary object to append to buffer.
+bool bzzStationariesAppend(BzzStationaries *s, BzzStationary b); 
+
+/// bzzStationariesGetSize returns size of the buffer;
+///
+/// s - BzzStationaries buffer.
+int bzzStationariesGetSize(BzzStationaries *s);
+
+/// bzzStationaryAt returns pointer to BzzStationaries object at given index or NULL otherwise.
+///
+/// s - BzzStationaries buffer.
+/// idx - index of the AssetTexture2D object in BzzStationaries.
+BzzStationary *bzzStationariesAt(BzzStationaries *s, int idx);
+
+/// bzzRemoveAt - removes object at index.
+///
+/// s - BzzStationaries buffer.
+/// idx - index of the BzzStationaries object in BzzStationaries.
+bool bzzStationatiesRemoveAt(BzzStationaries *s, int idx);
+
 /// BzzAnimated is an animated and movable object.
 typedef struct {
     BzzObject       obj;
@@ -211,8 +245,8 @@ BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, Animat
 /// bzzRenderAnimated renders moveable object.
 ///
 /// b - BzzAnimated animated object.
-/// next - next possition.
-void bzzRenderAnimated(BzzAnimated *b, Vector2 next);
+/// s - BzzStationaries buffer.
+void bzzRenderAnimated(BzzAnimated *b, BzzStationaries *s);
 
 /// bzzCheckCollision - checks collision between BzzAnimated object and rectangle.
 /// Returns 1 if collision or 0 otherwise.
@@ -272,65 +306,33 @@ BzzAnimated *bzzSwarmAt(BzzSwarm *s, int idx);
 /// idx - index of the BzzAnimated object in BzzSwarm.
 bool bzzSwarmRemoveAt(BzzSwarm *s, int idx);
 
-
-/// BzzSwarn represents swarm buffer. 
-typedef struct {
-    BzzStationary buffer[MAX_SWARN_SIZE];
-    int         st_size;
-} BzzStationaries;
-
-/// bzzStationariesNew creats a new BzzStationaries buffer.
-///
-BzzStationaries bzzStationariesNew(void);
-
-/// bzzStationariesAppend appends BzzStationary object to buffer.
-/// 
-/// s - BzzStationaries buffer.
-/// b - BzzStationary object to append to buffer.
-bool bzzStationariesAppend(BzzStationaries *s, BzzStationary b); 
-
-/// bzzStationariesGetSize returns size of the buffer;
-///
-/// s - BzzStationaries buffer.
-int bzzStationariesGetSize(BzzStationaries *s);
-
-/// bzzStationaryAt returns pointer to BzzStationaries object at given index or NULL otherwise.
-///
-/// s - BzzStationaries buffer.
-/// idx - index of the AssetTexture2D object in BzzStationaries.
-BzzStationary *bzzStationariesAt(BzzStationaries *s, int idx);
-
-/// bzzRemoveAt - removes object at index.
-///
-/// s - BzzStationaries buffer.
-/// idx - index of the BzzStationaries object in BzzStationaries.
-bool bzzStationatiesRemoveAt(BzzStationaries *s, int idx);
-
 /// PageNN holds all the data required to properly update the nn page view.
 typedef struct {
-    size_t          max_epoch;
-    size_t          epochs_per_frame;
-    size_t          epoch;
-    float           rate;
-    int             inner_layers_count;
-    int             inner_layers[MAX_INNER_LAYERS];
-    bool            paused;
-    bool            reset;
-    bool            modified;
-    Region          temp;
-    FlowersDataset  fl;
-    Mat             t;
-    NN              nn;
-    BzzPlot         plot;
-    BzzButton       minus_button;
-    BzzButton       plus_button;
-    BzzButton       learn_button;
-    BzzButton       update_button;
-    BzzButton       map_button;
-    BzzButton       bee_button;
-    BzzSwarm        *swarm;
-    BzzStationaries *stationaries;
-    Font            font;
+    size_t            max_epoch;
+    size_t            epochs_per_frame;
+    size_t            epoch;
+    float             rate;
+    int               inner_layers_count;
+    int               inner_layers[MAX_INNER_LAYERS];
+    bool              paused;
+    bool              reset;
+    bool              modified;
+    Region            temp;
+    Mat               t;
+    NN                nn;
+    BzzPlot           plot;
+    BzzButton         minus_button;
+    BzzButton         plus_button;
+    BzzButton         learn_button;
+    BzzButton         update_button;
+    BzzButton         map_button;
+    BzzButton         bee_button;
+    BzzSwarm*         swarm;
+    LevelsDataset     fl;
+    BzzStationaries*  stationaries;
+    BzzQuadTreeNode*  stat_quad_tree;
+    int*              discovered;
+    Font              font;
 } BzzBeeGame;
 
 /// bzzBzzBeeGameNew return new BzzBeeGame.
@@ -347,8 +349,8 @@ typedef struct {
 /// inner_layers - architecture of inner layers.
 BzzBeeGame bzzBzzBeeGameNew(
     Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, BzzStationaries *stationaries, FlowersDataset fl,
-    int inner_layers_count, int inner_layers[MAX_INNER_LAYERS]
+    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, BzzStationaries *stationaries, LevelsDataset fl,
+    int inner_layers_count, int inner_layers[MAX_INNER_LAYERS], BzzBoundingBox boundary
 );
 
 /// viewBeeRandomize - randomizes BzzBeeGame.
@@ -380,6 +382,7 @@ bool isModified(BzzBeeGame *bee);
 ///
 /// bee - BzzBeeGame holding bee functionality parameters.
 // screen - screen value representing screen to render.
-void renderMapView(BzzBeeGame *bee, ScreenView *screen);
+// w - screen width with.
+void renderMapView(BzzBeeGame *bp, ScreenView *screen, float w);
 
 #endif

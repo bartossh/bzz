@@ -11,6 +11,7 @@ CFLAGS += -pedantic
 CFLAGS += -Werror
 CFLAGS += -Wmissing-declarations
 CFLAGS += -DUNITY_SUPPORT_64 -DUNITY_OUTPUT_COLOR
+# CFLAGS += -O3 // uncomment for optimisation 
 
 ASANFLAGS  = -fsanitize=address
 ASANFLAGS += -fno-common
@@ -25,12 +26,14 @@ CFILES += src/assets/*.c
 CFILES += src/nn/*.c
 CFILES += src/levels/*.c
 CFILES += src/game/*.c
+CFILES += src/location_hash/*.c
 
 TFILES = src/nn/*.c
 TFILES += src/levels/*.c
 TFILES += src/assets/*.c
 TFILES += src/game/*.c
 TFILES += src/tests.c
+TFILES += src/location_hash/*.c
 
 EMCC = emcc
 EMCC_OUT = -o web_build/game.html  

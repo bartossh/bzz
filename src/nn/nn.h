@@ -113,9 +113,6 @@ typedef struct {
     size_t  arch_count;
     Mat     *ws; // The amount of activations is arch_count-1
     Row     *bs; // The amount of activations is arch_count-1
-
-    // TODO: maybe remove these? It would be better to allocate them in a
-    // temporary region during the actual forwarding
     Row     *as;
 } NN;
 
