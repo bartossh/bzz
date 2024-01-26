@@ -16,12 +16,15 @@ inline static void nextPosition(BzzAnimated *b, BzzStationaries *s)
 {
     if (vector2Equals(b->pos, b->target) && b->pause_time) {
         b->pause_time--;
+        if (b->pause_time == PAUSE_TIME) {
+            b->is_new_trg = true;
+        }
         return;
     } else if (vector2Equals(b->pos, b->target)) {
         int s_size = bzzStationariesGetSize(s);
-        float speed = randInRange(0.5f, 2.0f);
-        int idx = (int)randInRange(0.0f, (float)s_size);
-        BzzStationary* fl = bzzStationariesAt(s, idx);
+        float speed = randInRange(1.5f, 2.0f);
+        b->trg_idx = (int)randInRange(0.0f, (float)s_size);
+        BzzStationary* fl = bzzStationariesAt(s, b->trg_idx);
         b->target = bzzGetCenterStationary(fl);
         b->speed = speed; 
         b->pause_time = PAUSE_TIME;
@@ -47,16 +50,17 @@ inline static float calcResize(BzzAnimated *b)
     return 1.0f;
 }
 
-
-BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, AnimationLayout l)
+BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, int idx, AnimationLayout l)
 {
     float speed = randInRange(1.0f, 3.0f);
     BzzAnimated a = {
         .obj = obj,
         .layout = l,
+        .is_new_trg = false,
         .frame = 0,
         .total_frames = 4,
         .pause_time = PAUSE_TIME,
+        .trg_idx = idx,
         .speed = speed,
         .dir = 0.0f,
         .pos = start,
@@ -64,6 +68,21 @@ BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, Animat
     };
 
     return a;
+}
+
+bool bzzIsNewTargetAnimated(BzzAnimated* b)
+{
+    if (!b) {
+        return false;
+    }
+    bool result = b->is_new_trg;
+    b->is_new_trg = false;
+    return result;
+}
+
+int bzzGetTargetIndexAnimated(BzzAnimated* b)
+{
+    return b->trg_idx;
 }
 
 void bzzRenderAnimated(BzzAnimated *b, BzzStationaries *s)

@@ -226,9 +226,11 @@ bool bzzStationatiesRemoveAt(BzzStationaries *s, int idx);
 typedef struct {
     BzzObject       obj;
     AnimationLayout layout;
+    bool            is_new_trg;
     int             frame;
     int             total_frames;
     int             pause_time;
+    int             trg_idx;
     float           speed;
     float           dir;
     Vector2         pos;
@@ -239,8 +241,21 @@ typedef struct {
 /// bzzAnimatedNewBee creates new movable bee object.
 /// 
 /// start - starting position at which bee will be drawn.
-/// color - blend color. 
-BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, AnimationLayout l);
+/// start - starting position.
+/// next - next target position.
+/// idx - next target index.
+/// l - animation layout enum AnimationLayout.
+BzzAnimated bzzAnimatedNewBee(BzzObject obj, Vector2 start, Vector2 next, int idx, AnimationLayout l);
+
+/// bzzIsNewTargetAnimated returns true if BzzAnimated has a new target or false otherwise.
+///
+/// b - pointer to BzzAnimated.
+bool bzzIsNewTargetAnimated(BzzAnimated* b);
+
+/// bzzGetTargetIndexAnimated returns index of the target animated.
+///
+/// b - pointer to BzzAnimated.
+int bzzGetTargetIndexAnimated(BzzAnimated* b);
 
 /// bzzRenderAnimated renders moveable object.
 ///
@@ -330,7 +345,6 @@ typedef struct {
     BzzSwarm*         swarm;
     LevelsDataset     fl;
     BzzStationaries*  stationaries;
-    BzzQuadTreeNode*  stat_quad_tree;
     int*              discovered;
     Font              font;
 } BzzBeeGame;
@@ -349,9 +363,8 @@ typedef struct {
 /// inner_layers - architecture of inner layers.
 BzzBeeGame bzzBzzBeeGameNew(
     Font font, BzzButton minus_button, BzzButton plus_button, BzzButton learn_button, BzzButton update_button,
-    BzzButton map_button, BzzButton bee_button, BzzSwarm *swarm, BzzStationaries *stationaries, LevelsDataset fl,
-    int inner_layers_count, int inner_layers[MAX_INNER_LAYERS], BzzBoundingBox boundary
-);
+    BzzButton map_button, BzzButton bee_button, BzzSwarm* swarm, BzzStationaries* stationaries, LevelsDataset fl,
+    int inner_layers_count, int inner_layers[MAX_INNER_LAYERS], int* discovered);
 
 /// viewBeeRandomize - randomizes BzzBeeGame.
 ///
@@ -368,6 +381,12 @@ void renderBeeView(BzzBeeGame *bee, ScreenView *screen);
 ///
 /// bee -BzzBeeGame to be freed from memory.
 void bzzBzzBeeGameClenup(BzzBeeGame *bee);
+
+/// bzzBzzBeeGameUpdateDiscovered updates discovered flowers count.
+///
+/// bzz_game - ponter to BzzBeeGame.
+/// idx - index of flower in discovered buffer.
+void bzzBzzBeeGameUpdateDiscovered(BzzBeeGame* bzz_game, int idx);
 
 /// bzzRenderNN renders NN from BzzBeeGame with controls.
 ///

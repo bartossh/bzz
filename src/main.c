@@ -13,7 +13,7 @@
     #include <emscripten/emscripten.h>
 #endif
 
-void UpdateDrawFrame(float w, float h);
+void UpdateDrawFrame(int* discovered, float w);
 
 bool paused;
 ScreenView screen = MainMenuScreen;
@@ -59,6 +59,7 @@ inline static void prepareLevelBees(BzzSwarm *swarm, int starting_number_of_bees
             bee_object,
             CLITERAL(Vector2){.x = w/2, .y = h/2},
             target,
+            idx,
             TopDown
         );
         bzzSwarmAppend(swarm, bee_movable);
@@ -81,9 +82,9 @@ int main(void)
     InitWindow(WindowWidth, WindowHeight, "BZZ!");
     int w = GetScreenWidth();
     int h = GetScreenHeight();
-    BzzBoundingBox boundary = { .x_min = 0.0f, .y_min = 0.0f, .x_max = w, .y_max = h}; 
     
     fl = levelsDatasetNew(Basic_5_10);
+    int *discovered = NNMalloc(sizeof(int)*levelsGetFlowersCount(&fl));
     
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     
@@ -95,7 +96,7 @@ int main(void)
     update_button = bzzButtonNewUpdate(0.09f, ORANGE);
     logo_button = bzzButtonNewLogo(1.0f, ORANGE);
     bee_object = bzzObjectNewBee(ORANGE);
-    
+     
     stationaries = bzzStationariesNew();
     prepareLevelStationaries(&stationaries, &fl, w, h);
     
@@ -105,7 +106,7 @@ int main(void)
     m = viewMenuNew(font, logo_button);
     bee = bzzBzzBeeGameNew(
         font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-        &swarm, &stationaries, fl, inner_layers_count, inner_layers, boundary
+        &swarm, &stationaries, fl, inner_layers_count, inner_layers, discovered 
     );
     
     SetTargetFPS(60);
@@ -117,7 +118,7 @@ int main(void)
 #else
 
     while (!WindowShouldClose()) {  
-        UpdateDrawFrame(w, h);
+        UpdateDrawFrame(discovered, w);
     }
 #endif
 
@@ -136,7 +137,7 @@ int main(void)
     return 0;
 }
 
-void UpdateDrawFrame(float w, float h)
+void UpdateDrawFrame(int* discovered, float w)
 {   
     switch (screen) {
     case MainMenuScreen:
@@ -150,10 +151,9 @@ void UpdateDrawFrame(float w, float h)
         if (bee.paused && isModified(&bee)) {
             Font font = bee.font;
             bzzBzzBeeGameClenup(&bee);
-            BzzBoundingBox boundary = { .x_min = 0.0f, .y_min = 0.0f, .x_max = w, .y_max = h}; 
             bee = bzzBzzBeeGameNew(
                 font, minus_button, plus_button, learn_button, update_button, map_button, bee_button, 
-                &swarm, &stationaries, fl, bee.inner_layers_count, bee.inner_layers, boundary
+                &swarm, &stationaries, fl, bee.inner_layers_count, bee.inner_layers, discovered 
             );
         }
         renderBeeView(&bee, &screen);

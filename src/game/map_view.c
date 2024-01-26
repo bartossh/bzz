@@ -21,6 +21,9 @@ void renderMapView(BzzBeeGame *bp, ScreenView *screen, float w)
     for (int i = 0; i < swarm_size; i++) {
         BzzAnimated *bee = bzzSwarmAt(bp->swarm, i);
         bzzRenderAnimated(bee, bp->stationaries);
+        if (bzzIsNewTargetAnimated(bee)) {
+            bzzBzzBeeGameUpdateDiscovered(bp, bzzGetTargetIndexAnimated(bee));
+        }
     }
  
     int pressed = bzzRenderButton(bp->bee_button, CLITERAL(Vector2){ .x = w - 50 , .y = 20 });
