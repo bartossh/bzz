@@ -117,7 +117,7 @@ typedef struct {
 } NN;
 
 #define NNInput(nn) (NNAssert((nn).arch_count > 0), (nn).as[0])
-#define NNOutout(nn) (NNAssert((nn).arch_count > 0), (nn).as[(nn).arch_count-1])
+#define NNOutput(nn) (NNAssert((nn).arch_count > 0), (nn).as[(nn).arch_count-1])
 
 NN nnAlloc(Region *r, size_t *arch, size_t arch_count);
 void nnFree(NN *n);

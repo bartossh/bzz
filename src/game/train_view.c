@@ -261,14 +261,14 @@ void bzzSliderVertical(float *value, bool *slider_dragging, float rx, float ry, 
 void bzzNNImageGrayscale(NN nn, void *pixels, size_t width, size_t height, size_t stride, float low, float high) 
 {
     bzzAssert(NNInput(nn).cols >= 2);
-    bzzAssert(NNOutout(nn).cols >= 1);
+    bzzAssert(NNOutput(nn).cols >= 1);
     uint32_t *pixels_u32 = pixels;
     for (size_t y = 0; y < height; ++y) {
             for (size_t x = 0; x < width; ++x) {
             RowAt(NNInput(nn), 0) = (float)x / (float)(width - 1);
             RowAt(NNInput(nn), 1) = (float)y / (float)(height - 1);
             nnForward(nn);
-            float a = RowAt(NNOutout(nn), 0);
+            float a = RowAt(NNOutput(nn), 0);
             if (a < low)
                 a = low;
             if (a > high)
@@ -397,7 +397,7 @@ static void viewBeeLearn(BzzBeeGame *bee, BzzRect r, float *slider_position, boo
         nnForward(bee->nn);
         size_t move = printToBuffAtRow(bee->fl, i, inner_buff, 256);
         float expected = getExpectedValueAtRowNorm(bee->fl, i);
-        float value = RowAt(NNOutout(bee->nn), 0);
+        float value = RowAt(NNOutput(bee->nn), 0);
         float diff = absf(expected - value);
         snprintf(inner_buff + move, 28, " = [%.3f] %.3f\n", value, diff);
         size_t inner_buf_len = strlen(inner_buff);

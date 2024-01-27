@@ -255,20 +255,20 @@ void nnForward(NN nn)
 }
 
 float nnCost(NN nn, Mat t) {
-    NNAssert(NNInput(nn).cols + NNOutout(nn).cols == t.cols);
+    NNAssert(NNInput(nn).cols + NNOutput(nn).cols == t.cols);
     size_t n = t.rows;
 
     float c = 0;
     for (size_t i = 0; i < n; ++i) {
         Row row = matRow(t, i);
         Row x = rowSlice(row, 0, NNInput(nn).cols);
-        Row y = rowSlice(row, NNInput(nn).cols, NNOutout(nn).cols);
+        Row y = rowSlice(row, NNInput(nn).cols, NNOutput(nn).cols);
 
         RowCopy(NNInput(nn), x);
         nnForward(nn);
         size_t q = y.cols;
         for (size_t j = 0; j < q; ++j) {
-            float d = RowAt(NNOutout(nn), j) - RowAt(y, j);
+            float d = RowAt(NNOutput(nn), j) - RowAt(y, j);
             c += d * d;
         }
     }
@@ -279,7 +279,7 @@ float nnCost(NN nn, Mat t) {
 NN nnBackprop(Region *r, NN nn, Mat t)
 {
     size_t n = t.rows;
-    NNAssert(NNInput(nn).cols + NNOutout(nn).cols == t.cols);
+    NNAssert(NNInput(nn).cols + NNOutput(nn).cols == t.cols);
 
     NN g = nnAlloc(r, nn.arch, nn.arch_count);
     nnZero(g);
@@ -292,7 +292,7 @@ NN nnBackprop(Region *r, NN nn, Mat t)
     for (size_t i = 0; i < n; ++i) {
         Row row = matRow(t, i);
         Row in = rowSlice(row, 0, NNInput(nn).cols);
-        Row out = rowSlice(row, NNInput(nn).cols, NNOutout(nn).cols);
+        Row out = rowSlice(row, NNInput(nn).cols, NNOutput(nn).cols);
 
         RowCopy(NNInput(nn), in);
         nnForward(nn);
@@ -303,9 +303,9 @@ NN nnBackprop(Region *r, NN nn, Mat t)
 
         for (size_t j = 0; j < out.cols; ++j) {
 #ifdef NNBackpropTraditional
-            RowAt(NNOutout(g), j) = 2 * (RowAt(NNOutout(nn), j) - RowAt(out, j));
+            RowAt(NNOutput(g), j) = 2 * (RowAt(NNOutput(nn), j) - RowAt(out, j));
 #else
-            RowAt(NNOutout(g), j) = RowAt(NNOutout(nn), j) - RowAt(out, j);
+            RowAt(NNOutput(g), j) = RowAt(NNOutput(nn), j) - RowAt(out, j);
 #endif // NNBackpropTraditional
         }
 
