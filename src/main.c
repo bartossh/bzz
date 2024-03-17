@@ -13,7 +13,7 @@
     #include <emscripten/emscripten.h>
 #endif
 
-void UpdateDrawFrame(int* discovered, float w);
+void UpdateDrawFrame();
 
 bool paused;
 ScreenView screen = MainMenuScreen;
@@ -30,6 +30,8 @@ BzzButton logo_button;
 BzzObject bee_object; 
 BzzSwarm swarm;
 BzzStationaries stationaries;
+int w;
+int *discovered;
 
 const float padding = 50.0f;
 
@@ -71,7 +73,7 @@ int main(void)
     srand(time(NULL));
 
     paused = true;
-    int starting_number_of_bees = 5;
+    int starting_number_of_bees = 20;
     int inner_layers_count = 1;
     int inner_layers[MAX_INNER_LAYERS] = {5};
     
@@ -83,8 +85,8 @@ int main(void)
     int w = GetScreenWidth();
     int h = GetScreenHeight();
     
-    fl = levelsDatasetNew(Basic_5_10);
-    int *discovered = NNMalloc(sizeof(int)*levelsGetFlowersCount(&fl));
+    fl = levelsDatasetNew(Location_6_60);
+    discovered = NNMalloc(sizeof(int)*levelsGetFlowersCount(&fl));
     
     Font font = LoadFontEx("./fonts/Anonymous.ttf", 60, NULL, 0);
     
@@ -118,7 +120,7 @@ int main(void)
 #else
 
     while (!WindowShouldClose()) {  
-        UpdateDrawFrame(discovered, w);
+        UpdateDrawFrame();
     }
 #endif
 
@@ -137,7 +139,7 @@ int main(void)
     return 0;
 }
 
-void UpdateDrawFrame(int* discovered, float w)
+void UpdateDrawFrame()
 {   
     switch (screen) {
     case MainMenuScreen:

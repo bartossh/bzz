@@ -89,10 +89,6 @@ This software is still in the beginning of development stage. Keep your expectat
 - To check build `cd` in to `web_build` directory and run `python -m http.server 8080` go in your browser to [http://localhost:8080](http://localhost:8080)
 
 
-## Idea
-
-Roll your :game_die: for this repo becoming something of a value.
-
 ## Thanks and inspiration
 
  - Thanks to [rexim](https://github.com/rexim) for Tsoding/nn.h -> `https://github.com/tsoding/nn.h/blob/master/nn.h` an amazing Neural Network library and great streaming on how to code and hack things in `C`. I was truly inspired. I will blend this library in to my code simply because of the project requirements.
